@@ -15,7 +15,11 @@
 
 # 3\. Ubuntu 16.04 LTS Setup After
 
-- 설치 후 세팅을 위한 참고 블로그 <http://programmingsummaries.tistory.com/389>
+- 설치 후 세팅을 위한 참고 블로그
+
+  - http://programmingsummaries.tistory.com/389
+  - http://all-record.tistory.com/category/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C%2C%20%EC%84%9C%EB%B2%84/%EB%A6%AC%EB%88%85%EC%8A%A4
+  - http://jimnong.tistory.com/694?category=575588
 - 우분투 wiki : <https://wiki.ubuntu-kr.org/index.php/Getting_Started>
 
 # 4\. 개발환경 세팅
