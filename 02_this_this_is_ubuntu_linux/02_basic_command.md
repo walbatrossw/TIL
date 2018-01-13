@@ -39,21 +39,46 @@
 
 - Runlevel 변경해보기 : 그랙픽모드 -> 텍스트 모드
   ```
-  ls -l /lib/systemd/system/default.target
+  $ ls -l /lib/systemd/system/default.target
   ```
   ```
-  ln -sf /lib/systemd/system/multu-user.target /lib/systemd/system/default.target
+  $ ln -sf /lib/systemd/system/multu-user.target /lib/systemd/system/default.target
   ```
   ```
-  ls -l /lib/systemd/system/default.target
+  $ ls -l /lib/systemd/system/default.target
   ```
 
 ## 자동 완성, 히스토리, 디렉토리 이동
 - 파일명이나 디렉토리의 일부만 작성하고 `tab`키를 이용하여 자동완성할 수 있음.
 - 빠른입력뿐만아니라 정확한 타이핑이 가능하기 때문에 매우 유용
 - 이전에 작성한 명령키는 위아래 화살표키를 이용하여 다시 사용할수 있음.
-- `history`명령어를 입력하면 그동안 작성한 명령어들이 나온다.
-- `history -c` : 그동안 작성한 명령어를 삭제
-- `cd [해당 디렉토리 경로]` : 해당 디렉토리로 이동
-- `pwd` : 현재 디렉토리 경로를 알려줌
-- `cat [파일명]` : 해당 파일의 내용 출력
+- `$ history`명령어를 입력하면 그동안 작성한 명령어들이 나온다.
+- `$ history -c` : 그동안 작성한 명령어를 삭제
+- `$ cd [해당 디렉토리 경로]` : 해당 디렉토리로 이동
+- `$ pwd` : 현재 디렉토리 경로를 알려줌
+- `$ cat [파일명]` : 해당 파일의 내용 출력
+
+## 파일 목록보기
+- 파일 목록 명령어
+  ```
+  $ ls
+  ```
+- 파일 목록(숨긴파일) 명령어
+  ```
+  $ ls -a
+  ```
+- 목록 목록(숨긴파일, 자세히보기) 명령어
+  ```
+  $ ls -al
+  ```
+
+## 파일 삭제
+- 파일 삭제 명령어
+  ```
+  $ rm -f [해당디렉토리/파일명.확장자]
+  ```
+
+## 명령어 메뉴얼
+```
+$ man ls
+```
