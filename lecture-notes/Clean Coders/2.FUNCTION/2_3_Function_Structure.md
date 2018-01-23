@@ -169,23 +169,3 @@
   5. run with coverage
   6. remove unused code
   7. remove type code
-
-## 4. Temporal Coupling
-
-## 5. CQS
-
-## 6. Tell Don't Ask
-
-## 7. Law of Demeter
-
-## 8. early returns
-
-## 9. error handling
-
-## 10. Special Cases
-
-## 11. Null is not a error
-
-## 12. Null is a value
-
-## 13. try도 하나의 역할/기능이다.
