@@ -1,6 +1,6 @@
 # Clean Coders : Function Structure Part1
 
-## 1. Agrumenet
+## 1. Agrumenet(인자)
 - 인자가 많이지면 복잡도가 증가한다
 - 인자의 최대 갯수는 3개까지만
   - 왜냐면 인자가 많이지면 외우기가 어렵다
@@ -125,7 +125,7 @@
 - 중요한 부분은 위로, 상세한 부분은 밑으로
 - top에서 bottom으로 읽을 수 있도록 작성해야한다.
 
-## 3. switches and cases
+## 3. Switches and Cases
 - Switch문을 쓰는 것을 왜 꺼리는가?
   - 멋지지 않다? 만족스러운 대답은 아니다...
 - 객체지향의 가장 큰 이점은 의존성 관리 능력이다.

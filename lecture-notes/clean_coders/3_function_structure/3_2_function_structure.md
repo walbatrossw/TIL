@@ -101,28 +101,46 @@
   - 전역 객체
 - Ask대신 Tell을 하면 주변 객체와의 의존성이 낮아지게 된다.
 
-## 8. early returns
-```java
-private boolean nameIsValxxxx {
-  if (name.equals(""))
-    return true;
-  if (WikiWordWidget.xxx)
-    return true;
-  return false;
-}
-```
-- early return, guarded return은 허용된다.
+## 8. Early Returns
+- `early return`, `guarded return`은 허용된다.
+  ```java
+  private boolean nameIsValxxxx {
+    if (name.equals(""))
+      return true;
+    if (WikiWordWidget.xxx)
+      return true;
+    return false;
+  }
+  ```
 - `if else`문에서 `if`에서 모든 조건을 전부 확인하고 `else`에서 최종적으로 리턴을 하는 것은 바람직하지 않다. 오히려 `if`에서 부정조건을 넣어 확인한 다음바로 리턴할 수 있도록 하는 것이 더 좋다.
 - 하지만 roof 중간에서 리턴하는 것은 문제가 발생한다.
   - break, roof 중간에서 return은 roof를 복잡하게 만들어버린다.
   - 그렇기 때문에 좀더 깊이 있게 생각을 해봐야할 문제이다.
 - 코드가 동작하도록하는 것보다 이해할 수 있도록하는 것이 매우 중요하다.
 
-## 9. error handling
+## 9. Error Handling
+- Stack 예제
+  ```java
+  public static Stack make(int capacity) {
+    if (capacity < 0)
+      // 0보다 작은 stack은 있을 수 없기 때문에 예외를 발생
+      throw new IllegalCapacity();
+    if (capacity == 0)
+      return new ZeroCapacityStack();
+  }
+  // inner class로 예외를 정의
+  public static class IllegalCapacity extends RuntimeException {};
+  ```
+  - 아무것도 없는 상태에서 `pop()`을 하면 `null`, `-1`, `0` 중에 어떤 것을 반환하면 될까? 그리고 `push()`를 성공했다면 true를 반환하면 될까?
+    - `pop()`은 Query메서드이므로 반환을 할 수 있다. 하지만 만약 Integer Stack일면? `-1`, `0`는 값이기때문에 반환해서는 안된다.
+    - `push()`는 Command메서드이므로 반환을 해서는 안된다.
+    - 이러할 경우 예외상황이 생겼을 경우 Exception을 활용해야한다.
+- Use Exception
+  - checked VS unchecked
 
 ## 10. Special Cases
 
-## 11. Null is not a error
+## 11. Null is not an error
 
 ## 12. Null is a value
 
