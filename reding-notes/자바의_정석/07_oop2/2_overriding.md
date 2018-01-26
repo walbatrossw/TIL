@@ -1,4 +1,4 @@
-# 오버라이딩(Overriding)
+# 2. 오버라이딩(Overriding)
 
 ## 2.1 오버라이딩?
 
