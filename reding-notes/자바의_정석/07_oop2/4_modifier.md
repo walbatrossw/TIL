@@ -317,7 +317,6 @@ final class SingleTon {
 
 ---
 
-
 ## 4.6 제어자(modifier)의 조합
 ### 제어자를 조합해서 사용할 때의 주의사항
 - 메서드에 `static`와 `abstract`를 함께 사용할 수 없다.
