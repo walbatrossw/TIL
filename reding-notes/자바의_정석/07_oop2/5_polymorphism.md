@@ -161,7 +161,7 @@ class FireEngine2 extends Car2 {
 
 ### 1) `instanceof`?
 참조변수가 참조하고 있는 인스턴스의 실제 타입을 알아보기 위해 사용한다. 주로 조건문에 사용되며, `instanceof`의 왼쪽에는 참조변수를 오른쪽에 타입이 피연산자로 위치한다.
-연산의 결과는 `boolean`값이 반환된다. 즉, **`true`가 반환되었다는 것은 참조변수가 검사한 타입으로 형변환이 가능하다는 뜻** 이다.
+연산의 결과는 `boolean`값이 반환된다. **즉, `true`가 반환되었다는 것은 참조변수가 검사한 타입으로 형변환이 가능하다는 뜻** 이다.
 
 ```java
 void doWork(Car car) {
@@ -218,10 +218,426 @@ com.doubles.standardofjava.ch07_oop2.part05_polymorphism.FireEngine3
 
 ## 5.4 참조변수와 인스턴스의 연결
 
+### 1) 멤버변수가 조상클래스와 자손클래스에 중복으로 정의되었을 경우?
+
+- 조상타입의 참조변수를 사용한 경우 : 조상클래스에 선언된 멤버변수 사용
+- 자손타입의 참조변수를 사용한 경우 : 자손클래스에 선언된 멤버변수 사용
+- 메서드의 경우
+  - 조상클래스의 메서드를 자손클래스에서 오버라이딩한 경우에도 참조변수의 타입과 관계없이 항상 실제 인스턴스의 메서드가 호출된다.
+
+### 2) 예제 1 : 조상클래스와 자손클래스에 멤버변수가 중복정의 되었을 경우
+```java
+public class BindingTest {
+    public static void main(String[] args) {
+        Parent parent = new Child();
+        Child child = new Child();
+
+        // 조상타입의 참조변수를 사용
+        System.out.println("parent.x = " + parent.x);
+        parent.method();
+
+        // 자손타입의 참보변수 사용
+        System.out.println("child.x = " + child.x);
+        child.method();
+    }
+}
+
+class Parent {
+    int x = 100;
+    void method() {
+        System.out.println("parent method");
+    }
+}
+
+class Child extends Parent {
+    int x = 200;
+    void method() {
+        System.out.println("child method");
+    }
+}
+```
+```
+parent.x = 100
+child method
+child.x = 200
+child method
+```
+
+- 참조변수 `parent`와 `child`는 타입이 다르지만 `Child`인스턴스를 참조하고 있고, `Parent`와 `Child`클래스는 같이 이름의 멤버변수를 가지고 있다.
+- 참조변수를 어떤 타입으로 하는지에 따라 결과가 다르게 나온다는 것을 알 수 있다.
+- 메서드의 경우 참조변수에 관계없이 항상 실제 인스턴스의 `Child`에 정의된 메서드가 호출된다.
+
+### 3) 예제 2 : 중복정의가 되지 않은 경우
+```java
+public class BindingTest2 {
+  public static void main(String[] args) {
+    Parent2 parent2 = new Child2();
+    Child2 child2 = new Child2();
+
+    System.out.println("parent2.x = " + parent2.x);
+    parent2.method();
+
+    System.out.println("child2.x = " + child2.x);
+    child2.method();
+  }
+}
+
+class Parent2 {
+  int x = 100;
+  void method() {
+    System.out.println("parent2 method");
+  }
+}
+
+class Child2 extends Parent2 {
+
+}
+```
+```
+parent2.x = 100
+parent2 method
+child2.x = 100
+parent2 method
+```
+- 이전 예제와 다르게 `Child2`클래스의 경우 멤버변수가 정의되어 있지 않고 단순히 조상클래스로부터 멤버를 상속받게 된다.
+- 그래서 참조변수의 타입과 관계없이 조상클래스의 멤버들을 사용하게 된다.
+
+### 4) 예제 3 : `super`, `this`를 통해 조상, 자손클래스의 멤버 구분
+```java
+public class BindingTest3 {
+  public static void main(String[] args) {
+    Parent3 parent3 = new Child3();
+    Child3 child3 = new Child3();
+
+    System.out.println("parent3.x = " + parent3.x);
+    parent3.method();
+
+    System.out.println();
+
+    System.out.println("child3 = " + child3.x);
+    child3.method();
+  }
+}
+
+class Parent3 {
+  int x = 100;
+  void method() {
+    System.out.println("parent3 method");
+  }
+}
+
+class Child3 extends Parent3 {
+  int x = 200;
+  void method() {
+    System.out.println("child3 method");
+    System.out.println("x = " + x);
+    System.out.println("super.x = " + super.x);
+    System.out.println("this.x = " + this.x);
+  }
+}
+```
+```
+parent3.x = 100
+child3 method
+x = 200
+super.x = 100
+this.x = 200
+
+child3 = 200
+child3 method
+x = 200
+super.x = 100
+this.x = 200
+```
+
+- 자손클래스 `Child3`에 선언된 인스턴스변수 `x`와 조상클래스 `Parent3`로부터 상속받은 인스턴스변수 `x`를 구분하는데 `this`와 `super`가 사용된다.
+
 ---
 
 ## 5.5 매개변수의 다형성
+### 1) 매개변수의 다형성 예제 1
+
+```java
+public class PolyArgumentTest {
+  public static void main(String[] args) {
+    Buyer buyer = new Buyer();
+    buyer.buy(new Tv());
+    buyer.buy(new Computer());
+
+    System.out.println("현재 잔액은 " + buyer.money + "만원 입니다.");
+    System.out.println("현재 보너스 포인트는 " + buyer.bonusPoint + "점 입니다.");
+  }
+}
+
+class Product {
+  int price;
+  int bonusPoint;
+
+  Product(int price) {
+    this.price = price;
+    bonusPoint = (int) (price/10.0);
+  }
+}
+
+class Tv extends Product {
+  Tv() {
+    super(100);
+  }
+
+  public String toString() {
+    return "Tv";
+  }
+}
+
+class Computer extends Product {
+  Computer() {
+    super(200);
+  }
+
+  public String toString() {
+    return "Computer";
+  }
+}
+
+class Buyer {
+  int money = 1000;
+  int bonusPoint = 0;
+
+  // 상품이 새로 추가될 때마다 중복되는 로직의 메서드를 작성하지 않기 위해
+  // 매개변수의 다형성을 적용, Product을 상속받은 자손클래스의 경우 매개변수로 사용가능
+  void buy(Product product) {
+    if (money < product.price) {
+        System.out.println("잔액이 부족합니다.");
+        return;
+    }
+
+    money -= product.price; // 구매한 상품의 가격만큼 보유금액에서 차감
+    bonusPoint += product.bonusPoint; // 구매한 상품의 가격의 10%를 보너스포인트로 적립
+    System.out.println(product + "을/를 구입하셨습니다.");
+  }
+}
+```
+```
+Tv을/를 구입하셨습니다.
+Computer을/를 구입하셨습니다.
+현재 잔액은 700만원 입니다.
+현재 보너스 포인트는 30점 입니다.
+```
 
 ---
 
 ## 5.6 여러 종류의 객체를 배열로 다루기
+
+### 1) 여러 종류의 객체를 배열로 다루기 예제 1 : 배열사용
+```java
+public class PolyArgumentTest2 {
+    public static void main(String[] args) {
+        Buyer2 buyer2 = new Buyer2();
+        buyer2.buy(new Computer2());
+        buyer2.buy(new Tv2());
+        buyer2.buy(new Audio2());
+        buyer2.summary();
+    }
+}
+
+class Product2 {
+    int price;
+    int bonusPoint;
+
+    Product2(int price) {
+        this.price = price;
+        bonusPoint = (int) (price/10.0);
+    }
+}
+
+class Tv2 extends Product2 {
+
+    Tv2() {
+        super(100);
+    }
+
+    public String toString() {
+        return "Tv";
+    }
+}
+
+class Computer2 extends Product2 {
+
+    Computer2() {
+        super(200);
+    }
+
+    public String toString() {
+        return "Computer";
+    }
+
+}
+
+class Audio2 extends Product2 {
+
+    Audio2() {
+        super(50);
+    }
+
+    public String toString() {
+        return "Audio";
+    }
+}
+
+class Buyer2 {
+
+    int money = 1000;   // 잔액
+    int bonusPoint = 0; // 보너스 포인트
+    Product2[] item = new Product2[10]; // 구매한 상품을 저장하기 위한 배열
+    int i = 0;  // Product 배열에 사용될 카운터
+
+    void buy(Product2 product) {
+        if (money < product.price) {
+            System.out.println("잔액이 부족합니다.");
+            return;
+        }
+
+        money -= product.price;
+        bonusPoint += product.bonusPoint;
+        item[i++] = product;
+        System.out.println(product + "을/를 구입하셨습니다.");
+    }
+
+    void summary() {
+        int sum = 0;    // 구매한 물품의 가격합계
+        String itemList = ""; // 구매한 물품목록
+
+        for (int i = 0; i < item.length; i++) {
+            if (item[i] == null)
+                break;
+            sum += item[i].price;
+            itemList += (i == 0) ? "" + item[i] : "," + item[i];
+        }
+        System.out.println("구입하신 물품의 총금액은 " + sum + "만원입니다.");
+        System.out.println("구입하신 제품은 " + itemList + "입니다.");
+    }
+}
+```
+```
+Computer을/를 구입하셨습니다.
+Tv을/를 구입하셨습니다.
+Audio을/를 구입하셨습니다.
+구입하신 물품의 총금액은 350만원입니다.
+구입하신 제품은 Computer,Tv,Audio입니다.
+```
+### 2) 여러 종류의 객체를 배열로 다루기 예제 2 : `Vector`사용
+```java
+public class PolyArgumentTest3 {
+    public static void main(String[] args) {
+        Buyer3 buyer3 = new Buyer3();
+        buyer3.buy(new Computer3());
+        buyer3.buy(new Tv3());
+        buyer3.buy(new Audio3());
+        buyer3.summary();
+    }
+}
+
+class Product3 {
+    int price;
+    int bonusPoint;
+
+    Product3(int price) {
+        this.price = price;
+        bonusPoint = (int) (price/10.0);
+    }
+
+    Product3() {
+        price = 0;
+        bonusPoint = 0;
+    }
+}
+
+class Tv3 extends Product3 {
+
+    Tv3() {
+        super(100);
+    }
+
+    public String toString() {
+        return "Tv";
+    }
+}
+
+class Computer3 extends Product3 {
+
+    Computer3() {
+        super(200);
+    }
+
+    public String toString() {
+        return "Computer";
+    }
+
+}
+
+class Audio3 extends Product3 {
+
+    Audio3() {
+        super(50);
+    }
+
+    public String toString() {
+        return "Audio";
+    }
+}
+
+class Buyer3 {
+
+    int money = 1000;   // 잔액
+    int bonusPoint = 0; // 보너스 포인트
+    Vector item = new Vector(); // 구입한 제품을 저장하기 위한 Vector 객체
+    int i = 0;  // Product 배열에 사용될 카운터
+
+    void buy(Product3 product) {
+        if (money < product.price) {
+            System.out.println("잔액이 부족합니다.");
+            return;
+        }
+
+        money -= product.price;
+        bonusPoint += product.bonusPoint;
+        item.add(product);
+        System.out.println(product + "을/를 구입하셨습니다.");
+    }
+
+    void refund(Product3 product3) {
+        if (item.remove(product3)) {
+            money += product3.price;
+            bonusPoint -= product3.bonusPoint;
+            System.out.println(product3 + "을/를 반품하셨습니다.");
+        } else {
+            System.out.println("구입하신 제품이 없습니다.");
+        }
+    }
+
+    void summary() {
+        int sum = 0;    // 구매한 물품의 가격합계
+        String itemList = ""; // 구매한 물품목록
+
+        if (item.isEmpty()) {
+            System.out.println("구입하신 제품이 없습니다.");
+            return;
+        }
+
+        for (int i = 0; i < item.size(); i++) {
+            Product3 product = (Product3) item.get(i);
+            sum += product.price;
+            itemList += (i == 0) ? "" + product : "," + product;
+        }
+        System.out.println("구입하신 물품의 총금액은 " + sum + "만원입니다.");
+        System.out.println("구입하신 제품은 " + itemList + "입니다.");
+    }
+}
+```
+```
+Computer을/를 구입하셨습니다.
+Tv을/를 구입하셨습니다.
+Audio을/를 구입하셨습니다.
+구입하신 물품의 총금액은 350만원입니다.
+구입하신 제품은 Computer,Tv,Audio입니다.
+```
