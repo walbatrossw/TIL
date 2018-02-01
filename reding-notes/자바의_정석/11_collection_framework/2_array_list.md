@@ -1,5 +1,3 @@
-# 1. 컬렉션 프레임워크(collection framework)
-
 ## 1.2 `ArrayList`
 
 ### 1) `ArrayList`?
