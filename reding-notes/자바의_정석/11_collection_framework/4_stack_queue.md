@@ -329,6 +329,6 @@ offerLast -------┐   ┌-----▶ pollLast
               |---------|
               |         |
                  ▲   |
-offerFirst ------┘   └-------▶ poll
+offerFirst ------┘   └-------▶ pollFirst
 ```
 `Queue`의 변형으로 한쪽 끝으로만 추가/삭제할 수 있는 `Queue`와 달리 `Deque`는 양쪽 끝에 추가/삭제가 가능하다. `Deque`의 조상은 `Queue`이며 구현체로는 `ArrayDeque`와 `LinkedList`등이 있다.
