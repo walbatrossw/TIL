@@ -10,6 +10,7 @@ public interface Comparable {
   int compareTo(Object o);
 }
 ```
+- `Comparable` : 기본 정렬기준을 구현하는데 사용
 ```java
 // java.util 패키지에
 public interface Comparator {
@@ -18,8 +19,6 @@ public interface Comparator {
   boolean equals(Object obj);
 }
 ```
-
-- `Comparable` : 기본 정렬기준을 구현하는데 사용
 - `Comparator` : 기본 정렬기준 외에 다른 기준으로 정렬하고자 할 때 사용
 
 ### 2) `Comparator`, `Comparable` 예제
