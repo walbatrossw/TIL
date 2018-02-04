@@ -1,7 +1,7 @@
 ## 1.14 `Collection Framework` 간단 정리
 
 ### 1) 컬렉션 클래스간의 관계도
-![]()
+![summary](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/11_collection_framework/img/collection_class_relation.png?raw=true)
 
 ### 2) 컬렉션 클래스의 특징 요약
 |컬렉션|특징|
