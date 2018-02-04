@@ -4,7 +4,7 @@
 `TreeSet`은 **이진검색트리(binary search tree)라는 자료구조의 형태로 데이터를 저장하는 컬렉션 클래스** 이다. 이진 검색 트리는 정렬, 검색, 범위검색(range search)에 높은 성능을 보이는 구조로 `TreeSet`은 이진 검색 트리의 성능을 향상시킨 레드-블랙-트리(red-black-tree)로 구현되어 있다. 그리고 `Set`인터페이스를 구현했기 때문에 **중복된 데이터의 저장을 허용하지 않으며, 정렬된 유치에 저장하므로 저장 순서를 유지하지도 않는다.**
 
 **이진트리(binary-tree)**
-![]()
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/11_collection_framework/img/tree_set_1.png?raw=true)
 `LinkedList`처럼 여러 개의 노드(node)가 서로 연결된 구조로 각 노드에 최대 2개의 노드를 연결할 수 있으며 루트(root)라고 불리는 하나의 노드에서부터 시작해서 계속 확장해나갈 수 있다. 위아래로 연결된 두 노드를 부모-자식관계에 있다고 하며 위의 노드를 부모노드, 아래의 노드를 자식노드라고 한다. 부모-자식관계는 상대적인 것이며 하나의 부모노드는 두 개의 자식노드와 연결될 수 있다.
 
 ```java
@@ -15,3 +15,5 @@ class TreeNode {
   TreeNode light; // 오른쪽 자식 노드
 }
 ```
+
+**이진트리의 저장 순서**
