@@ -405,10 +405,415 @@ grapeBox = [Grape]v
 
 ## 1.5 와일드카드
 
+### 1) 와일드카드?
+제네릭 타입을 매개변수나 반환 타입으로 사용할 때 구체적인 타입 대신 와일드 카드를 다음과 같이 세 가지 형태로 사용할 수 있다
+- `<? extends T>` : 와일드 카드의 상한제한, `T`와 그의 자손들만 가능
+- `<? super T>` : 와일드 카드의 하한제한, `T`와 그의 조상들만 가능
+- `<?>` : 제한 없음, 모든 타입이 가능, `<? extends Object>`와 동일
+- 제네릭 클래스와 달리 와일드 카드에는 `&`를 사용할 수 없음
 
+### 2) 와일드카드 예제1 : `<? extends T>` - 와일드카드 상한제한
+```java
+public class FruitBoxEx3 {
+    public static void main(String[] args) {
+        FruitBox3<Fruit3> fruitBox = new FruitBox3<Fruit3>();
+        FruitBox3<Apple3> appleBox = new FruitBox3<Apple3>();
+
+        fruitBox.add(new Apple3());
+        fruitBox.add(new Grape3());
+        appleBox.add(new Apple3());
+        appleBox.add(new Apple3());
+
+        // 와일드카드 적용 전
+        System.out.println(Juicer.makeJuice1(fruitBox));   // OK
+        //System.out.println(Juicer.makeJuice1(appleBox)); // 에러, fruitBox 외에 다른 매개변수는 들어갈 수가 없음
+
+        // 와일드카드 적용후
+        System.out.println(Juicer.makeJuice2(fruitBox));    // OK
+        System.out.println(Juicer.makeJuice2(appleBox));    // OK
+    }
+}
+
+class Juicer {
+    // 와일드 카드 적용 전
+    // 매개변수를 FruitBox3<Fruit3>로 고정시킬 경우, FruitBox3<Apple3>는 매개변수가 될 수 없음
+    static Juice makeJuice1(FruitBox3<Fruit3> box3) {
+        String temp = "";
+
+        for (Fruit3 fruit3 : box3.getList())
+            temp += fruit3 + " ";
+
+        return new Juice(temp);
+    }
+
+    // 아래와 같이 오버로딩을 할 경우, 컴파일 에러가 발생함
+    // 제네릭타입이 다른 것만으로 오버로딩이 성립되지 않기 때문
+    // 제네릭타입은 컴파일러가 컴파일할 때만 사용하고 제거해버리기 때문에 오버로딩이 아닌 메서드 중복정의가 되버림
+//    static Juice makeJuice1(FruitBox3<Apple3> box3) {
+//        String temp = "";
+//
+//        for (Fruit3 fruit3 : box3.getList())
+//            temp += fruit3 + " ";
+//
+//        return new Juice(temp);
+//    }
+
+    // 와일드 카드 적용 이후
+    // 매개변수로 FruitBox3<Fruit3>, FruitBox3<Apple3>, FruitBox3<Grape3> 전부다 가능해짐
+    static Juice makeJuice2(FruitBox3<? extends Fruit3> box3) {
+        String temp = "";
+
+        for (Fruit3 fruit3 : box3.getList())
+            temp += fruit3 + " ";
+
+        return new Juice(temp);
+    }
+}
+
+class Juice {
+    String name;
+
+    Juice(String name) {
+        this.name = name + "Juice";
+    }
+
+    public String toString() {
+        return name;
+    }
+}
+
+class Box3<T> {
+
+    ArrayList<T> list = new ArrayList<T>();
+
+    void add(T item) {
+        list.add(item);
+    }
+
+    T get(int i) {
+        return list.get(i);
+    }
+
+    ArrayList<T> getList() {
+        return list;
+    }
+
+    int size() {
+        return list.size();
+    }
+
+    public String toString() {
+        return list.toString();
+    }
+
+}
+
+class FruitBox3<T extends Fruit3> extends Box3<T> {
+
+}
+
+class Fruit3 {
+    public String toString() {
+        return "Fruit";
+    }
+}
+
+class Apple3 extends Fruit3 {
+    public String toString() {
+        return "Apple";
+    }
+}
+
+class Grape3 extends Fruit3 {
+    public String toString() {
+        return "Grape";
+    }
+}
+```
+```
+Apple Grape Juice
+Apple Grape Juice
+Apple Apple Juice
+```
+
+### 3) 와일드카드 예제2 : `<? super T>` - 와일드카드의 하한제한
+```java
+public class FruitBoxEx4 {
+    public static void main(String[] args) {
+        FruitBox4<Apple4> appleBox = new FruitBox4<Apple4>();
+        FruitBox4<Grape4> grapeBox = new FruitBox4<Grape4>();
+
+        appleBox.add(new Apple4("GreenApple", 300));
+        appleBox.add(new Apple4("GreenApple", 100));
+        appleBox.add(new Apple4("GreenApple", 200));
+
+        grapeBox.add(new Grape4("GrapeApple", 400));
+        grapeBox.add(new Grape4("GrapeApple", 300));
+        grapeBox.add(new Grape4("GrapeApple", 200));
+
+        Collections.sort(appleBox.getList(), new AppleComp());
+        Collections.sort(grapeBox.getList(), new GrapeComp());
+        System.out.println(appleBox);
+        System.out.println(grapeBox);
+
+        Collections.sort(appleBox.getList(), new FruitComp());
+        Collections.sort(grapeBox.getList(), new FruitComp());
+        System.out.println(appleBox);
+        System.out.println(grapeBox);
+    }
+}
+
+
+class Box4<T> {
+
+    ArrayList<T> list = new ArrayList<T>();
+
+    void add(T item) {
+        list.add(item);
+    }
+
+    T get(int i) {
+        return list.get(i);
+    }
+
+    ArrayList<T> getList() {
+        return list;
+    }
+
+    int size() {
+        return list.size();
+    }
+
+    public String toString() {
+        return list.toString();
+    }
+
+}
+
+class FruitBox4<T extends Fruit4> extends Box4<T> {
+
+}
+
+class Fruit4 {
+    String name;
+    int weight;
+
+    Fruit4(String name, int weight) {
+        this.name = name;
+        this.weight = weight;
+    }
+
+    public String toString() {
+        return name + "(" + weight + ")";
+    }
+}
+
+class Apple4 extends Fruit4 {
+
+    Apple4(String name, int weight) {
+        super(name, weight);
+    }
+
+}
+
+class Grape4 extends Fruit4 {
+
+    Grape4(String name, int weight) {
+        super(name, weight);
+    }
+
+}
+
+class AppleComp implements Comparator<Apple4> {
+    public int compare(Apple4 t1, Apple4 t2) {
+        return t2.weight - t1.weight;
+    }
+}
+
+class GrapeComp implements Comparator<Grape4> {
+    public int compare(Grape4 t1, Grape4 t2) {
+        return t2.weight - t1.weight;
+    }
+}
+
+class FruitComp implements Comparator<Fruit4> {
+    public int compare(Fruit4 t1, Fruit4 t2) {
+        return t1.weight - t2.weight;
+    }
+}
+```
+```
+[GreenApple(300), GreenApple(200), GreenApple(100)]
+[GrapeApple(400), GrapeApple(300), GrapeApple(200)]
+[GreenApple(100), GreenApple(200), GreenApple(300)]
+[GrapeApple(200), GrapeApple(300), GrapeApple(400)]
+```
+위 예제는 `Collections.sort()`를 이용해서 `appleBox`와 `grapeBox`에 담긴 과일을 무게별로 정렬하는 예제를 통해서 와일드카드 하한제한을 알아보자.
+- `Collections.sort()`의 선언부는 아래의 코드와 같다.
+  ```java
+  static <T> void sort(List<T> list, Comparator<? super T> c)
+  ```
+  - `static`옆에 있는 `<T>`는 메서드에 선언된 제네릭타입으로 이런 메서드를 제네릭 메서드라고 한다.
+  - 첫번째 매개변수는 정렬할 대상이고, 두번째 매개변수는 정렬할 방법이 정의된 `Comparator`이다.
+  - **`Comparator`의 제네릭 타입에 하한제한이 걸려있는 와일드카드가 사용** 되었다.
+- 그렇다면 먼저 아래와 같이 와일드카드가 사용되지 않았다고 가정해보고, 매개변수 `T`에 `Apple4`가 대입되면 어떻게 바뀌는지 보자.
+  ```java
+  static <T> void sort(List<T> list, Comparator<T> c)
+  ```
+  ```java
+  static void sort(List<Apple4> list, Comparator<Apple4> c)
+  ```
+- 이것은 `List<Apple4>`를 정렬하기 위해서는 `Comparator<Apple4>`이 필요하다는 의미인데, 그래서 `Comparator<Apple4>`를 구현한 `AppleComp`클래스를 아래와 같이 정의하였다.
+  ```java
+  class AppleComp implements Comparator<Apple4> {
+    public int compare(Apple4 t1, Apple4 t2) {
+      return t2.weight - t1.weight;
+    }
+  }
+  ```
+- 지금까지는 별문제가 없어보이지만 만약 `Apple4`대신 `Grape4`가 대입된다면 `List<Grape4>`를 정렬하기 위해서는 `Comparator<Grape>`가 아래의 코드와 같이 또 하나의 클래스가 필요하게 된다.
+  ```java
+  class GrapeComp implements Comparator<Grape4> {
+    public int compare(Grape4 t1, Grape4 t2) {
+      return t2.weight - t1.weight;
+    }
+  }
+  ```
+- 그런데 `AppleComp`와 `GrapeComp`는 타입만 다를뿐 완전히 같은 코드이다. 코드의 중복도 문제지만, 새로운 `Fruit`자손이 생길 때마다 위와 같은 코드를 반복해서 만들어야한다는 문제도 발생한다.
+- 이러한 문제를 해결하기 위해서는 타입 매개변수에 하한 제한의 와일드 카드를 적용해야만한다.
+- 그래서 `Collections.sort()`가 처음에 본 것처럼 정의가 되어 있었던 것이다.
+  ```java
+  static <T> void sort(List<T> list, Comparator<? super T> c)
+  ```
+- 위의 코드의 타입 매개변수에 `Apple4`가 대입되면 아래와 같이 된다.
+  ```java
+  static void sort(List<Apple4> list, Comparator<? super Apple4> c)
+  ```
+- 매개변수 타입이 `Comparator<? super Apple4>`이라는 의미는 `Comparator`의 타입 매개변수로 `Apple4`와 그 조상이 가능하다는 것이다.
+- 즉, `Comparator<Apple4>`, `Comparator<Fruit4>`, `Comparator<Object>` 중 하나가 매개변수로 올 수 있다는 것을 의미한다.
+- 그래서 아래와 같이 `FruitComp`를 만들면 `List<Apple4>`와 `List<Grape4>`를 모두 정렬할 수 있게 된다.
+  ```java
+  class FruitComp implements Comparator<Fruit4> {
+      public int compare(Fruit4 t1, Fruit4 t2) {
+          return t1.weight - t2.weight;
+      }
+  }
+  ```
+
+---
 
 ## 1.6 제네릭 메서드
 
+### 1) 제네릭 메서드?
+**매서드의 선언부에 제네릭 타입이 선언된 메서드** 를 제네릭 메서드라고 한다. 이전 예제에서 본 것처럼 `Collections.sort()`가 바로 제네릭 메서드이며, **제네릭 타입의 선언 위치는 반환 타입 앞** 이다.
+
+```java
+static <T> void sort(List<T> list, Comparator<? super T> c)
+```
+
+**제네릭 클래스에 정의된 타입 매개변수와 제네릭 메서드에 정의된 타입 매개변수는 별개의 것** 이다. 같은 타입 문자 `T`를 사용하더라도 같은 것이 아니라는 것에 주의해야한다.
+
+```java
+// 클래스의 타입 매개변수 T와
+class FruitBox<T> {
+  // 메서드 타입 매개변수 T는 타입 문자만 같을 뿐 다르다
+  static <T> void sort(List<T> list, Comparator<? super T> c) {
+
+  }
+}
+```
+- 제네릭 클래스 `FruitBox`에 선언된 타입 매개변수 `T`와 제네릭 메서드 `sort()`에 선언된 타입 매개변수 `T`는 타입 문자만 같을 뿐 다르다.
+- `static`멤버에는 타입 매개변수를 사용할 수 없지만, 이처럼 메서드에 제네릭 타입을 선언하고 사용하는 것은 가능하다.
+- 메서드에 선언된 제네릭 타입은 마치 지역 변수를 선언한 것과 같다고 생각하면 이해하기가 쉬운데 이 타입 매개변수는 메서드 내에서만 지역적으로 사용되기 때문에 메서드가 `static`이든 아니든 상관없기 때문이다.
+
+### 2) 제네릭 메서드 선언, 호출
+
+그렇다면 이전 예제의 `makeJuice2()`를 제네릭 메서드로 변경하고, 호출해보자
+```java
+static Juice makeJuice2(FruitBox3<? extends Fruit3> box3) {
+    //...
+}
+```
+```java
+// 제네릭 메서드로 변환하기
+// 제네릭 타입을 반환타입 앞에 선언
+static <T extends Fruit3> Juice makeJuice2(FruitBox3<T> box3) {
+    //...
+}
+```
+```java
+// 제네릭 메서드 호출하기
+FruitBox3<Fruit3> fruitBox = new FruitBox3<Fruit3>();
+FruitBox3<Apple3> appleBox = new FruitBox3<Apple3>();
+
+//...
+
+// 메서드를 호출할 때는 타입변수에 타입을 대입해야함
+System.out.println(Juicer.<Fruit3>makeJuice2(fruitBox));
+System.out.println(Juicer.<Apple3>makeJuice2(appleBox));
+
+// 그러나 대부분 컴파일러가 타입을 추정할 수 있기 때문에 생략이 가능
+System.out.println(Juicer.makeJuice2(fruitBox));
+System.out.println(Juicer.makeJuice2(appleBox));
+
+// 주의사항
+// 제네릭 메서드를 호출할 때는 대입된 타입을 생략할 수 없는 경우, 참조변수나 클래스 이름을 생략할 수 없음
+System.out.println(<Fruit3>makeJuice2(fruitBox)); //에러, 클래스 이름 생략 불가
+System.out.println(this.makeJuice2(fruitBox));  // OK
+System.out.println(Juicer.makeJuice2(fruitBox)); // OK
+```
+
+### 3) 제네릭 메서드 매개변수 타입의 간소화
+```java
+public static void printAll(ArrayList<? extends Products> list1,
+                            ArrayList<? extends Products> list2) {
+  //...
+}
+```
+제네릭 메서드는 메개변수의 타입이 복잡할 때도 유용한데, 만일 위와 같은 코드가 있다면 타입을 별도로 선언함으로써 코드를 간략하게 만들 수 있다.
+```java
+// 타입을 별도로 선언
+public static <T extends Products> void printAll(ArrayList<T> list1,
+                                                  ArrayList<T> list2) {
+  //...
+}
+```
+
+### 4) 제네릭 메서드 타입이 복잡하게 선언된 경우?
+
+```java
+public static <T extends Comparable<? super T>> void sort(List<T> list) {
+  //...
+}
+```
+위의 코드는 `Collections`클래스의 `sort()` 중에 하나인데 매개변수가 하나짜리이다. 매개변수로 지정된 `List<T>`를 정렬한다는 것은 알겠지만, 메서드에 선언된 제네릭 타입이 다소 좀 복잡하다. 이럴 경우 일단 와일드 카드를 걷어내보자
+
+```java
+// 와일드 카드를 걷어낸 뒤
+public static <T extends Comparable<T>> void sort(List<T> list) {
+  //...
+}
+```
+일단 와일드 카드를 걷어내고 보니 `List<T>`의 요소가 `Comparable`인터페이스를 구현한 것이어야 한다는 뜻인데 이제 다시 와일드 카드를 넣고 자세히 살펴보자.
+
+```java
+public static <T extends Comparable<? super T>> void sort(List<T> list) {
+  //...
+}
+```
+- `List<T> list` : 타입 `T`를 요소로 하는 `List`를 매개변수로 허용
+- `<T extends Comparable>` : `T`는 `Comparable`인터페이스를 구현한 클래스이어야 한다는 것을 의미
+- `Comparable<? super T>` : `T`또는 그 조상의 타입을 비교하는 `Comparable`이어야 한다는 것을 의미
+- 만약 `T`가 `Student`이고, `Person`의 자손이라면 `<? super T>`는 `Student`, `Person`, `Object` 모두 가능하다.
+
+---
+
 ## 1.7 제네릭 타입의 형변환
 
+
+---
+
 ## 1.8 제네릭 타입의 제거
+
+
+---
