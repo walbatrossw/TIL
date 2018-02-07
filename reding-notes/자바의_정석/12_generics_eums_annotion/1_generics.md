@@ -810,6 +810,30 @@ public static <T extends Comparable<? super T>> void sort(List<T> list) {
 
 ## 1.7 제네릭 타입의 형변환
 
+### 1) 제네릭 타입과 넌제네릭(non-generic) 타입 간의 형변환 : 가능
+```java
+Box box = null;
+Box<Object> objBox = null;
+
+box = (Box) objBox; // OK, 형변환 가능 : 제네릭 -> 원시타입, 경고발생
+objBox = (Box<Object>) box; // OK, 형변환 가능 : 원시타입 -> 제네릭, 경고발생
+```
+
+
+### 2) 대입된 타입이 다른 제네릭 타입 간의 형변환 : 불가능
+```java
+Box<Object> objBox = null;
+Box<String> strBox = null;
+
+objBox = (Box<Object>) strBox; // 에러, 형변환 불가
+strbox = (Box<String>) objBox; // 에러, 형변환 불가
+```
+
+### 3) 제네릭 타입과 와일드 카드 타입 간의 형변환 : 가능
+```java
+Box<? extends Object> wBox = new Box<String>();
+```
+
 
 ---
 
