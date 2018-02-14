@@ -1,17 +1,17 @@
-# 인터페이스(interface)
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-## 7.1 인터페이스(interface)
+## 1. 인터페이스(interface)
 
 인터페이스는 **일종의 추상클래스** 로서 추상클래스처럼 추상메서드를 갖지만 추상클래스보다 **추상화 정도가 높아서 추상클래스와 달리 일반메서드, 멤버변수를 구성원으로 가질 수 없다.**
 
 - 추상클래스 : 부분적으로 완성된 "미완성 설계도"
 - 인터페이스 : 구현된 것이 하나도 없이 밑그림만 그려진 "기본 설계도"
 
----
 
-## 7.2 인터페이스의 작성
+## 2. 인터페이스의 작성
 
 **인터페이스 작성법**
+
 ```java
 interface InterfaceName {
 
@@ -26,9 +26,8 @@ interface InterfaceName {
 - 모든 메서드는 `public abstract`이어야 하며, 이를 생략할 수 있음.
 - `static`메서드, `default`메서드는 예외(JDK 1.8부터 변경)
 
----
+## 3. 인터페이스의 상속
 
-## 7.3 인터페이스의 상속
 인터페이스는 **인터페이스로부터만 상속** 이 가능하며, 클래스와 달리 **다중상속이 가능** 하다.
 ```java
 interface Movable {
@@ -43,11 +42,7 @@ interface Attackable {
 interface Fightable extends Movable, Attackable {}
 ```
 
-
-
----
-
-## 7.4 인터페이스의 구현
+## 4. 인터페이스의 구현
 
 **인터페이스의 구현법**
 ```java
@@ -113,13 +108,8 @@ fighter는 Attackable인터페이스를 구현했습니다.
 fighter는 Object클래스의 자손입니다.
 ```
 
----
 
-## 7.5 인터페이스를 이용한 다중상속
-
----
-
-## 7.6 인터페이스를 이용한 다형성
+## 5. 인터페이스를 이용한 다형성
 
 **인터페이스 타입의 참조변수**
 
@@ -193,9 +183,7 @@ document.xml - XML parsing completed
 document2.html - HTML parsing completed
 ```
 
----
-
-## 7.7 인터페이스의 장점
+## 7. 인터페이스의 장점
 **인터페이스의 장점들**
 - 개발시간을 단축시킬 수 있다.
 - 표준화가 가능하다.
@@ -364,12 +352,11 @@ void repair(Repairable repairable) {
   // 수리
 }
 ```
-아래의 그림은 지금까지 구현한 예제의 클래스와 인터페이스의 상속도인데 이것을 보면 지금까지 설명한 내용을 이해할 수 있을 것이다.
+아래의 그림은 지금까지 구현한 예제의 클래스와 인터페이스의 상속도인데 이것을 보면 지금까지 설명한 내용을 보다 쉽게 이해할 수 있다.
 ![예제1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/07_oop2/img/interface.png?raw=true)
 
----
 
-## 7.8 인터페이스의 이해
+## 8. 인터페이스의 이해
 
 **인터페이스를 이해하기 위해 염두해두어야할 사항 2가지**
 - 클래스를 사용하는 쪽(User)과 클래스를 제공하는 쪽(Provider)이 있다.
@@ -482,9 +469,8 @@ class InstanceManager {
 ```
 이번 예제는 인스턴스를 직접 생성하지 않고, `InstanceManager`클래스의 `getInstance()`를 통해 제공받는다. 이렇게 할 경우 나중에 다른 클래스의 인스턴스로 변경될 경우에도 A클래스의 변경없이 `getInstance()`만 변경하면된다.
 
----
 
-## 7.9 디폴트 메서드와 `static`메서드
+## 9. 디폴트 메서드와 `static`메서드
 
 앞서 잠깐 언급했던 것처럼 인터페이스는 추상 메서드만 선언할 수 있지만, JDK1.8부터는 디폴트메서드와 `static`메서드를 추가할 수 있게 되었다. `static`메서드는 인스턴스와 관계가 없는 독립적인 메서드이기 때문에 인터페이스에 추가하지 못할 이유가 없었다. 하지만 보다 자바를 쉽게? 배울수 있게 하기 위해 규칙을 단순화할 필요가 있어 예외로 두지 않았다고 한다.
 
@@ -559,6 +545,3 @@ method2() in Parent
 staticMethod() in MyInterface
 staticMethod() in MyInterface2
 ```
-
-
----
