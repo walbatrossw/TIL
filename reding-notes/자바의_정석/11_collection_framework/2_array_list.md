@@ -1,13 +1,12 @@
-## 1.2 `ArrayList`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `ArrayList`?
+## 1. `ArrayList`란?
 `ArrayList`는 컬렉션 프레임워크에서 가장 많이 사용되는 컬렉션 클래스이다. `List`인터페이스를 구현하기 때문에 **데이터의 저장순서는 유지되고, 중복을 허용** 한다. `Object`배열을 이용하여 **데이터를 순차적으로 저장** 한다.
 
 예를 들면, 첫 번째로 저장한 객체는 `Object`배열의 0번째에 저장되고 그 다음에 저장하는 객체는 1번째에 저장된다. 이런 식으로 계속 배열에 순서대로 저장되며, **배열에 더이상 저장할 공간이 없으면 보다 큰 새로운 배열을 생성하여 기존의 배열에 저장된 내용을 새로운 배열로 복사한 다음에 저장된다.**
 
----
 
-### 2) `ArrayList` 예제 1
+##### `ArrayList` 예제 1
 ```java
 public class ArrayListEx1 {
     public static void main(String[] args) {
@@ -86,7 +85,7 @@ list2 : [AA, B, C]
 
 ---
 
-### 3) `ArrayList` 예제 2
+##### `ArrayList` 예제 2
 ```java
 public class ArrayListEx2 {
   public static void main(String[] args) {
@@ -117,7 +116,7 @@ BCDEFGHIJ!
 ZZ
 ```
 
-### 4) `Vector` 예제
+##### `Vector` 예제
 ```java
 public class VectorEx1 {
     public static void main(String[] args) {
