@@ -1,6 +1,6 @@
-## 1.4 `Stack`과 `Queue`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `Stack`, `Queue` ?
+## 1. `Stack`, `Queue`
 
 **`Stack`**
 ```
@@ -36,7 +36,7 @@ offer -------┐
 ```
 **처음 저장한 데이터를 가장 먼저 꺼내게 되는 FIFO(First In First Out)의 구조** 로, 양옆에 뚫린 파이프에서 한쪽은 넣고, 다른 한쪽은 빼는 것과 동일하다. 예를 들면 `Queue`에 0, 1, 2, 3, 4를 차례로 데이터를 넣었다면, 꺼낼 때는 넣은 순서와 마찬가지로 0, 1, 2, 3, 4의 순서로 꺼내게 된다. `Queue`를 구현하기 위해서는 **`LinkedList`로 구현** 하는 것이 적합하다. 그 이유는 만약 `ArrayList`와 같이 배열기반의 컬렉션클래스를 사용한다면 데이터를 꺼낼 때 항상 첫번째 저장한 데이터를 삭제하므로 빈 공간을 채우기 위해 데이터의 복사가 발생해 비효율적이기 때문이다.
 
-**`Stack`, `Queue` 예제 1 : 비교**
+##### `Stack`, `Queue` 예제 1 : 비교
 ```java
 public class StackQueueEx {
     public static void main(String[] args) {
@@ -81,7 +81,7 @@ Queue
 - 스택과 큐는 각각 0, 1, 2, 3을 같은 순서로 넣고 꺼냈을 때 결과가 다르게 나온다는 것을 알 수 있다.
 - java에서는 스택을 `Stack`클래스로 구현하여 제공하지만, 큐는 `Queue`인터페이스만 정의해놓았을 뿐 별도의 클래스를 제공하지 않기 때문에 `Queue`인터페이스를 구현한 클래스들 중에 하나를 사용해야한다.
 
-**`Stack` 구현 예제**
+##### `Stack` 구현 예제
 ```java
 public class MyStack extends Vector {
 
@@ -120,12 +120,13 @@ public class MyStack extends Vector {
     }
 }
 ```
+
 **`Stack`, `Queue`활용**
 스택과 큐에 대해 알아보았는데 그렇다면 스택과 큐는 어떻게 활용되는지에 대해 알아보자.
 - `Stack` : 수식계산, 수식괄호검사, 웹브라우저의 뒤로/앞으로 등
 - `Queue` : 최근사용문서, 인쇄작업 대기목록, 버퍼(Buffer)
 
-**`Stack` 활용 예제 1 : 브라우저의 뒤로가기, 앞으로 가기 버튼 구현**
+##### `Stack` 활용 예제 1 : 브라우저의 뒤로가기, 앞으로 가기 버튼 구현
 ```java
 public class StackEx1 {
 
@@ -208,7 +209,7 @@ forward : []
 ```
 - 웹브라우저의 뒤로, 앞으로 가기 버튼의 기능을 구현한 것인데 이 기능을 구현하기 위해서는 2개의 스택을 사용해야한다.
 
-**`Queue`활용 예제 1 : 유닉스의 History명령어 구현**
+##### `Queue`활용 예제 1 : 유닉스의 History명령어 구현
 ```java
 public class QueueEx1 {
 
@@ -284,7 +285,7 @@ mkdir
 >>q
 ```
 
-**`PriorityQueue`(우선순위 큐)와 예제**
+##### `PriorityQueue`(우선순위 큐)와 예제
 `Queue`인터페이스의 구현체 중의 하나로 저장한 순서와 관계없이 우선순위가 높은 것부터 꺼내게 된다는 특징이 있다. 그리고 `null`은 저장할 수 없으며, 만약 `null`을 저장하면 `NullPointerException`이 발생한다.
 ```java
 public class PriorityQueueEx {
@@ -315,7 +316,7 @@ public class PriorityQueueEx {
 - 숫자뿐만아니라 객체를 저장할 수도 있는데 그럴 경우 각 객체의 크기를 비교할 수 있는 방법을 제공해야한다.
 - 참보변수 `priorityQueue`를 출력하면 내부적으로 가지고 있는 배열의 내용이 출력되는데 저장한 순서와 다르게 나온다. 힙이라는 자료구조의 형태로 저장되었기 때문이다.
 
-**`Deque`(Double-Ended Queue)**
+## 2. `Deque`(Double-Ended Queue)
 ```
 offerLast -------┐   ┌-----▶ pollLast
                  ▼   |
