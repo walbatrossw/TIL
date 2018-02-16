@@ -1,9 +1,9 @@
-## 1.13 `Collections`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `Collections`?
+## `Collections`란?
 `Arrays`가 배열과 관련된 메서드를 제공하는 것처럼, `Collections`는 컬렉션과 관련된 메서드를 제공한다. `fill()`, `copy()`, `sort()`, `binarySearch()` 등의 메서드는 두 클래스에서 모두 포함되어 있으며 같은 기능을 수행한다.
 
-### 2) `Collections`예제 1
+##### `Collections`예제 1
 ```java
 public class CollectionEx1 {
     public static void main(String[] args) {

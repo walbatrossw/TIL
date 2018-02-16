@@ -1,11 +1,11 @@
-## 1.8 `HashSet`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `HashSet`?
+## `HashSet`이란?
 `HashSet`은 **`Set`인터페이스를 구현한 가장 대표적인 컬렉션** 이며, `Set`인터페이스의 특징대로 **`HashSet`은 중복된 요소를 저장하지 않는다.** `HashSet`에 새로운 요소를 추가할 때는 `add()`나 `addAll()`를 사용하는데 만약 `HashSet`에 이미 저장되어 있는 요소와 중복된 요소를 추가하고자 한다면 이 메서드들은 `false`를 반환함으로써 중복된 요소이기 때문에 추가에 실패했다는 것을 알려준다.
 
 `ArrayList`와 같이 `List`인터페이스를 구현한 컬렉션과 달리 `HashSet`은 저장순서를 유지하지 않으므로 **저장순서를 유지하고자 한다면 `LinkedHashSet`을 사용** 해야한다.
 
-### 2) `HashSet` 예제 1 : `HashSet` 사용법과 이해
+##### `HashSet` 예제 1 : `HashSet` 사용법과 이해
 ```java
 public class HashSetEx1 {
     public static void main(String[] args) {
@@ -27,7 +27,7 @@ public class HashSetEx1 {
 - `add()`는 객체를 추가할 때 `HashSet`에 이미 같은 객체를 가지고 있으면 중복으로 간주하고, 저장하지 않고 `false`를 리턴한다.
 - 그런데 1이 두번 출력된 것은 첫번째 1은 `String`인스턴스이고, 두번째 1은 `Integer`인스턴스이기 때문이다.
 
-### 3) `HashSet` 예제 2 : 로또번호 생성기(중복된 숫자X)
+##### `HashSet` 예제 2 : 로또번호 생성기(중복된 숫자X)
 ```java
 public class HashSetLotto {
     public static void main(String[] args) {
@@ -50,7 +50,8 @@ public class HashSetLotto {
 - 중복된 값이 저장되지 않는 `HashSet`의 성질을 이용해서 로또번호를 생성했다.
 - `Math.random()`를 이용했기 때문에 실행할 때마다 생성되는 번호가 달라진다.
 - 번호를 크기 순으로 정렬하기 위해 `Collections.sort()`를 사용했는데 `sort()`의 인자로 `List`가 필요하기 때문에 `LinkedList`클래스의 생성자를 이용해 처리
-### 4) `HashSet` 예제 3 : 빙고판 만들기(`HashSet`, `LinkedHashSet`)
+
+##### `HashSet` 예제 3 : 빙고판 만들기(`HashSet`, `LinkedHashSet`)
 ```java
 public class Bingo {
     public static void main(String[] args) {
@@ -86,7 +87,7 @@ public class Bingo {
 - 여러번 실행하다보면 같은 숫자가 비슷한 위치에 나온다는 사실을 발견할 수 있는데 `HashSet`은 저장된 순서를 보장하지 않고, 자체적인 방식에 따라 저장하게 된다.
 - 이 경우에는 `HashSet`보다는 `LinkedHashSet`이 더 나은 선택일 수 있다.
 
-### 5) `HashSet` 예제 4 : name, age가 같으면 같은 사람으로 인식하기 1
+##### `HashSet` 예제 4 : name, age가 같으면 같은 사람으로 인식하기 1
 ```java
 public class HashSetEx2 {
     public static void main(String[] args) {
@@ -121,7 +122,7 @@ class Person {
 - 하지만 결과를 출력해보면 `name`과 `age`가 동일한데도 불구하고 2명이 출력되었다.
 - 코드의 의도대로 두 인스턴스가 같은 것으로 인식하게 하려면 어떻게 해야할지 다음 예제를 통해 알아보자.
 
-### 6) `HashSet` 예제 5 : name, age가 같으면 같은 사람으로 인식하기 2 (`equals()`와 `hashCode()`)
+##### `HashSet` 예제 5 : name, age가 같으면 같은 사람으로 인식하기 2 (`equals()`와 `hashCode()`)
 ```java
 public class HashSetEx3 {
     public static void main(String[] args) {
@@ -173,7 +174,7 @@ class Person2 {
   - `equals()`를 이용한 비교에 의해서 `true`를 얻은 두 개체에 대해 각각 `hashCode()`를 호출해서 얻은 결과는 반드시 같아야한다.
   - `equals()`를 호출했을 때 `false`를 반환하는 두 객체는 `hashCode()` 호출에 대해 같은 `int`값을 반환하는 경우가 있어도 괜찮지만, 해싱(hashing)을 사용하는 컬렉션의 성능을 향상시키기 위해 다른 `int`값을 반환하는 것이 좋다.
 
-### 7) `HashSet` 예제 6 : 교집합, 합집합, 차집합
+##### `HashSet` 예제 6 : 교집합, 합집합, 차집합
 ```java
 public class HashSetEx4 {
     public static void main(String[] args) {

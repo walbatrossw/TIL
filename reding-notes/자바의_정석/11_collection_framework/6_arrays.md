@@ -1,9 +1,9 @@
-## 1.6 `Arrays`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `Arrays`?
+## 1. `Arrays`란?
 `Arrays` 클래스에는 **배열을 다루는데 유용한 메서드들이 정의** 되어 있다. 같은 기능의 메서드가 배열의 타입만 다르게 오버로딩되어 있을 뿐, 실제로는 그리 많지 않다. 정의된 메서드는 모두 **`static`메서드** 이다. 주요 메서드들에 대해 알아보자.
 
-### 2) `copyOf()`, `copyOfRange()` : 배열의 복사
+## 2. `copyOf()`, `copyOfRange()` : 배열의 복사
 ```java
 int[] arr = {0, 1, 2, 3, 4};
 int[] arr2 = Arrays.copyOf(arr, arr.length); // arr2 = {0, 1, 2, 3, 4}
@@ -16,7 +16,7 @@ int[] arr6 = Arrays.copyOfRange(arr, 0, 7); // arr6 = {0, 1, 2, 3, 4, 0, 0}
 - `copyOf()` : 배열전체를 복사해서 새로운 배열에 반환
 - `copyOfRange()` : 배열의 일부를 복사해서 새로운 배열에 반환, 지정된 범위의 끝은 포함되지 않음
 
-### 3) `fill()`, `setAll()` : 배열 채우기
+## 3. `fill()`, `setAll()` : 배열 채우기
 ```java
 int[] arr = new int[5];
 Arrays.fill(arr, 9);  // arr = {9, 9, 9, 9, 9}
@@ -25,7 +25,7 @@ Arrays.setAll(arr, () -> (int) (Math.random() * 5 ) + 1); // arr = {1, 5, 2, 1, 
 - `fill()` : 배열의 모든 요소를 지정된 값으로 채움
 - `setAll()` : 배열을 채우는데 사용할 함수형 인터페이스를 매개변수로 받는다. 함수형객체나 람다식을 매개변수로 지정해야함
 
-### 4) `sort()`, `binarySearch()` : 배열의 정렬과 검색
+## 4. `sort()`, `binarySearch()` : 배열의 정렬과 검색
 ```java
 int[] arr = {3, 2, 0, 1, 4};
 int index = Arrays.binarySearch(arr, 2); // index = -5 로 잘못된 결과가 나온다.
@@ -37,7 +37,7 @@ int index = Arrays.binarySearch(arr, 2); // index = 2 올바른 결과가 나온
 - `sort()` : 배열을 정렬할 때 사용
 - `binarySearch()` : 배열에 저장된 요소를 검색할 때 사용, 배열에서 지정된 값이 저장된 위치를 찾아서 반환하는데 반드시 배열이 정렬되어 있어야함
 
-### 5) `equals()`, `toString()` : 문자열 비교와 출력
+## 5. `equals()`, `toString()` : 문자열 비교와 출력
 ```java
 String[][] str2D = new String[][]{{"aaa", "bbb"}, {"AAA", "BBB"}};
 String[][] str2D2 = new String[][]{{"aaa", "bbb"}, {"AAA", "BBB"}};
@@ -57,7 +57,7 @@ System.out.println(Arrays.deepToString(arr2D)); // [[11, 12], [21, 22]]
 - `toString()` : 일차원 배열만 출력
 - `deepToString()` : 다차원 배열 출력
 
-### 6) `asList(Object... a)` : 배열을 `List`로 변환
+## 6. `asList(Object... a)` : 배열을 `List`로 변환
 ```java
 List list = Arrays.asList(new Integer[]{1, 2, 3, 4, 5}); // list = [1, 2, 3, 4, 5]
 List<Integer> list = Arrays.asList(1, 2, 3, 4, 5); // list = [1, 2, 3, 4, 5]
@@ -71,12 +71,12 @@ list.add(6); // UnsupportedOperationException 예외 발생
   List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
   ```
 
-### 7) `parallelXXX()`, `spliterator()`, `stream()`
+## 7. `parallelXXX()`, `spliterator()`, `stream()`
 - `parallelXXX()` : 보다 빠른 결과를 얻기 위해 여러 쓰레드가 작업을 나누어 처리
 - `spliterator()` : 여러 쓰레드가 처리할 수 있게 하나의 작업을 여러 작업으로 나누는 `Spliterator`를 반환
 - `stream()` : 컬렉션을 스트림으로 반환
 
-### 8) `Arrays` 예제 1
+##### `Arrays` 예제 1
 ```java
 public class ArraysEx {
     public static void main(String[] args) {

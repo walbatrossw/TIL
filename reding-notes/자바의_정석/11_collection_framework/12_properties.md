@@ -1,10 +1,10 @@
-## 1.12 `Properties`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `Properties`?
-`Properties`는 `HashMap`의 구버전인 `Hashtable`을 상속받아 구현한 것으로, `Hashtable`은 키와 값을 `(Object, Object)`의 형태로 저장하는데 비해 `Properties`는 `(String, String)`형태로 저장하는 보다 단순화된 컬렉션 클래스이다.
-주로 애플리케이션의 환경설정과 관련된 속성을 저장하는데 사용되며 데이터를 파일로부터 읽고 쓰는 편리한 기능을 제공한다. 그래서 간단한 입출력은 `Properties`를 활용하면 몇 줄의 코드로 쉽게 해결할 수 있다.
+## `Properties`란?
+`Properties`는 `HashMap`의 구버전인 `Hashtable`을 상속받아 구현한 것으로, `Hashtable`은 키와 값을 `(Object, Object)`의 형태로 저장하는데 비해 **`Properties`는 `(String, String)`형태로 저장하는 보다 단순화된 컬렉션 클래스** 이다.
+**주로 애플리케이션의 환경설정과 관련된 속성을 저장하는데 사용되며 데이터를 파일로부터 읽고 쓰는 편리한 기능을 제공한다.** 그래서 간단한 입출력은 `Properties`를 활용하면 몇 줄의 코드로 쉽게 해결할 수 있다.
 
-### 2) `Properties`예제 1 : 저장, 읽기, 출력
+##### `Properties`예제 1 : 저장, 읽기, 출력
 ```java
 public class PropertiesEx1 {
     public static void main(String[] args) {

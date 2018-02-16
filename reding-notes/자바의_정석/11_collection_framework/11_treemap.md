@@ -1,9 +1,9 @@
-## 1.11 `TreeMap`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-### 1) `TreeMap`?
+## `TreeMap`이란?
 이름에서 알 수 있듯이 **이진검색트리의 형태로 키와 값의 쌍으로 이루어진 데이터를 저장하는데 검색과 정렬에 적합한 컬렉션 클래스** 이다. 기본적인 검색성능은 `HashMap`이 더 뛰어나지만 **범위검색이나 정렬이 필요한 경우는 `TreeMap`을 사용하는 것** 이 좋다.
 
-### 2) `TreeMap`예제 1 : `TreeMap`을 이용한 그래프 표현하기
+##### `TreeMap`예제 1 : `TreeMap`을 이용한 그래프 표현하기
 ```java
 public class TreeMapEx1 {
     public static void main(String[] args) {
