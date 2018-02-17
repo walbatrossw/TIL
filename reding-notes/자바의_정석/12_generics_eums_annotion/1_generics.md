@@ -1,19 +1,18 @@
-# 1 `Generics`
+본 내용은 자바의 정석 3rd Edition을 참고하여 작성되었습니다. 개인적으로 학습한 내용을 복습하기 목적이기 때문에 내용상 오류가 있을 수 있습니다.
 
-## 1.1 `Generics`?
-**`Generics`는 다양한 타입의 객체를 다루는 메서드나 컬렉션 클래스에 컴파일 시의 타입체크(complie-time type check)를 해주는 기능** 이다. 객체의 타입을 컴파일 시에 체크하기 때문에 객체의 타입 안정성을 높이고 형변환의 번거로움이 줄어든다.
+## 1. `Generics`이란?
+**`Generics`는 다양한 타입의 객체를 다루는 메서드나 컬렉션 클래스에 컴파일 시의 타입 체크(complie-time type check)를 해주는 기능** 이다. 객체의 타입을 컴파일 시에 체크하기 때문에 객체의 타입 안정성을 높이고 형변환의 번거로움이 줄어든다.
 
-- 타입의 안정성을 높이는 것?
-  - 의도하지 않은 타입의 객체가 저장되는 것을 막고, 저장된 객체를 꺼내올 때 원래의 타입과 다른 타입으로 잘못 형변환되어 발생할 수 있는 오류를 줄여준다는 뜻이다.
-- 장점
-  - 타입 안전성을 제공한다.
-  - 타입체크와 형변환을 생략할 수 있으므로 코드가 간결해진다.
+**타입의 안정성을 높이는 것이란?**
+- 의도하지 않은 타입의 객체가 저장되는 것을 막고, 저장된 객체를 꺼내올 때 원래의 타입과 다른 타입으로 잘못 형변환되어 발생할 수 있는 오류를 줄여준다는 뜻이다.
 
----
+**제네릭의 장점**
+- 타입 안전성을 제공한다.
+- 타입체크와 형변환을 생략할 수 있으므로 코드가 간결해진다.
 
-## 1.2 `Generics` 클래스의 선언
+## 2. `Generics` 클래스의 선언
 
-### 1) 제네릭 클래스 선언방법
+**제네릭 클래스 선언방법**
 ```java
 class Box {
 
@@ -49,14 +48,16 @@ class Box<T> {
 - 기호의 종류만 다를뿐 임의의 참조형 타입을 의미한다는 것은 모두 같다.
 - 기존에는 다양한 종류의 타입을 다루는 메서드의 매개변수나 리턴타입으로 `Object`타입의 참조변수를 많이 사용했고, 그로 인해 형변환이 불가피 했지만 이젠 `Object`타입 대신 원하는 타입을 지정하기만 하기만 하면된다.
 
-### 2) 제네릭 클래스의 객체 생성
+**제네릭 클래스의 객체 생성**
 ```java
 Box<String> b = new Box<String>(); // 타입 T대신 실제 타입을 지정
 //b.setItem(new Object()); // 에러 String타입 이외의 타입은 지정이 불가능
 b.setItem("abc"); // OK, String타입이므로 가능
 //String item = (String) b.getItem(); // 형변환이 이제 필요 없음
 ```
+
 - 제네릭 클래스가 된 `Box`클래스의 객체를 생성할 때는 다음과 같이 참조변수와 생성자에 타입 `T`대신 사용될 실제타입을 지정해주어야 한다.
+
 ```java
 class Box<String> {
   String item;
@@ -76,7 +77,8 @@ class Box<String> {
 - 제네릭이 도입되기 이전의 코드와의 호환을 위해 제네릭 클래스인데도 불구하고 예전의 방식으로 객체를 생성하는 것이 허용된다.
 - 이렇게 하였을 경우 제네릭 타입을 지정하지 않아 안전하지 않다는 경고가 발생한다 `unchecked or unsafe operation`
 
-### 3) 제네릭의 용어
+**제네릭의 용어**
+
 ```java
 class Box<T> {}
 ```
@@ -84,7 +86,7 @@ class Box<T> {}
 - `T` : 타입변수, 타입매개변수
 - `Box` : 원시타입(raw type)
 
-### 4) 제네릭의 제한
+**제네릭의 제한**
 ```java
 Box<Apple> appleBox = new Box<Apple>();
 Box<Grape> grapeBox = new Box<Grape>();
@@ -116,11 +118,10 @@ class Box<T> {
 - 제네릭 배열을 생성할 수 없는 것은 `new`연산자 때문인데, 이 연산자는 컴파일 시점에 타입 `T`가 뭔지 정확히 알아야한다. 그런데 위의 코드에 정의된 `Box<T>`클래스를 컴파일하는 시점에서는 `T`가 어떤 타입이 될지 전혀 알 수 없다.
 - **`instanceof`연산자도 `new`연산자와 같은 이유로 `T`를 피연산자로 사용할 수 없다.**
 
----
 
-## 1.3 `Generics`클래스의 객체 생성과 사용
+## 3. `Generics`클래스의 객체 생성과 사용
 
-### 1) 제네릭 객체 생성과 사용법
+**제네릭 객체 생성과 사용법**
 ```java
 class Box<T> {
   ArrayList<T> list = new ArrayList<T>();
@@ -189,7 +190,7 @@ fruitBox.add(new Apple());  // OK, void add(Fruit item);
 ```
 - **메서드의 매개변수에 대입된 타입의 자손의 객체는 추가할 수 있다.**
 
-### 2) 제네릭 클래스의 객체 생성과 사용 예제1
+##### 제네릭 클래스의 객체 생성과 사용 예제 1
 ```java
 public class FruitBoxEx1 {
     public static void main(String[] args) {
@@ -269,11 +270,10 @@ class Toy {
 [Toy]
 ```
 
----
 
-## 1.4 제한된 `Generics`클래스
+## 4. 제한된 `Generics`클래스
 
-### 1) 제한된 `Generics`클래스 사용법
+**제한된 `Generics`클래스 사용법**
 
 ```java
 FruitBox<Toy> fruitBox = new FruitBox<Toy>();
@@ -318,7 +318,7 @@ class FruitBox<T extends Fruit & Eatable> {
 ```
 - 타입 `T`를 Fruit의 자손이면서 `Eatable`인터페이스도 구현해야한다면 위와 같이 `&`기호로 연결해준다.
 
-### 2) 제한된 `Generics`클래스 예제 1
+##### 제한된 `Generics`클래스 예제 1
 ```java
 public class FruitBoxEx2 {
     public static void main(String[] args) {
@@ -403,16 +403,16 @@ grapeBox = [Grape]v
 
 ---
 
-## 1.5 와일드카드
+## 5. 와일드카드
 
-### 1) 와일드카드?
-제네릭 타입을 매개변수나 반환 타입으로 사용할 때 구체적인 타입 대신 와일드 카드를 다음과 같이 세 가지 형태로 사용할 수 있다
+**와일드카드란?**
+제네릭 타입을 매개변수나 반환 타입으로 사용할 때 구체적인 타입 대신 와일드 카드를 다음과 같이 세 가지 형태로 사용할 수 있다.
 - `<? extends T>` : 와일드 카드의 상한제한, `T`와 그의 자손들만 가능
 - `<? super T>` : 와일드 카드의 하한제한, `T`와 그의 조상들만 가능
 - `<?>` : 제한 없음, 모든 타입이 가능, `<? extends Object>`와 동일
 - 제네릭 클래스와 달리 와일드 카드에는 `&`를 사용할 수 없음
 
-### 2) 와일드카드 예제1 : `<? extends T>` - 와일드카드 상한제한
+##### 와일드카드 예제1 : `<? extends T>` - 와일드카드 상한제한
 ```java
 public class FruitBoxEx3 {
     public static void main(String[] args) {
@@ -536,7 +536,7 @@ Apple Grape Juice
 Apple Apple Juice
 ```
 
-### 3) 와일드카드 예제2 : `<? super T>` - 와일드카드의 하한제한
+##### 와일드카드 예제2 : `<? super T>` - 와일드카드의 하한제한
 ```java
 public class FruitBoxEx4 {
     public static void main(String[] args) {
@@ -700,11 +700,10 @@ class FruitComp implements Comparator<Fruit4> {
   }
   ```
 
----
+## 6. 제네릭 메서드
 
-## 1.6 제네릭 메서드
+**제네릭 메서드란?**
 
-### 1) 제네릭 메서드?
 **매서드의 선언부에 제네릭 타입이 선언된 메서드** 를 제네릭 메서드라고 한다. 이전 예제에서 본 것처럼 `Collections.sort()`가 바로 제네릭 메서드이며, **제네릭 타입의 선언 위치는 반환 타입 앞** 이다.
 
 ```java
@@ -726,7 +725,7 @@ class FruitBox<T> {
 - `static`멤버에는 타입 매개변수를 사용할 수 없지만, 이처럼 메서드에 제네릭 타입을 선언하고 사용하는 것은 가능하다.
 - 메서드에 선언된 제네릭 타입은 마치 지역 변수를 선언한 것과 같다고 생각하면 이해하기가 쉬운데 이 타입 매개변수는 메서드 내에서만 지역적으로 사용되기 때문에 메서드가 `static`이든 아니든 상관없기 때문이다.
 
-### 2) 제네릭 메서드 선언, 호출
+**제네릭 메서드 선언, 호출**
 
 그렇다면 이전 예제의 `makeJuice2()`를 제네릭 메서드로 변경하고, 호출해보자
 ```java
@@ -763,7 +762,7 @@ System.out.println(this.makeJuice2(fruitBox));  // OK
 System.out.println(Juicer.makeJuice2(fruitBox)); // OK
 ```
 
-### 3) 제네릭 메서드 매개변수 타입의 간소화
+**제네릭 메서드 매개변수 타입의 간소화**
 ```java
 public static void printAll(ArrayList<? extends Products> list1,
                             ArrayList<? extends Products> list2) {
@@ -779,7 +778,7 @@ public static <T extends Products> void printAll(ArrayList<T> list1,
 }
 ```
 
-### 4) 제네릭 메서드 타입이 복잡하게 선언된 경우?
+**제네릭 메서드 타입이 복잡하게 선언된 경우?**
 
 ```java
 public static <T extends Comparable<? super T>> void sort(List<T> list) {
@@ -806,11 +805,9 @@ public static <T extends Comparable<? super T>> void sort(List<T> list) {
 - `Comparable<? super T>` : `T`또는 그 조상의 타입을 비교하는 `Comparable`이어야 한다는 것을 의미
 - 만약 `T`가 `Student`이고, `Person`의 자손이라면 `<? super T>`는 `Student`, `Person`, `Object` 모두 가능하다.
 
----
+## 7. 제네릭 타입의 형변환
 
-## 1.7 제네릭 타입의 형변환
-
-### 1) 제네릭 타입과 넌제네릭(non-generic) 타입 간의 형변환 : 가능
+**제네릭 타입과 넌제네릭(non-generic) 타입 간의 형변환 : 가능**
 ```java
 Box box = null;
 Box<Object> objBox = null;
@@ -820,7 +817,7 @@ objBox = (Box<Object>) box; // OK, 형변환 가능 : 원시타입 -> 제네릭,
 ```
 
 
-### 2) 대입된 타입이 다른 제네릭 타입 간의 형변환 : 불가능
+**대입된 타입이 다른 제네릭 타입 간의 형변환 : 불가능**
 ```java
 Box<Object> objBox = null;
 Box<String> strBox = null;
@@ -829,15 +826,7 @@ objBox = (Box<Object>) strBox; // 에러, 형변환 불가
 strbox = (Box<String>) objBox; // 에러, 형변환 불가
 ```
 
-### 3) 제네릭 타입과 와일드 카드 타입 간의 형변환 : 가능
+**제네릭 타입과 와일드 카드 타입 간의 형변환**
 ```java
 Box<? extends Object> wBox = new Box<String>();
 ```
-
-
----
-
-## 1.8 제네릭 타입의 제거
-
-
----
