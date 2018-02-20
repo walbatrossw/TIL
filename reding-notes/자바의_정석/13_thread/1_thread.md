@@ -142,11 +142,125 @@ t1.start();
 
 앞서 쓰레스를 실행시킬 때 `run()`이 아닌 `start()`를 호출하는 것에 대해 다소 의문 들었을 것이다. 이제 `start()`와 `run()`의 차이와 쓰레드가 실행되는 과정에 대해서 알아보자.
 
-`main()`에서 `run()`을 호출하는 것은 생성된 쓰레드를 실행시키는 것이 아니라, 단순히 클래스에 선언된 메서드를 호출하는 것일 뿐이다. 반면에 `start()`는 새로운 쓰레드가 작업을 실행하는데 필요한 호출스택을 생성한 다음에 `run()`을 호출해서 생성된 호출스택에 `run()`이 첫번째로 올라가게 한다. 모든 쓰레드는 독립적인 작업을 수행하기 위해 자신만의 호출 스택을 필요로 하기 때문에 새로운 쓰레드를 생성하고 실행시킬 때마다 새로운 호출스택이 생성되고 쓰레드가 종료되면 작업에 사용된 호출스택은 소멸된다.
+`main()`에서 `run()`을 호출하는 것은 생성된 쓰레드를 실행시키는 것이 아니라, 단순히 클래스에 선언된 메서드를 호출하는 것일 뿐이다.
+![thread1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/13_thread/img/thread1.png?raw=true)
+
+반면에 `start()`는 새로운 쓰레드가 작업을 실행하는데 필요한 호출스택을 생성한 다음에 `run()`을 호출해서 생성된 호출스택에 `run()`이 첫번째로 올라가게 한다. 모든 쓰레드는 독립적인 작업을 수행하기 위해 자신만의 호출 스택을 필요로 하기 때문에 새로운 쓰레드를 생성하고 실행시킬 때마다 새로운 호출스택이 생성되고 쓰레드가 종료되면 작업에 사용된 호출스택은 소멸된다.
+
+아래의 그림은 새로운 쓰레드를 생성하고, `start()`를 호출한 후 호출스택의 변화를 순서대로 나타낸 것이다.
+
+![thread2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/13_thread/img/thread2.png?raw=true)
+
+1. `main()`에서 쓰레드의 `start()`를 호출한다.
+
+![thread3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/13_thread/img/thread3.png?raw=true)
+
+2. `start()`는 새로운 쓰레드를 생성하고, 쓰레드가 작업하는데 사용될 호출스택을 생성한다.
+
+![thread4](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/13_thread/img/thread4.png?raw=true)
+
+3. 새로 생성된 호출스택에 `run()`이 호출되어, 쓰레드가 독립된 공간에서 작업을 수행한다.
+
+![thread5](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/13_thread/img/thread5.png?raw=true)
+
+4. 이제는 호출스택이 2개이므로 스케쥴러가 정한 순서에 의해 번갈아가면서 실행된다.
+
+보통 일반적으로 쓰레드가 하나일 경우 호출스택에서는 가장 위에 있는 메서드가 현재 실행중인 메서드이고, 나머지 메서드들은 대기상태에 있다. 그러나 위의 그림과 같이 쓰레드가 둘 이상일 때는 호출스택의 최상위에 있는 메서드일지라도 대기상태에 있을 수 있다. 스케쥴러는 실행대기 중인 쓰레드들의 우선순위를 고려하여 실행순서와 실행시간을 결정하고, 각 쓰레드들은 작성된 스케쥴에 따라 자신의 순서가 되면 지정된 시간동안 작업을 수행한다.
+
+스케쥴러는 실행 대기 중인 쓰레드들의 우선순위를 고려하여 실행순서와 실행시간을 결정하고, 각 쓰레드들은 작성된 스케쥴에 따라 자신의 순서가 되면 지정된 시간동안 작업을 수행한다.
+
+이 때 주어진 시간동안 작업을 마치지 못한 쓰레드는 다시 자신의 차례가 돌아올 때까지 대기상태로 있게되며, 자업을 마친 쓰레드, 즉 `run()`의 수행이 종료된 쓰레드는 호출스택에 모두 비워지면서 쓰레드가 사용하던 호출스택은 사라지게된다.
+
+#### 쓰레드 예제 1 : `start()`호출
+```java
+public class ThreadEx2 {
+
+    public static void main(String[] args) {
+        ThreadEx2_1 t1 = new ThreadEx2_1();
+        t1.start();
+    }
+
+}
+
+
+class ThreadEx2_1 extends Thread {
+
+    public void run() {
+        throwException();
+    }
+
+    public void throwException() {
+        try {
+            throw new Exception();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+```
+java.lang.Exception
+	at com.doubles.standardofjava.ch13_thread.ThreadEx2_1.throwException(ThreadEx2.java:19)
+	at com.doubles.standardofjava.ch13_thread.ThreadEx2_1.run(ThreadEx2.java:14)
+```
+- 새로 생성한 쓰레드에서 고의로 예외를 발생시키고, `printStackTrace()`을 이용해서 예외가 발생한 당시의 호출스택을 출력하는 예제이다.
+- 호출스택의 첫번째 메서드가 `main()`이 아니라 `run()`인 것을 알 수 있다.
+- 한 쓰레드가 예외가 발생해서 종료되어도 다른 쓰레드의 실행에는 영향을 미치지 않는다. 아래의 그림에 `main`쓰레드의 호출스택이 없는 이유는 `main`쓰레드가 종료되었기 때문이다.
+
+#### 쓰레드 예제 2 : `run()`호출
+```java
+public class ThreadEx3 {
+
+    public static void main(String[] args) {
+        ThreadEx3_1 t1 = new ThreadEx3_1();
+        t1.run();
+    }
+
+}
+
+class ThreadEx3_1 extends Thread {
+
+    public void run() {
+        throwException();
+    }
+
+    public void throwException() {
+        try {
+            throw new Exception();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+```
+java.lang.Exception
+	at com.doubles.standardofjava.ch13_thread.ThreadEx3_1.throwException(ThreadEx3.java:20)
+	at com.doubles.standardofjava.ch13_thread.ThreadEx3_1.run(ThreadEx3.java:15)
+	at com.doubles.standardofjava.ch13_thread.ThreadEx3.main(ThreadEx3.java:7)
+```
+- 이전 예제와 다르게 쓰레드가 새로 생성되지 않았는데, `ThreadEx3_1`클래스의 `run()`이 호출되었을 뿐이기 때문이다.
 
 ## 4. 싱글 쓰레드와 멀티 쓰레드
+
 ## 5. 쓰레드의 우선순위
+
 ## 6. 쓰레드 그룹
+
 ## 7. 데몬 쓰레드
+
 ## 8. 쓰레드의 실행제어
+
 ## 9. 쓰레드의 동기화
+
+#### `synchronized`를 이용한 동기화
+
+#### `wait()`와 `nofify()`
+
+#### `Lock`과 `Condition`을 이용한 동기화
+
+#### `volatile`
+
+#### `fork`, `join` 프레임워크
