@@ -2,31 +2,32 @@
 
 본 포스팅은 [코드로 배우는스프링 웹프로젝트](http://www.yes24.com/24/goods/19720776?scode=032&OzSrank=1)를 참조하여 작성한 내용입니다. 개인적으로 학습한 내용을 복습하기 위한 내용이기 때문에 내용상 오류가 있을 수 있습니다. 기존의 Spring MVC 관련 포스팅들이 제대로 정리되지 않은 것 같아 처음부터 차분히 정리하면서 포스팅을 진행하고 있습니다.
 
-본 포스팅의 예제는 STS 또는 Eclipse를 사용하지 않고 IntelliJ를 통해 구현하고 있습니다. 그래서 기존의 STS에서 생성된 Spring 프로젝트의 스프링관련 설정파일명과 프로젝트 구조가 약간 다를 수 있습니다. [IntelliJ를 통한 Spring MVC 프로젝트 생성](http://doublesprogramming.tistory.com/171?category=667155) 포스팅을 참고해주시면 감사하겠습니다.
+그리고 본 포스팅의 예제는 STS 또는 Eclipse를 사용하지 않고 IntelliJ를 통해 구현하고 있습니다. 그래서 기존의 STS에서 생성된 Spring 프로젝트의 스프링관련 설정 파일명과 프로젝트 구조가 약간 다를 수 있습니다. [IntelliJ를 통한 Spring MVC 프로젝트 생성](http://doublesprogramming.tistory.com/171?category=667155) 포스팅을 참고해주시면 감사하겠습니다.
 
 포스팅하고 있는 현재 프로젝트의 예제가 혹시 필요하신 분은 깃주소(https://github.com/walbatrossw/spring-mvc-ex)를 통해 얻으실 수 있습니다.
 
-[1. IntelliJ에서 Spring MVC Project 생성하기](http://doublesprogramming.tistory.com/171)
-[2. Spring MVC - MySQL 연결테스트](http://doublesprogramming.tistory.com/172)
-[3. Spring MVC - MyBatis 설정 및 테스트](http://doublesprogramming.tistory.com/173)
-[4. Spring MVC 구조](http://doublesprogramming.tistory.com/174)
-[5. Spring MVC - Controller 작성 연습, WAS없이 Controller 테스트 해보기](http://doublesprogramming.tistory.com/175)
-[6. SpringMVC + MyBatis](http://doublesprogramming.tistory.com/176)
+|순서|포스팅 제목|
+|:---:|---|
+|1|[IntelliJ에서 Spring MVC Project 생성하기](http://doublesprogramming.tistory.com/171)|
+|2|[Spring MVC - MySQL 연결테스트](http://doublesprogramming.tistory.com/172)|
+|3|[Spring MVC - MyBatis 설정 및 테스트](http://doublesprogramming.tistory.com/173)|
+|4|[Spring MVC 구조](http://doublesprogramming.tistory.com/174)|
+|5|[Spring MVC - Controller 작성 연습, WAS없이 Controller 테스트 해보기](http://doublesprogramming.tistory.com/175)|
+|6|[SpringMVC + MyBatis](http://doublesprogramming.tistory.com/176)|
 
----
+#### Spring-MVC 게시판 예제  이전 포스팅 링크
+|순서|포스팅 제목|
+|:---:|---|
+|1|[Intellij를 이용한 Spring-MVC 프로젝트 생성 및 세팅](http://doublesprogramming.tistory.com/177)|
 
-앞서 위와 같이 여러번의 포스팅에 걸쳐서 Spring-MVC에 대해 정리해보았다. 아직 정리가 부족한 부분은 포스팅을 하면서 추가적으로 정리해보도록 하자.
-이제는 본격적으로 Spring-MVC 게시판 만들기 예제를 직접 구현해보면서 각각의 내용들을 다시 한번 정리해보자.
-포스팅 서두에서 언급한 것과 같이 IntelliJ에서 Spring MVC 프로젝트를 생성했기 때문에 기존에 STS나 Eclipse의 스프링 설정 관련 `xml`파일명이 다르거나, 디렉토리 구조가 약간 다를 수 있다.
+앞서 위와 같이 여러 번의 포스팅에 걸쳐서 Spring-MVC에 대해 정리해보았다. 아직 정리가 부족한 부분은 포스팅을 하면서 추가적으로 정리할 예정이다. 이제는 본격적으로 Spring-MVC 게시판 만들기 예제를 직접 구현해보면서 각각의 내용들을 다시 한번 정리해보자. 서두에서 언급한 것과 같이 IntelliJ에서 Spring MVC 프로젝트를 생성했기 때문에 기존에 STS나 Eclipse의 스프링 설정 관련 `xml`파일명이 다르거나, 디렉토리 구조가 약간 다를 수 있다.
 
-## 01) Spring MVC 프로젝트 생성 및 라이브러리 설정
+## 1. Spring MVC 프로젝트 생성 및 라이브러리 설정
 
-#### 1. [IntelliJ에서 Spring MVC Project 생성하기](http://doublesprogramming.tistory.com/171) 포스팅 참고
+#### # [IntelliJ에서 Spring MVC Project 생성하기](http://doublesprogramming.tistory.com/171) 포스팅 참고
 
-#### 2. 라이브러리 설정 : `pom.xml`라이브러리 추가 및 변경
-* `spring-jdbc`, `spring-test` `MySQL`, `MyBatis`, `MyBatis-Spring`, `log4jdbc-log4j2`, `jackson-databind` 라이브러리 추가
-* `servlet` 버전 3.1로 변경
-* `Junit` 버전 4.12로 변경
+#### # 라이브러리 설정 : `pom.xml`라이브러리 추가 및 변경
+`spring-jdbc`, `spring-test` `MySQL`, `MyBatis`, `MyBatis-Spring`, `log4jdbc-log4j2`, `jackson-databind` 라이브러리를 추가한다. `servlet`의 버전은 3.1로 변경한다. `Junit`의 버전 4.12로 변경한다.
   ```xml
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -228,9 +229,9 @@
   </project>
   ```
 
-## 02) Web관련 설정 및 한글인코딩 설정
+## 2. Web관련 설정 및 한글인코딩 설정
 
-#### 1. `web.xml`
+#### # `web.xml`
 ```xml
 <!DOCTYPE web-app PUBLIC
         "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
