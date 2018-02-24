@@ -4,6 +4,8 @@
 
 포스팅하고 있는 현재 프로젝트의 예제가 혹시 필요하신 분은 깃주소(https://github.com/walbatrossw/spring-mvc-ex)를 통해 얻으실 수 있습니다.
 
+---
+
 #### Spring-MVC 기본 개념 및 테스트 예제 관련 포스팅 링크
 
 |순서|포스팅 제목|
@@ -18,13 +20,13 @@
 #### Spring-MVC 게시판 예제 관련 포스팅 링크
 |순서|포스팅 제목|
 |:---:|---|
-|1|[Intellij를 이용한 Spring-MVC 프로젝트 생성 및 세팅](http://doublesprogramming.tistory.com/177)|
+|1|[IntelliJ에서 Spring MVC Project 생성하기](http://doublesprogramming.tistory.com/171)|
+
+
+
+# Spring-MVC 게시판 예제 01 - 프로젝트 생성 및 세팅
 
 앞서 위와 같이 여러 번의 포스팅에 걸쳐서 Spring-MVC에 대해 정리해보았다. 아직 정리가 부족한 부분은 포스팅을 하면서 추가적으로 정리할 예정이다. 이제는 본격적으로 Spring-MVC 게시판 만들기 예제를 직접 구현해보면서 각각의 내용들을 다시 한번 정리해보자. 서두에서 언급한 것과 같이 IntelliJ에서 Spring MVC 프로젝트를 생성했기 때문에 기존에 STS나 Eclipse의 스프링 설정 관련 `xml`파일명이 다르거나, 디렉토리 구조가 약간 다를 수 있다.
-
----
-
-# Spring-MVC 게시판 예제 - 01. 프로젝트 생성 및 세팅
 
 ## 1. Spring MVC 프로젝트 생성 및 라이브러리 설정
 
@@ -403,7 +405,8 @@
 log4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
 ```
 
-#### # `logback.xml` : src/main/resoures 디렉토리에 파일 생성, 아래와 같이 작성
+#### # `logback.xml`
+`src/main/resoures` 디렉토리에 파일 생성, 아래와 같이 작성해준다.
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
@@ -449,12 +452,13 @@ log4jdbc.spylogdelegator.name=net.sf.log4jdbc.log.slf4j.Slf4jSpyLogDelegator
 
 ## 5. package, resoures 구성 및 완성된 기본 프로젝트의 형태
 #### # package 구성과 resoures에 추가된 설정파일
+아래와 같이 기능별로 각각의 패키지를 구성해준다.
 ```
 main
  ├── java
  |     └── 기본 패키지(com.doubles.mvcboard)
  |              ├── article : 게시글 관련
- |              ├── commons : 공통으로 사용되는 클래스 모음
+ |              ├── commons : 공통으로 사용되는 클래스 모음(aop, exception, interceptor, util)
  |              ├── reply   : 댓글 관련
  |              ├── tutorial : 연습 예제 관련
  |              ├── upload : 업로드 관련
@@ -472,7 +476,7 @@ main
 ```
 
 #### # 완성된 기본 프로젝트 형태
-![end](http://cfile23.uf.tistory.com/image/99C983335A1C33B80808F0)
+![end](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_210006.png?raw=true)
 
 ## 6. 마무리
 
