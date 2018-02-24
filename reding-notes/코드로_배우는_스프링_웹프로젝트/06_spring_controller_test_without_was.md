@@ -20,72 +20,71 @@ public class VoidController {
 
     @RequestMapping("/doA")
     public void doA() {
-        logger.info("doA called...");
+        logger.info("/doA called...");
     }
 
     @RequestMapping("/doB")
     public void doB() {
-        logger.info("doA called...");
+        logger.info("/doB called...");
     }
 
 }
 ```
 `/doA`, `/doB`요청시 브라우저와 콘솔화면 화면
-![doA](http://cfile9.uf.tistory.com/image/99F03C335A1959261D6B69)
+![doA](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180223_173226.png?raw=true)
 
-![doB](http://cfile5.uf.tistory.com/image/994DB6335A195926046213)
+![doB](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180223_173244.png?raw=true)
 
 ## 2. `String`리턴 타입인 경우
 `StringController`을 아래와 같이 작성해준다.
-  ```java
-  @Controller
-  public class StringController {
+```java
+@Controller
+public class StringController {
 
-      private static final Logger logger = LoggerFactory.getLogger(StringController.class);
+    private static final Logger logger = LoggerFactory.getLogger(StringController.class);
 
-      @RequestMapping("doC")
-      public String doC(@ModelAttribute("msg") String msg) {
-          logger.info("doC called....");
+    @RequestMapping("/doC")
+    public String doC(@ModelAttribute("msg") String msg) {
+        logger.info("/doC called");
+        return "tutorial/result";
+    }
 
-          return "result";
-      }
-
-  }
-  ```
+}
+```
 
 `result.jsp`을 아래와 같이 작성해준다.
-  ```xml
-  <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-  <html>
-  <head>
-      <title>doC Result</title>
-  </head>
-  <body>
-      <h2>doC</h2>
-      <p>message : ${msg}</p>
-  </body>
-  </html>
-  ```
+```xml
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>String Controller Test</title>
+</head>
+<body>
+    <span>Hello ${msg}</span>
+</body>
+</html>
+```
 `/doC` 요청시 브라우저와 콘솔화면 확인
-![doC](http://cfile24.uf.tistory.com/image/993A52335A1959262BE936)
+![doC](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180223_173322.png?raw=true)
 
 ## 3. 만들어진 결과 데이터를 view에 전달할 경우
 `DomainController`을 아래와 같이 작성해준다.
 ```java
 @Controller
-public class VoController {
+public class DomainController {
 
-    private static final Logger logger = LoggerFactory.getLogger(VoController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DomainController.class);
 
     @RequestMapping("/doD")
     public String doD(Model model) {
-        ProductVO vo = new ProductVO("sample product", 100000);
-        logger.info("doD : " + vo);
-        model.addAttribute(vo);
-        model.addAttribute("vo", vo);
 
-        return "productDetail";
+        ProductVO product = new ProductVO("desktop", 10000);
+        logger.info("/doD called");
+        model.addAttribute(product);
+
+        return "/tutorial/product_detail";
     }
+
 }
 ```
 `ProductVO`을 아래와 같이 작성해준다.
@@ -116,6 +115,7 @@ public class ProductVO {
                 ", price=" + price +
                 '}';
     }
+
 }
 ```
 `product_detail.jsp`을 아래와 같이 작성해준다.
@@ -123,18 +123,16 @@ public class ProductVO {
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>doD</title>
+    <title>Domain Controller Test</title>
 </head>
 <body>
-    <h2>doD</h2>
-    <p>model.addAttribute(vo) : ${productVO}</p>
-    <br/>
-    <p>model.addAttribute("vo", vo) : ${vo}</p>
+    <span>${productVO.name}</span>
+    <span>${productVO.price}</span>
 </body>
 </html>
 ```
 `/doD` 요청시 브라우저와 콘솔화면 확인
-![doD](http://cfile21.uf.tistory.com/image/9984E9335A195926035E2B)
+![doD](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180223_173352.png?raw=true)
 
 ## 4. `redirect`를 해야할 경우
 `RedirectController`을 아래와 같이 작성해준다.
@@ -145,41 +143,46 @@ public class RedirectController {
     private static final Logger logger = LoggerFactory.getLogger(RedirectController.class);
 
     @RequestMapping("/doE")
-    public String doE(RedirectAttributes rttr) {
-        logger.info("doE called but redirect to /doF");
-        rttr.addFlashAttribute("msg", "This is message! with redirected");
+    public String doE(RedirectAttributes redirectAttributes) {
+
+        logger.info("/doE called and redirect to /doF");
+        redirectAttributes.addAttribute("msg", "this is the message with redirected");
+
         return "redirect:/doF";
     }
 
     @RequestMapping("/doF")
     public void doF(@ModelAttribute String msg) {
-        logger.info("doF called...." + msg);
+
+        logger.info("/doF called" + msg);
+
     }
+
 }
 ```
 `/doE` 요청시 브라우저와 콘솔화면 확인
-![doE](http://cfile4.uf.tistory.com/image/998942335A19592620DC4B)
+![doE](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180223_173446.png?raw=true)
 
 ## 5. `JSON`데이터를 생성하는 경우
 `JsonController`을 아래와 같이 작성해준다.
 ```java
 @Controller
-public class JsonController {
+public class JasonController {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonController.class);
-
-    @RequestMapping("doJson")
+    @RequestMapping("/doJson")
     @ResponseBody
     public ProductVO doJson() {
-        ProductVO vo = new ProductVO("sample product", 300000);
-        logger.info(String.valueOf(vo));
-        return vo;
+
+        ProductVO productVO = new ProductVO("laptop", 3000000);
+
+        return productVO;
     }
+
 }
 ```
 
 `/doC` 요청시 브라우저와 콘솔화면 확인
-![doJson](http://cfile27.uf.tistory.com/image/990799335A19592609ACEB)
+![doJson](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180223_173515.png?raw=true)
 
 ## 6. WAS없이 Controller 테스트
 
@@ -204,29 +207,43 @@ public class JsonController {
   </dependency>
   ```
 
-테스트 코드 작성
+테스트 코드를 아래와 같이 작성해준다.
 ```java
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import javax.inject.Inject;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/*.xml"})
-public class SampleControllerTest {
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring-config/**/*.xml"})
+public class ControllerTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(SampleControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ControllerTest.class);
 
     @Inject
-    private WebApplicationContext wac;
+    private WebApplicationContext webApplicationContext;
 
-    // 브라우저에서 요청과 응답을 의미하는 객체
     private MockMvc mockMvc;
 
-    @Before // 테스트를 진행하기전 수행하는 작업
+    @Before
     public void setup() {
-        // MockMvc 객체를 생성
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-        logger.info("setup.....");
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        logger.info("setup...");
     }
-
-    // 각각의 Controller 테스트 코드 작성
 
     @Test
     public void testDoA() throws Exception {
@@ -244,7 +261,7 @@ public class SampleControllerTest {
 
     @Test
     public void testDoC() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/doC?msg=Hello"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/doC?msg=world"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -254,7 +271,7 @@ public class SampleControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/doD"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(model().attributeExists("vo"));
+                .andExpect(model().attributeExists("productVO"));
     }
 
     @Test
@@ -262,7 +279,7 @@ public class SampleControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/doE"))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/doF"));
+                .andExpect(redirectedUrl("/doF?msg=this+is+the+message+with+redirected"));
     }
 
     @Test
@@ -272,260 +289,261 @@ public class SampleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=utf-8"));
     }
+
 }
 ```
-테스트 실행 결과
-- `testDoA()`
-  ```
-  INFO : com.doubles.ex00.SampleControllerTest - setup.....
-  INFO : com.doubles.ex00.sample.VoidController - doA called....
+테스트 실행 결과 콘솔에 출력된 내용을 아래와 같다.
 
-  MockHttpServletRequest:
-        HTTP Method = GET
-        Request URI = /doA
-         Parameters = {}
-            Headers = {}
+**`testDoA()`**
+```
+INFO : com.doubles.mvcboard.tutorial.ControllerTest - setup...
+INFO : com.doubles.mvcboard.tutorial.controller.VoidController - /doA called...
 
-  Handler:
-               Type = com.doubles.ex00.sample.VoidController
-             Method = public void com.doubles.ex00.sample.VoidController.doA()
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /doA
+       Parameters = {}
+          Headers = {}
 
-  Async:
-      Async started = false
-       Async result = null
+Handler:
+             Type = com.doubles.mvcboard.tutorial.controller.VoidController
+           Method = public void com.doubles.mvcboard.tutorial.controller.VoidController.doA()
 
-  Resolved Exception:
-               Type = null
+Async:
+    Async started = false
+     Async result = null
 
-  ModelAndView:
-          View name = doA
-               View = null
-              Model = null
+Resolved Exception:
+             Type = null
 
-  FlashMap:
-         Attributes = null
+ModelAndView:
+        View name = doA
+             View = null
+            Model = null
 
-  MockHttpServletResponse:
-             Status = 200
-      Error message = null
-            Headers = {}
-       Content type = null
-               Body =
-      Forwarded URL = /WEB-INF/views/doA.jsp
-     Redirected URL = null
-            Cookies = []
+FlashMap:
+       Attributes = null
 
-  ```
-- `testDoB()`
-  ```
-  INFO : com.doubles.ex00.SampleControllerTest - setup.....
-  INFO : com.doubles.ex00.sample.VoidController - doB called....
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = {}
+     Content type = null
+             Body =
+    Forwarded URL = /WEB-INF/views/doA.jsp
+   Redirected URL = null
+          Cookies = []
+```
 
-  MockHttpServletRequest:
-        HTTP Method = GET
-        Request URI = /doB
-         Parameters = {}
-            Headers = {}
+**`testDoB()`**
+```
+INFO : com.doubles.mvcboard.tutorial.ControllerTest - setup...
+INFO : com.doubles.mvcboard.tutorial.controller.VoidController - /doB called...
 
-  Handler:
-               Type = com.doubles.ex00.sample.VoidController
-             Method = public void com.doubles.ex00.sample.VoidController.doB()
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /doB
+       Parameters = {}
+          Headers = {}
 
-  Async:
-      Async started = false
-       Async result = null
+Handler:
+             Type = com.doubles.mvcboard.tutorial.controller.VoidController
+           Method = public void com.doubles.mvcboard.tutorial.controller.VoidController.doB()
 
-  Resolved Exception:
-               Type = null
+Async:
+    Async started = false
+     Async result = null
 
-  ModelAndView:
-          View name = doB
-               View = null
-              Model = null
+Resolved Exception:
+             Type = null
 
-  FlashMap:
-         Attributes = null
+ModelAndView:
+        View name = doB
+             View = null
+            Model = null
 
-  MockHttpServletResponse:
-             Status = 200
-      Error message = null
-            Headers = {}
-       Content type = null
-               Body =
-      Forwarded URL = /WEB-INF/views/doB.jsp
-     Redirected URL = null
-            Cookies = []
+FlashMap:
+       Attributes = null
 
-  ```
-- `testDoC()`
-  ```
-  INFO : com.doubles.ex00.SampleControllerTest - setup.....
-  INFO : com.doubles.ex00.sample.StringController - doC called....
-  INFO : com.doubles.ex00.sample.StringController - msg = Hello
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = {}
+     Content type = null
+             Body =
+    Forwarded URL = /WEB-INF/views/doB.jsp
+   Redirected URL = null
+          Cookies = []
+```
 
-  MockHttpServletRequest:
-        HTTP Method = GET
-        Request URI = /doC
-         Parameters = {msg=[Hello]}
-            Headers = {}
+**`testDoC()`**
+```
+INFO : com.doubles.mvcboard.tutorial.ControllerTest - setup...
+INFO : com.doubles.mvcboard.tutorial.controller.StringController - /doC called
 
-  Handler:
-               Type = com.doubles.ex00.sample.StringController
-             Method = public java.lang.String com.doubles.ex00.sample.StringController.doC(java.lang.String)
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /doC
+       Parameters = {msg=[world]}
+          Headers = {}
 
-  Async:
-      Async started = false
-       Async result = null
+Handler:
+             Type = com.doubles.mvcboard.tutorial.controller.StringController
+           Method = public java.lang.String com.doubles.mvcboard.tutorial.controller.StringController.doC(java.lang.String)
 
-  Resolved Exception:
-               Type = null
+Async:
+    Async started = false
+     Async result = null
 
-  ModelAndView:
-          View name = result
-               View = null
-          Attribute = msg
-              value = Hello
-             errors = []
+Resolved Exception:
+             Type = null
 
-  FlashMap:
-         Attributes = null
+ModelAndView:
+        View name = tutorial/result
+             View = null
+        Attribute = msg
+            value = world
+           errors = []
 
-  MockHttpServletResponse:
-             Status = 200
-      Error message = null
-            Headers = {}
-       Content type = null
-               Body =
-      Forwarded URL = /WEB-INF/views/result.jsp
-     Redirected URL = null
-            Cookies = []
-  ```
-- `testDoD()`
-  ```
-  INFO : com.doubles.ex00.SampleControllerTest - setup.....
-  INFO : com.doubles.ex00.sample.VoController - doD : ProductVO{name='sample product', price=100000.0}
+FlashMap:
+       Attributes = null
 
-  MockHttpServletRequest:
-        HTTP Method = GET
-        Request URI = /doD
-         Parameters = {}
-            Headers = {}
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = {}
+     Content type = null
+             Body =
+    Forwarded URL = /WEB-INF/views/tutorial/result.jsp
+   Redirected URL = null
+          Cookies = []
+```
 
-  Handler:
-               Type = com.doubles.ex00.sample.VoController
-             Method = public java.lang.String com.doubles.ex00.sample.VoController.doD(org.springframework.ui.Model)
+**`testDoD()`**
+```
+INFO : com.doubles.mvcboard.tutorial.ControllerTest - setup...
+INFO : com.doubles.mvcboard.tutorial.controller.DomainController - /doD called
 
-  Async:
-      Async started = false
-       Async result = null
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /doD
+       Parameters = {}
+          Headers = {}
 
-  Resolved Exception:
-               Type = null
+Handler:
+             Type = com.doubles.mvcboard.tutorial.controller.DomainController
+           Method = public java.lang.String com.doubles.mvcboard.tutorial.controller.DomainController.doD(org.springframework.ui.Model)
 
-  ModelAndView:
-          View name = productDetail
-               View = null
-          Attribute = productVO
-              value = ProductVO{name='sample product', price=100000.0}
-             errors = []
-          Attribute = vo
-              value = ProductVO{name='sample product', price=100000.0}
-             errors = []
+Async:
+    Async started = false
+     Async result = null
 
-  FlashMap:
-         Attributes = null
+Resolved Exception:
+             Type = null
 
-  MockHttpServletResponse:
-             Status = 200
-      Error message = null
-            Headers = {}
-       Content type = null
-               Body =
-      Forwarded URL = /WEB-INF/views/productDetail.jsp
-     Redirected URL = null
-            Cookies = []
-  ```
-- `testDoE()`
-  ```
-  INFO : com.doubles.ex00.SampleControllerTest - setup.....
-  INFO : com.doubles.ex00.sample.RedirectController - doE called but redirect to /doF
+ModelAndView:
+        View name = /tutorial/product_detail
+             View = null
+        Attribute = productVO
+            value = ProductVO{name='desktop', price=10000.0}
+           errors = []
 
-  MockHttpServletRequest:
-        HTTP Method = GET
-        Request URI = /doE
-         Parameters = {}
-            Headers = {}
+FlashMap:
+       Attributes = null
 
-  Handler:
-               Type = com.doubles.ex00.sample.RedirectController
-             Method = public java.lang.String com.doubles.ex00.sample.RedirectController.doE(org.springframework.web.servlet.mvc.support.RedirectAttributes)
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = {}
+     Content type = null
+             Body =
+    Forwarded URL = /WEB-INF/views//tutorial/product_detail.jsp
+   Redirected URL = null
+          Cookies = []
+```
 
-  Async:
-      Async started = false
-       Async result = null
+**`testDoE()`**
+```
+INFO : com.doubles.mvcboard.tutorial.ControllerTest - setup...
+INFO : com.doubles.mvcboard.tutorial.controller.RedirectController - /doE called and redirect to /doF
 
-  Resolved Exception:
-               Type = null
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /doE
+       Parameters = {}
+          Headers = {}
 
-  ModelAndView:
-          View name = redirect:/doF
-               View = null
-              Model = null
+Handler:
+             Type = com.doubles.mvcboard.tutorial.controller.RedirectController
+           Method = public java.lang.String com.doubles.mvcboard.tutorial.controller.RedirectController.doE(org.springframework.web.servlet.mvc.support.RedirectAttributes)
 
-  FlashMap:
-          Attribute = msg
-              value = This is message! with redirected
+Async:
+    Async started = false
+     Async result = null
 
-  MockHttpServletResponse:
-             Status = 302
-      Error message = null
-            Headers = {Location=[/doF]}
-       Content type = null
-               Body =
-      Forwarded URL = null
-     Redirected URL = /doF
-            Cookies = []
-  ```
-- `testDoJson()`
-  ```
-  INFO : com.doubles.ex00.SampleControllerTest - setup.....
-  INFO : com.doubles.ex00.sample.JsonController - ProductVO{name='sample product', price=300000.0}
+Resolved Exception:
+             Type = null
 
-  MockHttpServletRequest:
-        HTTP Method = GET
-        Request URI = /doJson
-         Parameters = {}
-            Headers = {}
+ModelAndView:
+        View name = redirect:/doF
+             View = null
+        Attribute = msg
+            value = this is the message with redirected
 
-  Handler:
-               Type = com.doubles.ex00.sample.JsonController
-             Method = public com.doubles.ex00.domain.ProductVO com.doubles.ex00.sample.JsonController.doJson()
+FlashMap:
+       Attributes = null
 
-  Async:
-      Async started = false
-       Async result = null
+MockHttpServletResponse:
+           Status = 302
+    Error message = null
+          Headers = {Location=[/doF?msg=this+is+the+message+with+redirected]}
+     Content type = null
+             Body =
+    Forwarded URL = null
+   Redirected URL = /doF?msg=this+is+the+message+with+redirected
+          Cookies = []
+```
 
-  Resolved Exception:
-               Type = null
+**`testDoJson()`**
+```
+INFO : com.doubles.mvcboard.tutorial.ControllerTest - setup...
 
-  ModelAndView:
-          View name = null
-               View = null
-              Model = null
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /doJson
+       Parameters = {}
+          Headers = {}
 
-  FlashMap:
-         Attributes = null
+Handler:
+             Type = com.doubles.mvcboard.tutorial.controller.JasonController
+           Method = public com.doubles.mvcboard.tutorial.domain.ProductVO com.doubles.mvcboard.tutorial.controller.JasonController.doJson()
 
-  MockHttpServletResponse:
-             Status = 200
-      Error message = null
-            Headers = {Content-Type=[application/json;charset=UTF-8]}
-       Content type = application/json;charset=UTF-8
-               Body = {"name":"sample product","price":300000.0}
-      Forwarded URL = null
-     Redirected URL = null
-            Cookies = []
-  ```
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = {Content-Type=[application/json;charset=UTF-8]}
+     Content type = application/json;charset=UTF-8
+             Body = {"name":"laptop","price":3000000.0}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+```
+
 
 #### 테스트 코드를 작성하고 테스트를 하는 것의 장점
 *  웹페이지를 테스트하려면 매번 입력 항목을 입력해서 제대로 동작하는지 확인하는데, 여러번 웹페이지를 입력하는 것보다 테스트 코드를 통해 처리하는 것이 개발 시간을 단축할 수 있다.
