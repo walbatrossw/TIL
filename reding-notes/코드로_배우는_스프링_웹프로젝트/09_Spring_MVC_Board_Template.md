@@ -31,9 +31,9 @@
 
 AdminLTE 다운로드 페이지(https://adminlte.io/docs/2.4/installation)에서 템플릿 다운로드한 뒤에 압축해제 후 `bower_component`, `dist`, `plugins` 폴더를 복사 프로젝트의 `/webapp/resources` 디렉토리에 붙여넣는다.
 
-![photo01](http://cfile28.uf.tistory.com/image/99AD60335A1D0DCE01E986)
+![photo01](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_214254.png?raw=true)
 
-![photo02](http://cfile30.uf.tistory.com/image/9967C7335A1D0E3E262F54)
+![photo02](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_230555.png?raw=true)
 
 views디렉토리에 `home.jsp`를 생성하고, 압축 해제한 템플릿 폴더의 `starter.html`파일 전체 코드를 복사한 뒤 붙여넣는다. 그리고 `dispathcer-servlet.xml`에 정적자원 디렉토리를 등록해준다.
 
@@ -59,14 +59,14 @@ public class HomeController {
 
 크롬 브라우저 개발자도구의 Network탭에서 정적자원 요청이 제대로 이루어지는지 확인한다.
 
-![photo03](http://cfile3.uf.tistory.com/image/996461335A1D129216E190)
+![photo03](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_222551.png?raw=true)
 
 ## 2. Include 처리
 Include 관련 포스팅 : [JSP include(지시자와 액션태그)](http://doublesprogramming.tistory.com/64)
 
 만약 현재 `home.jsp`처럼 많은 코드를 반복적으로 모든 페이지마다 작성한다면 수정할 코드가 있을 때마다 모든 페이지를 동일하게 수정해 줘야하는 번거로움이 있다. 그래서 `views`디렉토리 하위에 `include`디렉토리를 생성하여 각각 부분별로 `jsp`파일을 만들어주고 include해주는게 좋다. `home.jsp`페이지의 내용을 5개 부분으로 나누어 `jsp`파일을 생성해 `home.jsp`에 include 해주자.
 
-![photo08](http://cfile10.uf.tistory.com/image/998E96335A1D3161260C5A)
+![photo08](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_222654.png?raw=true)
 - `head.jsp` : `meta`태그, `css`태그를 작성해줄 곳
 - `main_header.jsp` : 페이지의 main header에 해당하는 부분
 - `left_column.jsp` : 페이지의 left side column에 해당하는 부분
@@ -75,20 +75,20 @@ Include 관련 포스팅 : [JSP include(지시자와 액션태그)](http://doubl
 
 아래 사진은 브라우저 상에서 보이는 부분을 나누어 본 것으로 그외에 `head.jsp`, `plugin_js.jsp`는 css와 js태그를 추가할 용도로 사용한다.
 
-![photo04](http://cfile30.uf.tistory.com/image/99907A335A1D2EF0290758)
+![photo04](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_223342.png?raw=true)
 
-아래 사진의 코드는 내용이 상당히 길기 때문에 collaspe한 상태이다. include할 내용을 복사해서 해당하는 `jsp`파일에 붙여 넣어주고 include를 해주면된다. 왼쪽의 line number를 보더라도 319에서 57로 줄어든 것을 볼 수 있다. 이제 페이지 본문내용의 코드는 `<div class="content-wrapper">`에 작성해주기만 하면된다.
+아래 사진의 코드는 내용이 상당히 길기 때문에 collaspe한 상태이다. include할 내용을 복사해서 해당하는 `jsp`파일에 붙여 넣어주고 include를 해주면된다. 왼쪽의 line number를 보더라도 310에서 52로 줄어든 것을 볼 수 있다. 이제 페이지 본문내용의 코드는 `<div class="content-wrapper">`에 작성해주기만 하면된다.
 
 include 처리하기 전 `home.jsp`
 
-![photo05](http://cfile23.uf.tistory.com/image/99BD56335A1D31610171D4)
+![photo05](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_225439.png?raw=true)
 
 include 처리하기 후 `home.jsp`
 
-![photo06](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180221_170425.png?raw=true)
+![photo06](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_230146.png?raw=true)
 
 크롬 브라우저 개발자도구의 Network탭에서 정상적으로 화면이 나오는지 다시 확인해보면 이상없이 잘 나오는것을 확인해볼 수 있다.
-  ![photo07](http://cfile27.uf.tistory.com/image/99896F335A1D33BE12668A)
+![photo07](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_230228.png?raw=true)
 
 
 ## 3. 마무리
