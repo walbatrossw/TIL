@@ -21,6 +21,7 @@
 |:---:|---|
 |1|[Intellij를 이용한 Spring-MVC 프로젝트 생성 및 세팅](http://doublesprogramming.tistory.com/177)|
 |2|[Bootstrap 템플릿 세팅 (AdminLTE)](http://doublesprogramming.tistory.com/178)|
+|3|[기본적인 CRUD 구현 : 영속계층, 비지니스계층](http://doublesprogramming.tistory.com/195)|
 
 #### 포스팅과 관련된 내용 포스팅 링크
 |순서|포스팅 제목|
@@ -408,23 +409,46 @@ $(document).ready(function () {
 
 ## 5. 기본적인 CRUD 구현 모습 확인
 #### # 메인페이지
-![]()
+![main.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-20-02.png?raw=true)
 #### # 게시글 등록처리
 게시글 등록 페이지
-![]()
+![write.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-21-10.png?raw=true)
 게시글 등록처리 성공알림
-![]()
+![regSuccess](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-21-30.png?raw=true)
 #### # 게시글 목록
 게시글 목록 페이지
-![]()
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-21-56.png?raw=true)
 #### # 게시글 조회
 게시글 조회 페이지
-![]()
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-22-19.png?raw=true)
 #### # 게시글 수정
 게시글 수정 페이지
-![]()
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-23-58.png?raw=true)
 게시글 수정처리 성공알림
-![]()
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-24-14.png?raw=true)
+게시글 수정 처리 완료후
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-24-40.png?raw=true)
 #### # 게시글 삭제처리
 게시글 삭제처리 성공알림
-![]()
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-25-12.png?raw=true)
+게시글 삭제처리 완료 후
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-25-34.png?raw=true)
+
+## 6. 간단 요약 정리
+게시판 예제의 기본적인 CRUD기능 control, presentation 계층 구현을 완료했다. 지금까지 구현한 내용을 간단히 요약정리 해보자.
+#### # Controller
+- `@RequestMapping` : 매핑처리, GET/POST, URI
+- `@RequestParam` : 파라미터 전달, 형변환이 가능
+- `RedirectAttributes.addFlashAttribute()` : `redirect`처리시 사용될 데이터를 저장하기 위해
+
+#### # JSP
+- `EL`, `JSTL`을 사용하기 위해 `head.jsp`에 태그 추가 작성
+- `include`페이지 수정과 `include`경로 수정
+- `JS`, `jQuery`를 이용해 페이지 요청처리
+
+## 7. 추가적으로 구현해야할 사항들
+게시글을 처리하는 예제를 구현하면서 앞으로 추가될 사항들을 정리해보자.
+- 예외 발생의 처리
+- 게시글의 입력 항목들의 검증처리
+- 게시글 조회시 이스케이프 문자처리
+- 게시글 목록의 페이징과 검색처리
