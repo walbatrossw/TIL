@@ -80,5 +80,9 @@ public class CommonExceptionAdvice {
 ```
 
 #### # 예외가 발생할 경우 출력된 화면의 모습
-![common_error.jsp1]()
-![common_error.jsp2]()
+예외를 고의적으로 발생시켜보면 아래와 같이 `common_error.jsp`로 이동하여 예외가 발생한 내용을 출력하게 된다.
+![common_error.jsp1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2017-02-36.png?raw=true)
+![common_error.jsp2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2017-08-56.png?raw=true)
+
+#### # 정리
+위와 같이 예외를 처리하고, 어떤 예외가 발생했는지 브라우저에 로그를 출력해줌으로써 개발할 때 보다 빠르게 예외나 에러가 발생한 원인을 빠르게 찾을 수 있다. 하지만 실서버에 배포하고, 서비스를 할 때에는 위와 같은 예외처리 출력은 바람직하지 못하다. 사용자가 웹을 사용하면서 이러한 예외를 마주치게 해서는 안되기 때문이다. 그래서 예외가 발생한 경우를 대비해 404, 500 에러 정도를 알려주는 적절한 페이지를 만들어 주는 것이 바람직하다.
