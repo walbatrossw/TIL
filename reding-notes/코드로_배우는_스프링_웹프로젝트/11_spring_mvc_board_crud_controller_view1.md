@@ -44,16 +44,36 @@
 |POST|/article/modify|게시글의 수정처리|
 |POST|/article/remove|게시글의 삭제처리|
 
-## 2. 게시글의 기본 CRUD관련 Controller 작성
-게시글 컨트롤러를 작성하기에 앞서 알아두어야 할 사항들을 정리해보자.
-- 파라미터의 수집은 SpringMVC에서 자동으로 이루어지므로, 파라미터의 수집이 필요할 경우 원하는 객체를 파라미터로 선언하고, 특별한 경우가 아니라면 `VO`클래스나 `DTO`클래스를 파라미터로 사용하는 것이 편리하다.
-- 브라우저에서 들어오는 요청이 자동으로 파라미터로 지정한 클래스의 객체 속성 값으로 처리되는데 이것을 바인딩(Binding)이라고 한다.
-- SpringMVC의 `Model`객체는 해당 메서드에서 뷰(`JSP`)에 필요한 데이터를 전달하는 용도로 사용되는데 메서드 내에 뷰로 전달할 데이터가 있다면 `MOdel`을 파라미터로 선언해주는 것이 편리하다.
-- `RedirectAttributes`객체는 `redirect`되는 시점에 한번만 사용될 데이터를 전송할 수 있는 `addFlashAttribute()`라는 메서드가 정의 되어있다. 이 메서드를 사용하면 `redirect`된 페이지까지 데이터를 전송하지만 URI상에서는 보이지 않게된다.
-- `@RequestParam`은 `Servlet`에서 `request.getParameter()`와 유사한 역할을 수행하는데 문자열, 숫자, 날짜 등의 형변환까지 가능하다.
+## 2. JSP파일 수정사항 및 생성
+Control, Presentation계층을 구현하기에 앞서 미리 설정해야할 사항들을 정리해보자. 앞서 포스팅을 하면서 누락했던 사항들도 함께 정리했다.
 
-게시글 컨트롤러(`ArticleController`)를 생성하고, 아래의 코드와 같이 작성해준다.
+#### # `Include`페이지 수정 : `left_column.jsp`, `head.jsp`
+`JSTL`과 `EL`을 사용하기 위해 `head.jsp`의 상단에 아래와 같이 코드를 추가시켜준다.
+```xml
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="path" value="${pageContext.request.contextPath}"/>
+```
+그리고 템플릿의 왼쪽 사이드 메뉴를 사용하기 위해 `left_column.jsp`의 코드를 아래와 같이 수정해준다.
+```xml
+<ul class="sidebar-menu" data-widget="tree">
+    <li class="header">메뉴</li>
+    <li class="active"><a href="${path}/article/write"><i class="fa fa-edit"></i> <span>게시글 작성</span></a></li>
+    <li><a href="${path}/article/list"><i class="fa fa-list"></i> <span>게시글 목록</span></a></li>
+</ul>
+```
 
+#### # `jsp`파일 생성, `include`경로 변경
+`WEB-INF/views/article`디렉토리에 등록(`write.jsp`), 조회(`read.jsp`), 수정(`modify.jsp`), 목록(`list.jsp`) `jsp`파일을 생성해준다. 그리고 `home.jsp`의 전체 코드를 복사해 붙여넣고, `include`의 모든 경로를 아래와 같이 수정해준다.
+```xml
+<%@ include file="../include/jsp파일명"%>
+```
+
+
+## 3. 게시글 관련 컨트롤러 생성하기
+#### # `ArticleController`
+`/src/main/java/기본패키지/article/controller`패키지에 `ArticleController`를 생성하고, 아래와 같이 코드를 작성한다.
 ```java
 @Controller
 @RequestMapping("/article")
@@ -67,16 +87,18 @@ public class ArticleController {
     public ArticleController(ArticleService articleService) {
         this.articleService = articleService;
     }
-
-}    
+}
 ```
-컨트롤러 클래스 선언부에 `@Controller`애너테이션과 `@RequestMapping("/article")`을 추가한다. `@RequestMapping("/article")`을 추가함으로써 공통의 경로를 `/article`로 인식하도록 설정하였다. 보통 컨트롤러는 하나의 기능을 가진 모듈의 대표적인 경로를 갖도록 하는 것이 좋다. 이후 컨트롤러에 작성할 메서드들의 매핑URL의 길이를 줄여주는 장점도 가지게 된다.
+위 코드에서 주목할 점은 클래스 선언부의 `@RequestMapping("/article")`인데 공통의 경로를 `/article`로 인식하도록 설정한 것이다. 보통 컨트롤러는 하나의 기능을 가진 모듈의 대표적인 경로를 갖도록 하는 것이 좋다. 이후 작성할 메서드에 매핑할 URL의 길이를 줄여주는 장점도 가지고 있다.
 
-각각의 요청에 응답할 메서드들을 아래와 같이 작성한다.
+이제 본격적으로 등록, 목록, 조회, 수정, 삭제 순으로 기능을 구현해보자.
 
-#### # 등록
+## 4. 등록 구현
+
+#### # 게시글 등록관련 메서드 작성
+`ArticleController`에 게시글 등록 페이지 이동을 위한 메서드(`writeGET()`)와 등록 처리를 위한 메서드(`wrtiePOST()`)는 아래와 같이 작성해준다.
 ```java
-// 등록 페이지 이동
+// 게시글 등록페이지 매핑
 @RequestMapping(value = "/write", method = RequestMethod.GET)
 public String writeGET() {
 
@@ -87,127 +109,22 @@ public String writeGET() {
 ```
 
 ```java
-// 등록 처리
+// 게시글 등록처리 매핑
 @RequestMapping(value = "/write", method = RequestMethod.POST)
-public String writePOST(ArticleVO articleVO,
-                        RedirectAttributes redirectAttributes) throws Exception {
+public String writePOST(ArticleVO articleVO, Model model) throws Exception {
 
     logger.info("write POST...");
     logger.info(articleVO.toString());
     articleService.create(articleVO);
-    redirectAttributes.addFlashAttribute("msg", "regSuccess");
+    model.addAttribute("msg", "regSuccess");
 
-    return "redirect:/article/list";
+    return "/article/success";
 }
 ```
-게시글 등록 처리요청을 처리하고, `redirect`되는 시점에 `RedirectAttributes`객체의 `addFlashAttribute()`를 이용해 처리가 성공적으로 이루어진 것을 알리기 위해 `regSuccess`메시지를 `String`데이터로 저장해준다.
-
-#### # 목록
-```java
-// 목록 페이지 이동
-@RequestMapping(value = "/list", method = RequestMethod.GET)
-public String list(Model model) throws Exception {
-
-    logger.info("list ...");
-    model.addAttribute("articles", articleService.listAll());
-
-    return "/article/list";
-}
-```
-
-#### # 조회
-```java
-// 조회 페이지 이동
-@RequestMapping(value = "/read", method = RequestMethod.GET)
-public String read(@RequestParam("articleNo") int articleNo,
-                   Model model) throws Exception {
-
-    logger.info("read ...");
-    model.addAttribute("article", articleService.read(articleNo));
-
-    return "/article/read";
-}
-```
-
-#### # 수정
-```java
-// 수정 페이지 이동
-@RequestMapping(value = "/modify", method = RequestMethod.GET)
-public String modifyGET(@RequestParam("articleNo") int articleNo,
-                        Model model) throws Exception {
-
-    logger.info("modifyGet ...");
-    model.addAttribute("article", articleService.read(articleNo));
-
-    return "/article/modify";
-}
-```
-
-```java
-// 수정 처리
-@RequestMapping(value = "/modify", method = RequestMethod.POST)
-public String modifyPOST(ArticleVO articleVO,
-                         RedirectAttributes redirectAttributes) throws Exception {
-
-    logger.info("modifyPOST ...");
-    articleService.update(articleVO);
-    redirectAttributes.addFlashAttribute("msg", "modSuccess");
-
-    return "redirect:/article/list";
-}
-```
-게시글 수정 처리요청을 처리하고, `redirect`되는 시점에 `RedirectAttributes`객체의 `addFlashAttribute()`를 이용해 처리가 성공적으로 이루어진 것을 알리기 위해 `modSuccess`메시지를 `String`데이터로 저장해준다.
-
-
-#### # 삭제
-```java
-// 삭제 처리
-@RequestMapping(value = "/remove", method = RequestMethod.POST)
-public String remove(@RequestParam("articleNo") int articleNo,
-                     RedirectAttributes redirectAttributes) throws Exception {
-
-    logger.info("remove ...");
-    articleService.delete(articleNo);
-    redirectAttributes.addFlashAttribute("msg", "delSuccess");
-
-    return "redirect:/article/list";
-}
-```
-게시글 삭제 처리요청을 처리하고, `redirect`되는 시점에 `RedirectAttributes`객체의 `addFlashAttribute()`를 이용해 처리가 성공적으로 이루어진 것을 알리기 위해 `delSuccess`메시지를 `String`데이터로 저장해준다.
-
-## 3. JSP파일 생성 및 수정
-
-#### # `Include`페이지 수정 : `head.jsp`, `left_column.jsp`
-`JSTL`과 `EL`을 사용하기 위해 `head.jsp`의 상단에 아래와 같이 코드를 추가시켜준다.
-```xml
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<c:set var="path" value="${pageContext.request.contextPath}"/>
-```
-그리고 왼쪽 사이드 메뉴를 사용하기 위해 `left_column.jsp`의 코드를 아래와 같이 수정해준다.
-```xml
-<ul class="sidebar-menu" data-widget="tree">
-    <li class="header">메뉴</li>
-    <li class="active"><a href="${path}/article/write"><i class="fa fa-edit"></i> <span>게시글 작성</span></a></li>
-    <li><a href="${path}/article/list"><i class="fa fa-list"></i> <span>게시글 목록</span></a></li>
-</ul>
-```
-
-#### # `JSP`파일 생성, `include`경로 변경
-`WEB-INF/views/article`디렉토리에 등록(`write.jsp`), 조회(`read.jsp`), 수정(`modify.jsp`), 목록(`list.jsp`) `jsp`파일을 생성해준다. 그리고 `home.jsp`의 전체 코드를 복사해 붙여넣고, 각각의 `JSP`파일의 `include`의 모든 경로를 아래와 같이 수정해준다.
-```xml
-<%@ include file="../include/head.jsp"%>
-<%@ include file="../include/main_header.jsp"%>
-<%@ include file="../include/left_column.jsp"%>
-<%@ include file="../include/main_footer.jsp"%>
-<%@ include file="../include/plugin_js.jsp"%>
-```
-
-## 4. 게시글 관련 페이지 작성
-각각의 페이지의 내용은 `<section class="content container-fluid">`태그 안에 작성하면 된다.
+`writePOST()`의 파라미터는 화면으로부터 받아온 모든 데이터를 `ArticleVO`로 수집 하도록하는 부분과 향후 데이터를 전달할 가능성이 있으므로 `Model`클래스의 객체를 받도록 했다. 게시글 처리가 완료되면 게시글 목록페이지로 `redirect`가 되도록 할 예정인데 아직 게시글 목록 페이지가 구현되지 않았기 때문에 임시페이지인 `success.jsp`을 생성하여 정상적으로 게시글이 등록되었는지 확인할 수 있도록 하였다.
 
 #### # 게시글 등록 페이지 : `write.jsp`
+게시글 등록페이지인 `write.jsp`의 `<section>`태그 안에 아래와 같이 코드를 작성해준다.
 ```xml
 <div class="col-lg-12">
     <form role="form" id="writeForm" method="post" action="${path}/article/write">
@@ -241,8 +158,55 @@ public String remove(@RequestParam("articleNo") int articleNo,
     </form>
 </div>
 ```
+아래의 사진은 게시글 작성 페이지의 모습이다.
+![write.jsp]()
+아래의 사진은 게시글이 정상적으로 등록되고, `success.jsp`페이지로 이동한 결과이다.
+![regSuccess]()
 
-#### # 게시글 목록 페이지 : `list.jsp`
+#### # 등록처리 메서드 수정
+이제는 게시글 등록이 완료되면 `success.jsp`로 이동하지 않고, `redirect`결과페이지인 `list.jsp`로 이동하도록 `writePOST()`메서드의 리턴값을 `"redirect:/article/list";`로 변경한다. 그리고 아래의 코드에서 주목 해야할 점은 `writePOST()`의 매개변수 중에서 `Model`이 `RedirectAttributes`로 변경되었다는 점이다. `RedirectAttributes`객체는 `redirect`되는 시점에 딱 한번만 사용될 데이터를 전송할 수 있는 `addFlashAttribute()`라는 메서드가 정의 되어있다. 이 메서드를 통해 게시글의 등록처리가 완료되고 `redirect` 되는 시점에 딱 한번만 게시글이 성공적으로 등록되었다는 것을 알리는 데이터가 전송된다.
+
+```java
+@RequestMapping(value = "/write", method = RequestMethod.POST)
+public String writePOST(ArticleVO articleVO,
+                        RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("write POST...");
+    logger.info(articleVO.toString());
+    articleService.create(articleVO);
+    redirectAttributes.addFlashAttribute("msg", "regSuccess");
+
+    return "redirect:/article/list";
+}
+```
+
+`list.jsp`의 하단에 `<script>`태그를 추가하고 `js`코드를 아래와 같이 작성해주면 게시글 등록처리 완료 `alert`창이 뜨게된다.
+```js
+var result = "${msg}";
+if (result == "regSuccess") {
+    alert("게시글 등록이 완료되었습니다.");
+}
+```
+
+## 5. 목록 구현
+이제 게시글 목록 구현을 완료해보자.
+
+#### # 게시글 목록 메서드 작성
+
+```java
+// 게시글 목록 페이지 매핑
+@RequestMapping(value = "/list", method = RequestMethod.GET)
+public String list(Model model) throws Exception {
+
+    logger.info("list ...");
+    model.addAttribute("articles", articleService.listAll());
+
+    return "/article/list";
+}
+```
+
+#### # 게시글 등록 페이지 : `write.jsp`
+`<section>`태그 안에 아래와 같이 코드를 작성해준다.
 ```xml
 <div class="col-lg-12">
     <div class="box box-primary">
@@ -281,18 +245,29 @@ public String remove(@RequestParam("articleNo") int articleNo,
     </div>
 </div>
 ```
-게시글 등록, 수정, 삭제 요청이 컨트롤러에서 처리가 되고, `redirect`되면서 `redirectAttributes.addFlashAttribute()`를 통해 저장된 데이터를 가지고 요청이 정상적으로 처리되었는지 알려주기 위해 아래와 같이 `js`코드를 작성해준다.
-```js
-var result = "${msg}";
-if (result == "regSuccess") {
-    alert("게시글 등록이 완료되었습니다.");
-} else if (result == "modSuccess") {
-    alert("게시글 수정이 완료되었습니다.");
-} else if (result == "delSuccess") {
-    alert("게시글 삭제가 완료되었습니다.");
+위의 코드에서 주목해야할 점은 게시글의 제목에 `<a>`태그로 조회페이지로 이동할 수 있도록 링크를 처리한 것과 게시글의 작성시간을 `JSTL`의 `fmt`태그를 통해 날짜,시간의 포맷을 변경한 것이다.
+
+아래의 사진은 게시글이 정상적으로 등록되고 게시글 목록페이지로 이동한 결과이다.
+![regSuccess]()
+![list.jsp]()
+
+## 6. 조회 구현
+
+#### # 게시글 조회 메서드 작성
+```java
+// 게시글 조회 페이지 매핑
+@RequestMapping(value = "/read", method = RequestMethod.GET)
+public String read(@RequestParam("articleNo") int articleNo,
+                   Model model) throws Exception {
+
+    logger.info("read ...");
+    model.addAttribute("article", articleService.read(articleNo));
+
+    return "/article/read";
 }
 ```
-#### # 게시글 조회 페이지 : `read.jsp`
+
+#### # 게시글 조회 페이지 작성
 ```xml
 <div class="col-lg-12">
     <div class="box box-primary">
@@ -324,7 +299,7 @@ if (result == "regSuccess") {
     </div>
 </div>
 ```
-게시글 조회 페이지의 하단 버튼(목록, 수정, 삭제)를 제어하기 위해 아래와 같이 `jQuery`코드를 작성해준다. 각각의 버튼을 클릭함에 따라 `form`태그 속성 값을 변경하기 위해 `attr()`을 사용했다.
+위의 코드에서 눈여겨봐야할 점은 수정페이지, 삭제처리 링크처리인데 `<a>`를 사용하지 않고, `jQuery`를 통해 페이지를 이동하도록 `<script>`태그 안에 아래와 같이 작성해준다.
 ```js
 $(document).ready(function () {
 
@@ -349,7 +324,41 @@ $(document).ready(function () {
 });
 ```
 
-#### # 게시글 수정 페이지 : `modify.jsp`
+
+아래의 그림은 조회 페이지로 이동한 결과이다.
+![read.jsp]()
+
+
+## 7. 수정 구현
+
+#### # 수정관련 메서드 작성
+```java
+// 수정페이지 매핑
+@RequestMapping(value = "/modify", method = RequestMethod.GET)
+public String modifyGET(@RequestParam("articleNo") int articleNo,
+                        Model model) throws Exception {
+
+    logger.info("modifyGet ...");
+    model.addAttribute("article", articleService.read(articleNo));
+
+    return "/article/modify";
+}
+```
+```java
+// 수정처리 매핑
+@RequestMapping(value = "/modify", method = RequestMethod.POST)
+public String modifyPOST(ArticleVO articleVO,
+                         RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("modifyPOST ...");
+    articleService.update(articleVO);
+    redirectAttributes.addFlashAttribute("msg", "modSuccess");
+
+    return "redirect:/article/list";
+}
+```
+
+#### # 수정페이지 작성
 ```xml
 <div class="col-lg-12">
     <form role="form" id="writeForm" method="post" action="${path}/article/modify">
@@ -384,7 +393,6 @@ $(document).ready(function () {
     </form>
 </div>
 ```
-수정 페이지의 하단 버튼을 제어하기 위해 아래와 같이 `jQuery`코드를 작성해준다.
 ```js
 $(document).ready(function () {
 
@@ -406,25 +414,18 @@ $(document).ready(function () {
 });
 ```
 
-## 5. 기본적인 CRUD 구현 모습 확인
-#### # 메인페이지
-![]()
-#### # 게시글 등록처리
-게시글 등록 페이지
-![]()
-게시글 등록처리 성공알림
-![]()
-#### # 게시글 목록
-게시글 목록 페이지
-![]()
-#### # 게시글 조회
-게시글 조회 페이지
-![]()
-#### # 게시글 수정
-게시글 수정 페이지
-![]()
-게시글 수정처리 성공알림
-![]()
-#### # 게시글 삭제처리
-게시글 삭제처리 성공알림
-![]()
+## 8. 삭제 구현
+#### # 게시글 삭제 메서드 작성
+```java
+// 게시글 삭제 매핑
+@RequestMapping(value = "/remove", method = RequestMethod.POST)
+public String remove(@RequestParam("articleNo") int articleNo,
+                     RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("remove ...");
+    articleService.delete(articleNo);
+    redirectAttributes.addFlashAttribute("msg", "delSuccess");
+
+    return "redirect:/article/list";
+}
+```

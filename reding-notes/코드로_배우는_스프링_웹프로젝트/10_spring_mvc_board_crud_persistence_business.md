@@ -29,7 +29,7 @@
 
 ---
 
-# Spring MVC 게시판 예제 03 - 기본적인 CRUD 구현 : 영속계층, 비지니스계층
+# Spring MVC 게시판 예제 03 - 기본적인 CRUD 구현 : Presistence, Business 계층
 
 ## 1. 게시판 테이블 생성
 기본적인 CRUD를 구현하기에 앞서 `spring_ex`스키마에 아래와 같이 `tbl_article`테이블을 생성해준다.
