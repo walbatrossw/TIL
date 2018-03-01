@@ -230,6 +230,59 @@ public class PageMaker {
 ## 5. 컨트롤러와 JSP페이지 작성
 
 #### # `ArticleController`
+`ArticleController`에 페이지 번호 출력처리가 된 목록페이지를 처리할 메서드를 아래와 같이 작성해준다.
 ```java
+@RequestMapping(value = "/listPaging", method = RequestMethod.GET)
+public String listPaging(Model model, Criteria criteria) throws Exception {
+    logger.info("listPaging ...");
 
+    PageMaker pageMaker = new PageMaker();
+    pageMaker.setCriteria(criteria);
+    pageMaker.setTotalCount(1000);
+
+    model.addAttribute("articles", articleService.listCriteria(criteria));
+    model.addAttribute("pageMaker", pageMaker);
+
+    return "/article/list_paging";
+}
 ```
+위의 코드에 눈여겨 볼 점은 아래와 같다.
+- `Criteria`, `Model`타입의 변수 `criteria`와 `model`를 파라미터로 사용한다.
+- `Model`객체를 사용하여 `PageMaker`에서 계산한 결과 값을 저장한다.
+- 아직 영속계층에서 전체 게시글의 갯수를 구하는 로직을 구현하지 않았기 때문에 `setTotalCount()`의 매개변수는 1000을 임의로 넣어주었다.
+
+#### # `list_paging.jsp`
+`/WEB-INF/views/article/`디렉토리에 `list_paging.jsp`파일을 생성하고, `list.jsp`의 내용을 전체 복사한 뒤 붙여 넣는다. 그리고 `<div class="box-body"></div>`태그 바로 밑에 추가적으로 아래의 코드를 작성해준다.
+```xml
+<div class="box-footer">
+    <div class="text-center">
+        <ul class="pagination">
+            <c:if test="${pageMaker.prev}">
+                <li><a href="${path}/article/listPaging?page=${pageMaker.startPage - 1}">이전</a></li>
+            </c:if>
+            <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="idx">
+                <li <c:out value="${pageMaker.criteria.page == idx ? 'class=active' : ''}"/>>
+                    <a href="${path}/article/listPaging?page=${idx}">${idx}</a>
+                </li>
+            </c:forEach>
+            <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
+                <li><a href="${path}/article/listPaging?page=${pageMaker.endPage + 1}">다음</a></li>
+            </c:if>
+        </ul>
+    </div>
+</div>
+```
+위의 코드에서 살펴볼 점을 정리한 내용은 아래와 같다.
+- `JSTL`의 `<c:if>` 조건문을 통해 이전 링크와 다음 링크의 활성/비활성 처리를 하였다.
+- `<c:forEach>` 반복문을 통해 `pageMaker`클래스에서 계산된 페이지 번호를 출력해준다.
+- `<c:out>`에서 삼항연산자를 통해 `<li>`태그의 속성을 제어하여 페이지 번호들 중에서 현재 페이지 번호임을 알 수 있게 색을 변경한다.
+
+#### # 페이지 번호 출력까지 한 목록 페이지 화면
+첫 페이지와 이전 링크 비활성화
+![1]()
+
+중간 페이지와 이전, 다음 링크 활성화
+![2]()
+
+끝 페이지와 다음 링크 비활성화
+![3]()
