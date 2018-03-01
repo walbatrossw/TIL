@@ -96,6 +96,7 @@ public String listCriteria(Model model, Criteria criteria) throws Exception {
 int endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
 ```
 예를 들어 위의 계산식을 통해 계산한 결과는 아래의 표와 같다.
+
 |페이지 번호의 갯수|현재 페이지|계산식|끝 페이지 번호|
 |---|---|---|---|
 |10|3|Math.ceil(3/10) * 10|10|
@@ -112,6 +113,7 @@ int endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * d
 int startPage = (endPage - displayPageNum) + 1;
 ```
 끝 페이지 번호에서 페이지 번호의 갯수를 빼고 1을 더해 주기만 하면 된다. 예를 들어 계산한 결과는 아래의 표와 같다.
+
 |끝 페이지 번호|페이지 번호의 갯수|계산식|시작 페이지 번호|
 |---|---|---|---|
 |10|10|(10-10)+1|1|
@@ -160,10 +162,10 @@ boolean next = endPage * criteria.getPerPageNum() >= totalCount ? false : true;
 // true = 10 * 10 >= 101 ? false : true;
 ```
 
-## 4. 페이징 처리를 위한 클래스 설계
+## 4. 페이징 처리를 위한 계산 클래스 설계
 위에서 정리한 계산식을 직접 JSP에서 처리할 수 있지만, 좀 더 편리하게 사용하기 위해서 별도의 클래스를 설계하여 처리하는 것이 좋다. 이렇게 클래스를 설계하여 처리하면 페이징이 필요한 모든 곳에서 사용할 수 있기 때문에 재사용에 장점을 가지게 된다.
 
-클래스 작성에 앞서 필요한 데이터를 혼동하지 않도록 다시 한번 체크해보자.
+클래스 작성에 앞서 필요한 데이터 변수들을 혼동하지 않도록 다시 한번 체크해보자.
 
 **외부에서 입력되는 데이터**
 - `page` : 현재 페이지의 번호
@@ -181,4 +183,53 @@ boolean next = endPage * criteria.getPerPageNum() >= totalCount ? false : true;
 #### # `PageMaker`클래스 작성
 이제 하단의 페이지 번호 출력을 도와줄 클래스를 아래와 같이 작성한다.
 ```java
+public class PageMaker {
+
+    private int totalCount;
+    private int startPage;
+    private int endPage;
+    private boolean prev;
+    private boolean next;
+
+    private int displayPageNum = 10;
+
+    private Criteria criteria;
+
+    public void setCriteria(Criteria criteria) {
+        this.criteria = criteria;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+        calcData();
+    }
+
+    private void calcData() {
+
+        endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
+
+        startPage = (endPage - displayPageNum) + 1;
+
+        int tempEndPage = (int) (Math.ceil(totalCount / (double) criteria.getPerPageNum()));
+
+        if (endPage > tempEndPage) {
+            endPage = tempEndPage;
+        }
+
+        prev = startPage == 1 ? false : true;
+
+        next = endPage * criteria.getPerPageNum() >= totalCount ? false : true;
+
+    }
+}
+```
+위 코드에서 주목해서 봐야할 점은 아래와 같이 2가지이다.
+- `displayPageNum` : 하단의 페이지 번호의 갯수를 의미한다.
+- `calcData()` : 게시글의 전체 갯수가 설정되는 시점에 `calcData()`메서드를 호출하여 필요한 데이터들를 계산한다.
+
+## 5. 컨트롤러와 JSP페이지 작성
+
+#### # `ArticleController`
+```java
+
 ```
