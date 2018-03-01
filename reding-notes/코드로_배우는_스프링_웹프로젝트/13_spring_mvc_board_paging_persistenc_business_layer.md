@@ -63,13 +63,14 @@ public void testCreate() throws Exception {
 SELECT COUNT(*) FROM tbl_article;
 ```
 쿼리 수행 결과
-![COUNT]()
+![COUNT](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2018-27-23.png?raw=true)
 
 ## 4. 페이징 처리를 위한 SQL : `LIMIT`
 DB에 따라 페이징 처리를 위한 방법은 각기 다른데 MySQL의 경우 `LIMIT`를 ORACLE의 경우는 `ROWNUM`을 이용한다. 본 예제의 경우 MySQL을 사용하기 때문에 `LIMIT`을 이용할 것이다.
 ```sql
 -- MySQL LIMIT
-SELECT SQL
+SELECT *
+FROM 테이블명
 LIMIT 시작데이터, 출력할 데이터갯수
 ```
 `LIMIT`을 사용하는 방법은 간단하다. 기존의 `SELECT`쿼리에 `LIMIT`키워드를 써주고 첫번째는 시작데이터를 두번째는 출력할 데이터의 갯수를 써주면 된다. 만약 게시글을 10건씩 출력하고, 첫번째 페이지를 출력하고 싶다면 아래와 같이 쿼리를 작성해주면 된다.
@@ -87,4 +88,254 @@ ORDER BY article_no DESC, regdate DESC
 LIMIT 0, 10
 ```
 쿼리 수행 결과
-![LIMIT]()
+![LIMIT](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2018-48-31.png?raw=true)
+
+## 5. 페이징 처리를 위한 영속(Persistence) 계층 구현
+
+#### # `ArticleDAO`인터페이스 : 페이징 처리와 관련된 메서드 추가
+```java
+List<ArticleVO> listPaging(int page) throws Exception;
+```
+
+#### # `ArticleDAOImpl`클래스 : 메서드 구현
+`ArticleDAO`인터페이스에서 선언한 추상메서드를 `ArticleDAOImpl`클래스에서 아래와 같이 구현해준다.
+```java
+@Override
+public List<ArticleVO> listPaging(int page) throws Exception {
+
+    if (page <= 0) {
+        page = 1;
+    }
+
+    page = (page - 1) * 10;
+
+    return sqlSession.selectList(NAMESPACE + ".listPaging", page);
+}
+```
+파라미터 `page`의 값이 0보다 작은 음수값이 들어올 수 없게 위와 같이 조건문을 작성해준다.
+
+#### # `articleMapper.xml` : `LIMIT`쿼리 작성
+게시글을 페이지당 10개씩 출력하기 위해 아래와 같이 `LIMIT`쿼리를 작성해준다.
+```sql
+<select id="listPaging" resultMap="ArticleResultMap">
+    <![CDATA[
+    SELECT
+        article_no,
+        title,
+        content,
+        writer,
+        regdate,
+        viewcnt
+    FROM tbl_article
+    WHERE article_no > 0
+    ORDER BY article_no DESC, regdate DESC
+    LIMIT #{page}, 10
+    ]]>
+</select>
+```
+
+## 6. 페이징 처리 SQL 테스트
+
+#### # `ArticleDAOTest`
+`ArticleDAOTest`클래스에 아래와 같이 페이징 처리 SQL테스트 코드를 작성해준다.
+```java
+@Test
+public void testListPaging() throws Exception {
+
+    int page = 3;
+
+    List<ArticleVO> articles = articleDAO.listPaging(page);
+
+    for (ArticleVO article : articles) {
+        logger.info(article.getArticleNo() + ":" + article.getTitle());
+    }
+
+}
+```
+
+#### # 테스트 결과
+테스트 결과 아래와 같이 출력되었다.
+```
+|-----------|-----------------|-----------------|-------|----------------------|--------|
+|article_no |title            |content          |writer |regdate               |viewcnt |
+|-----------|-----------------|-----------------|-------|----------------------|--------|
+|980        |980번째 글 제목입니다... |980번재 글 내용입니다... |user00 |2018-02-28 18:19:52.0 |0       |
+|979        |979번째 글 제목입니다... |979번재 글 내용입니다... |user09 |2018-02-28 18:19:52.0 |0       |
+|978        |978번째 글 제목입니다... |978번재 글 내용입니다... |user08 |2018-02-28 18:19:52.0 |0       |
+|977        |977번째 글 제목입니다... |977번재 글 내용입니다... |user07 |2018-02-28 18:19:52.0 |0       |
+|976        |976번째 글 제목입니다... |976번재 글 내용입니다... |user06 |2018-02-28 18:19:52.0 |0       |
+|975        |975번째 글 제목입니다... |975번재 글 내용입니다... |user05 |2018-02-28 18:19:52.0 |0       |
+|974        |974번째 글 제목입니다... |974번재 글 내용입니다... |user04 |2018-02-28 18:19:52.0 |0       |
+|973        |973번째 글 제목입니다... |973번재 글 내용입니다... |user03 |2018-02-28 18:19:52.0 |0       |
+|972        |972번째 글 제목입니다... |972번재 글 내용입니다... |user02 |2018-02-28 18:19:52.0 |0       |
+|971        |971번째 글 제목입니다... |971번재 글 내용입니다... |user01 |2018-02-28 18:19:52.0 |0       |
+|-----------|-----------------|-----------------|-------|----------------------|--------|
+
+INFO : jdbc.resultset - 1. ResultSet.next() returned false
+INFO : jdbc.resultset - 1. ResultSet.close() returned void
+INFO : jdbc.audit - 1. PreparedStatement.getConnection() returned net.sf.log4jdbc.sql.jdbcapi.ConnectionSpy@70cf32e3
+INFO : jdbc.audit - 1. Connection.getMetaData() returned com.mysql.jdbc.JDBC4DatabaseMetaData@5a59ca5e
+INFO : jdbc.audit - 1. PreparedStatement.getMoreResults() returned false
+INFO : jdbc.audit - 1. PreparedStatement.getUpdateCount() returned -1
+INFO : jdbc.audit - 1. PreparedStatement.close() returned
+INFO : jdbc.connection - 1. Connection closed
+INFO : jdbc.audit - 1. Connection.close() returned
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 980:980번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 979:979번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 978:978번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 977:977번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 976:976번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 975:975번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 974:974번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 973:973번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 972:972번째 글 제목입니다...
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - 971:971번째 글 제목입니다...
+```
+
+## 7. 페이징 처리를 도와줄 `Criteria`클래스 작성
+
+#### # 문제점?
+지금까지 작성했던 `articleMapper.xml`의 SQL과 `ArticleDAOImpl`코드의 문제점(?)을 한번 살펴보자.
+
+- `articleMapper.xml` : 만약 한 페이지에 보여지는 데이터가 10개가 아니라면 `LIMIT`구문의 마지막에 10이라는 숫자는 변경되어야만 한다.
+- `ArticleDAOImpl` : 매번 원하는 페이지를 처리할 때마다 계산을 해야한다.
+
+이러한 문제점를 해결하기 위해서 `listPaging()`의 파라미터를 2개로 받는 방법이 있다. 하지만 매번 2개의 적절한 데이터를 직접 넘겨 줘야하는 불편함이 발생한다. 그래서 페이징 처리를 도와줄 `Criteria`클래스 생성하고, 페이징 처리의 기준이 되는 변수들을 하나의 객체로 처리하면 보다 편리하게 사용할 수 있다. 또한 이후에 추가사항이 발생하더라도 메서드의 파라미터를 늘리지 않고, 객체에 필드를 추가함으로써 보다 관리가 용이하다.
+
+#### # SQL Mappper의 규칙
+`Criteria`클래스를 작성하기 전에 `MyBatis`의 SQL Mappper의 공통적인 규칙에 대해 알아보자.
+`#{page}`와 같은 파라미터를 사용할 때 SQL Mapper는 내부적으로 `page`속성의 `getter`에 해당하는 `getPage()`를 호출하게 된다. 예를 들어 아래와 같은 SQL이 있다고 가정해보자.
+```sql
+SELECT *
+FROM tbl_article
+WHERE article_no > 0
+ORDER BY article_no DESC
+LIMIT #{pageStart}, #{perPageNum}
+```
+위의 SQL은 `pageStart`, `perPageNum`라는 인라인 파라미터를 2개 가지고 있는데, SQL을 실행하게 되면 파라미터로 전달된 객체의 `getPageStart()`, `getPerPageNum()`이라는 메서드를 각각 호출하게 된다.
+
+#### # `Criteria`클래스 작성
+
+`src/main/java/기본패키지/commons/paging`패키지를 생성하고, `Criteria`클래스를 아래와 같이 작성한다.
+```java
+public class Criteria {
+
+    private int page;
+    private int perPageNum;
+
+    public Criteria() {
+        this.page = 1;
+        this.perPageNum = 10;
+    }
+
+    public void setPage(int page) {
+
+        if (page <= 0) {
+            this.page = 1;
+            return;
+        }
+
+        this.page = page;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPerPageNum(int perPageNum) {
+
+        if (perPageNum <= 0 || perPageNum > 100) {
+            this.perPageNum = 10;
+            return;
+        }
+
+        this.perPageNum = perPageNum;
+    }
+
+    public int getPerPageNum() {
+        return this.perPageNum;
+    }
+
+    public int getPageStart() {
+        return (this.page - 1) * perPageNum;
+    }
+
+    // toString() 생략...
+}
+```
+`Criteria`클래스는 페이징 처리의 기준이 되는 되는 변수들를 처리하기 위해 작성되었는데 코드의 내용을 살펴보자.
+- `page` : 현재 페이지 번호
+- `perPageNum` : 페이지 당 출력되는 게시글의 갯수
+- `Criteria()` : 기본생성자, 현재페이지를 1, 페이지 당 출력할 게시글의 갯수를 10으로 기본 세팅
+- `set`메서드 : 음수와 같은 잘못된 값이 들어오지 않도록 validation체크를 통해 적절한 값으로 세팅
+- `get`메서드 : SQL Mapper가 사용할 `get`메서드를 정의
+
+위 코드에서 가장 주목해서 봐야할 점은 `getPageStart()`인데 SQL Mapper의 `LIMIT`구문에서 현재 페이지의 게시글의 시작위치를 지정할 때 사용한다. 예를 들어 10개씩 출력할 경우, 3페이지는 SQL이 `LIMIT 20, 10`과 같은 형태가 되어야 한다. 아래는 20을 얻기 위한 계산 공식이다.
+```
+현재 페이지의 시작 게시글 번호 = (현재 페이지번호 - 1) * 페이지 당 출력할 게시글의 갯수
+```
+
+## 8. 영속(Persistence)계층 수정하기
+매개변수를 `Criteria`타입의 변수로 가진 게시글 페이징 목록 메서드를 인터페이스에 선언하고, 클래스에서 구현해준다. SQL Mapper도 위와 같이 작성해준다.
+
+#### # `ArticleDAO`인터페이스
+아래와 같이 추상 메서드를 추가시킨다.
+```java
+List<ArticleVO> listCriteria(Criteria criteria) throws Exception;
+```
+
+#### # `ArticleDAOImpl`클래스
+인터페이스에 선언되 추상메서드를 아래와 같이 구현해준다.
+```java
+@Override
+public List<ArticleVO> listCriteria(Criteria criteria) throws Exception {
+    return sqlSession.selectList(NAMESPACE + ".listCriteria", criteria);
+}
+```
+
+#### # `articleMapper.xml`
+아래와 같이 select 쿼리를 작성해준다.
+```sql
+<select id="listCriteria" resultMap="ArticleResultMap">
+    <![CDATA[
+    SELECT
+        article_no,
+        title,
+        content,
+        writer,
+        regdate,
+        viewcnt
+    FROM tbl_article
+    WHERE article_no > 0
+    ORDER BY article_no DESC, regdate DESC
+    LIMIT #{pageStart}, #{perPageNum}
+    ]]>
+</select>
+```
+
+## 9. 비지니스(Business) 계층 구현
+`ArticleService`는 아직까지는 큰 역할이 없다. 단지 `ArticleController`와 `ArticleDAO`를 연결하는 작업만을 담당하고 있다. `ArticleService`인터페이스에 페이징 목록 메서드를 추가하고, `ArticleServiceImpl`클래스에서 메서드를 구현을 완료해준다.
+
+#### # `ArticleService`인터페이스
+```java
+List<ArticleVO> listCriteria(Criteria criteria) throws Exception;
+```
+
+#### # `ArticleServiceImpl`클래스
+```java
+@Override
+public List<ArticleVO> listCriteria(Criteria criteria) throws Exception {
+    return articleDAO.listCriteria(criteria);
+}
+```
+
+## 10. 간단 요약 정리
+이번에는 게시글 목록의 페이징 처리의 영속, 비지니스 계층까지 구현해보았다. 지금까지의 내용 중에서 기억해야할 것들을 간단 요약 정리해보자.
+- 페이징 처리를 위한 SQL 키워드 : `LIMIT 시작데이터, 출력할 데이터의 갯수`
+- SQL Mapper의 규칙 : 객체 파라미터를 사용할 때 내부적으로 `get`메서드를 통해 필요한 값을 가져온다.
+- `Criteria`클래스
+  - `set`메서드의 내부에 값의 유효성검사 정의
+  - 현재 페이지의 시작 데이터를 가져오기 위한 계산식
+    ```
+    현재 페이지의 시작 데이터 = (현재 페이지 번호 - 1) 페이지 당 출력할 데이터의 갯수
+    ```
