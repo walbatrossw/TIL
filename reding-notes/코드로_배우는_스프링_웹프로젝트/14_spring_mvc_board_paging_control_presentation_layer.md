@@ -25,390 +25,160 @@
 |3|[기본적인 CRUD 구현 : Persistence, Business 계층](http://doublesprogramming.tistory.com/195)|
 |4|[기본적인 CRUD 구현 : Control, Presentation 계층](http://doublesprogramming.tistory.com/196)|
 |5|[예외처리](http://doublesprogramming.tistory.com/197)|
+|6|[페이징처리 : Persistence, Business 계층](http://doublesprogramming.tistory.com/198)|
 ---
 
-# Spring MVC 게시판 예제 06 - 페이징처리 : Persistence, Business 계층
+# Spring MVC 게시판 예제 07 - 페이징처리 : Control, Presentation 계층
 
-## 1. 페이징 구현 단계
-페이징처리는 사용자에게 필요한 최소한의 데이터를 전송하기 위해 전체 데이터 중에서 일부분만을 보여주는 방식을 의미하는데 페이징 처리를 위해 아래와 같은 3단계를 거쳐 구현하게 된다.
-- URI의 문자열을 조절해 원하는 페이지의 데이터가 출력되게 하는 1단계
-- 목록 페이지 하단에 페이지 번호를 보여주고, 번호를 클릭하면 해당 페이지로 이동하는 2단계
-- 목록 페이지에서 조회나 수정 작업을 한 뒤에 다시 원래의 목록 페이지로 이동할 수 있게 처리하는 3단계
-
-## 2. 페이징 처리의 원칙
-페이징 처리는 다음과 같은 원칙이 지켜져야한다.
-- 페이징처리는 반드시 GET방식만을 이용한다.
-- 페이징처리가 되면 조회 화면에서 반드시 목록으로 이동할 수 있어야 한다. 예를 들면 게시판의 4페이지를 보다가 특정게시물을 조회하고, 목록으로 이동할 경우 다시 4페이지로 이동할 수 있어야 한다.
-- 페이징처리는 반드시 필요한 페이지 번호만을 제공해야한다. 만약 페이지당 10개의 게시글을 출력하고, 전체 데이터가 41건의 게시글이 있다면 5페이지까지 화면에 출력되어야 하며, 더 많은 데이터가 존재할 경우 다음, 이전과 같은 버튼이 존재해야한다.
-
-## 3. 페이징 처리를 위한 더미데이터 넣기
-페이징 처리가 제대로 되었는지 확인하기 위해서는 많은 양의 데이터가 존재해야한다. 그래서 이전에 `ArticleDAOTest`클래스의 게시글 작성 테스트메서드인 `testCreate()`를 아래와 같이 수정한 뒤 테스트를 진행하면 1000건의 데이터가 DB에 저장된다.
+## 1. 페이징처리를 위한 컨트롤러 메서드 작성
+#### #`ArticleController`
+아래와 같이 페이징된 목록의 요청을 처리할 메서드를 아래와 같이 작성해준다.
 ```java
-@Test
-public void testCreate() throws Exception {
-
-    for (int i = 1; i <= 1000; i++) {
-        ArticleVO articleVO = new ArticleVO();
-        articleVO.setTitle(i+ "번째 글 제목입니다...");
-        articleVO.setContent(i+ "번재 글 내용입니다...");
-        articleVO.setWriter("user0"+(i%10));
-
-        articleDAO.create(articleVO);
-    }
-
-}
-```
-`COUNT`쿼리를 통해 전체 데이터의 수를 확인해보면 아래와 같이 1000건의 게시글이 DB저장된 것을 확인해볼수 있다.
-```sql
-SELECT COUNT(*) FROM tbl_article;
-```
-쿼리 수행 결과
-![COUNT](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2018-27-23.png?raw=true)
-
-## 4. 페이징 처리를 위한 SQL : `LIMIT`
-DB에 따라 페이징 처리를 위한 방법은 각기 다른데 MySQL의 경우 `LIMIT`를 ORACLE의 경우는 `ROWNUM`을 이용한다. 본 예제의 경우 MySQL을 사용하기 때문에 `LIMIT`을 이용할 것이다.
-```sql
--- MySQL LIMIT
-SELECT *
-FROM 테이블명
-LIMIT 시작데이터, 출력할 데이터갯수
-```
-`LIMIT`을 사용하는 방법은 간단하다. 기존의 `SELECT`쿼리에 `LIMIT`키워드를 써주고 첫번째는 시작데이터를 두번째는 출력할 데이터의 갯수를 써주면 된다. 만약 게시글을 10건씩 출력하고, 첫번째 페이지를 출력하고 싶다면 아래와 같이 쿼리를 작성해주면 된다.
-```SQL
-SELECT
-  article_no,
-  title,
-  content,
-  writer,
-  regdate,
-  viewcnt
-FROM tbl_article
-WHERE article_no > 0
-ORDER BY article_no DESC, regdate DESC
-LIMIT 0, 10
-```
-쿼리 수행 결과
-![LIMIT](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2018-48-31.png?raw=true)
-
-## 5. 페이징 처리를 위한 영속(Persistence) 계층 구현
-
-#### # `ArticleDAO`인터페이스 : 페이징 처리와 관련된 메서드 추가
-```java
-List<ArticleVO> listPaging(int page) throws Exception;
-```
-
-#### # `ArticleDAOImpl`클래스 : 메서드 구현
-`ArticleDAO`인터페이스에서 선언한 추상메서드를 `ArticleDAOImpl`클래스에서 아래와 같이 구현해준다.
-```java
-@Override
-public List<ArticleVO> listPaging(int page) throws Exception {
-
-    if (page <= 0) {
-        page = 1;
-    }
-
-    page = (page - 1) * 10;
-
-    return sqlSession.selectList(NAMESPACE + ".listPaging", page);
-}
-```
-파라미터 `page`의 값이 0보다 작은 음수값이 들어올 수 없게 위와 같이 조건문을 작성해준다.
-
-#### # `articleMapper.xml` : `LIMIT`쿼리 작성
-게시글을 페이지당 10개씩 출력하기 위해 아래와 같이 `LIMIT`쿼리를 작성해준다.
-```sql
-<select id="listPaging" resultMap="ArticleResultMap">
-    <![CDATA[
-    SELECT
-        article_no,
-        title,
-        content,
-        writer,
-        regdate,
-        viewcnt
-    FROM tbl_article
-    WHERE article_no > 0
-    ORDER BY article_no DESC, regdate DESC
-    LIMIT #{page}, 10
-    ]]>
-</select>
-```
-
-## 6. 페이징 처리 SQL 테스트
-
-#### # `ArticleDAOTest`
-`ArticleDAOTest`클래스에 아래와 같이 페이징 처리 SQL테스트 코드를 작성해준다.
-```java
-@Test
-public void testListPaging() throws Exception {
-
-    int page = 3;
-
-    List<ArticleVO> articles = articleDAO.listPaging(page);
-
-    for (ArticleVO article : articles) {
-        logger.info(article.getArticleNo() + ":" + article.getTitle());
-    }
-
+@RequestMapping(value = "/listCriteria", method = RequestMethod.GET)
+public String listCriteria(Model model, Criteria criteria) throws Exception {
+    logger.info("listCriteria ...");
+    model.addAttribute("articles", articleService.listCriteria(criteria));
+    return "/article/list_criteria";
 }
 ```
 
-#### # 테스트 결과
-테스트 결과 아래와 같이 출력되었다.
+## 2. 페이징처리를 위한 `JSP`페이지 작성
+`/WEB-INF/views/article/`디렉토리에 `list_criteria.jsp`파일을 생성하고, `list.jsp`내용을 전체 복사해 붙여 넣어준다.
+
+#### # 페이징 처리전의 게시글 목록과 처리 후의 게시글 목록 차이 비교
+
+페이지 처리 전의 게시글 목록
+![list.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2020-58-17.png?raw=true)
+
+페이징 처리 후의 게시글 목록1 : 기본값 페이지
+![list_criteria.jsp1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2020-58-46.png?raw=true)
+
+페이징 처리 후의 게시글 목록2 : GET파라미터의 page 값이 4일때
+![list_criteria.jsp2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2021-01-37.png?raw=true)
+
+페이징 처리 후의 게시글 목록3 : GET파라미터 page값이 4이고, perPageNum의 값이 20일때
+![list_criteria.jsp3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2021-03-30.png?raw=true)
+
+## 3. 목록 하단의 페이지 번호 출력을 위한 계산식 정리
+위와 같이 매번 원하는 페이지로 이동하기 위해서 매번 URI를 직접 써서 이동할 수 없기 때문에 화면의 하단에 페이지번호가 출력되는 작업을 진행해보자.
+
+#### # 하단 페이지 번호 출력을 위한 데이터들
+화면 하단에 페이지 번호를 출력하기 위해서는 아래와 같은 데이터들이 필요하다.
+
 ```
-|-----------|-----------------|-----------------|-------|----------------------|--------|
-|article_no |title            |content          |writer |regdate               |viewcnt |
-|-----------|-----------------|-----------------|-------|----------------------|--------|
-|980        |980번째 글 제목입니다... |980번재 글 내용입니다... |user00 |2018-02-28 18:19:52.0 |0       |
-|979        |979번째 글 제목입니다... |979번재 글 내용입니다... |user09 |2018-02-28 18:19:52.0 |0       |
-|978        |978번째 글 제목입니다... |978번재 글 내용입니다... |user08 |2018-02-28 18:19:52.0 |0       |
-|977        |977번째 글 제목입니다... |977번재 글 내용입니다... |user07 |2018-02-28 18:19:52.0 |0       |
-|976        |976번째 글 제목입니다... |976번재 글 내용입니다... |user06 |2018-02-28 18:19:52.0 |0       |
-|975        |975번째 글 제목입니다... |975번재 글 내용입니다... |user05 |2018-02-28 18:19:52.0 |0       |
-|974        |974번째 글 제목입니다... |974번재 글 내용입니다... |user04 |2018-02-28 18:19:52.0 |0       |
-|973        |973번째 글 제목입니다... |973번재 글 내용입니다... |user03 |2018-02-28 18:19:52.0 |0       |
-|972        |972번째 글 제목입니다... |972번재 글 내용입니다... |user02 |2018-02-28 18:19:52.0 |0       |
-|971        |971번째 글 제목입니다... |971번재 글 내용입니다... |user01 |2018-02-28 18:19:52.0 |0       |
-|-----------|-----------------|-----------------|-------|----------------------|--------|
-
-INFO : jdbc.resultset - 1. ResultSet.next() returned false
-INFO : jdbc.resultset - 1. ResultSet.close() returned void
-INFO : jdbc.audit - 1. PreparedStatement.getConnection() returned net.sf.log4jdbc.sql.jdbcapi.ConnectionSpy@70cf32e3
-INFO : jdbc.audit - 1. Connection.getMetaData() returned com.mysql.jdbc.JDBC4DatabaseMetaData@5a59ca5e
-INFO : jdbc.audit - 1. PreparedStatement.getMoreResults() returned false
-INFO : jdbc.audit - 1. PreparedStatement.getUpdateCount() returned -1
-INFO : jdbc.audit - 1. PreparedStatement.close() returned
-INFO : jdbc.connection - 1. Connection closed
-INFO : jdbc.audit - 1. Connection.close() returned
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 980:980번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 979:979번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 978:978번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 977:977번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 976:976번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 975:975번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 974:974번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 973:973번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 972:972번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 971:971번째 글 제목입니다...
+// 시작 페이지 번호는 1
+[1] [2] [3] [4] [5] ... [9] [10] [다음]
 ```
-
-## 7. 페이징 처리를 도와줄 `Criteria`클래스 작성
-
-#### # 문제점?
-지금까지 작성했던 `articleMapper.xml`의 SQL과 `ArticleDAOImpl`코드의 문제점(?)을 한번 살펴보자.
-
-- `articleMapper.xml` : 만약 한 페이지에 보여지는 데이터가 10개가 아니라면 `LIMIT`구문의 마지막에 10이라는 숫자는 변경되어야만 한다.
-- `ArticleDAOImpl` : 매번 원하는 페이지를 처리할 때마다 계산을 해야한다.
-
-이러한 문제점를 해결하기 위해서 `listPaging()`의 파라미터를 2개로 받는 방법이 있다. 하지만 매번 2개의 적절한 데이터를 직접 넘겨 줘야하는 불편함이 발생한다. 그래서 페이징 처리를 도와줄 `Criteria`클래스 생성하고, 페이징 처리의 기준이 되는 변수들을 하나의 객체로 처리하면 보다 편리하게 사용할 수 있다. 또한 이후에 추가사항이 발생하더라도 메서드의 파라미터를 늘리지 않고, 객체에 필드를 추가함으로써 보다 관리가 용이하다.
-
-#### # SQL Mappper의 규칙
-`Criteria`클래스를 작성하기 전에 `MyBatis`의 SQL Mappper의 공통적인 규칙에 대해 알아보자.
-`#{page}`와 같은 파라미터를 사용할 때 SQL Mapper는 내부적으로 `page`속성의 `getter`에 해당하는 `getPage()`를 호출하게 된다. 예를 들어 아래와 같은 SQL이 있다고 가정해보자.
-```sql
-SELECT *
-FROM tbl_article
-WHERE article_no > 0
-ORDER BY article_no DESC
-LIMIT #{pageStart}, #{perPageNum}
+**시작 페이지 번호** : 하단에 출력할 페이지 번호의 갯수가 10이고, 현재 페이지 번호가 1~10사이라면 시작번호는 1이어야한다.
 ```
-위의 SQL은 `pageStart`, `perPageNum`라는 인라인 파라미터를 2개 가지고 있는데, SQL을 실행하게 되면 파라미터로 전달된 객체의 `getPageStart()`, `getPerPageNum()`이라는 메서드를 각각 호출하게 된다.
+// 끝 페이지 번호는 7
+[1] [2] [3] [4] [5] [6] [7]
+```  
+**끝 페이지 번호** : 만약 전체 게시글의 갯수가 만약 65개라면, 끝페이지 번호는 7이어야 한다.
+**전체 게시글의 갯수** : 끝 페이지의 번호 계산을 위해서는 전체 게시글의 전체 갯수가 반드시 필요하다.
+```
+// 이전 페이지 링크
+[이전] [11] [12] [13] [14] [15] ... [19] [20]
+```
+**이전 페이지 링크** : 시작 페이지 번호가 1이 아니라면 이전 페이지를 조회 할 수 있어야 한다.
+```
+// 다음 페이지 링크
+[1] [2] [3] [4] [5] ... [9] [10] [다음]
+```
+**다음 페이지 링크** : 끝 페이지의 번호 이후에 더 많은 게시글이 존재한다면 다음 페이지를 조회 할 수 있어야 한다.
 
-#### # `Criteria`클래스 작성
+이제 각 데이터들이 어떻게 계산되는지 정리해보자.
 
-`src/main/java/기본패키지/commons/paging`패키지를 생성하고, `Criteria`클래스를 아래와 같이 작성한다.
+#### # 끝 페이지 번호의 계산
+시작페이지 번호부터 계산하는 것보다 끝 페이지 번호를 계산하는 것이 산술적으로 더 편할 수 있다.
 ```java
-public class Criteria {
-
-    private int page;
-    private int perPageNum;
-
-    public Criteria() {
-        this.page = 1;
-        this.perPageNum = 10;
-    }
-
-    public void setPage(int page) {
-
-        if (page <= 0) {
-            this.page = 1;
-            return;
-        }
-
-        this.page = page;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPerPageNum(int perPageNum) {
-
-        if (perPageNum <= 0 || perPageNum > 100) {
-            this.perPageNum = 10;
-            return;
-        }
-
-        this.perPageNum = perPageNum;
-    }
-
-    public int getPerPageNum() {
-        return this.perPageNum;
-    }
-
-    public int getPageStart() {
-        return (this.page - 1) * perPageNum;
-    }
-
-    // toString() 생략...
-}
+// 끝 페이지번호 = Math.ceil(현재페이지 / 페이지 번호의 갯수) * 페이지 번호의 갯수
+int endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
 ```
-`Criteria`클래스는 페이징 처리의 기준이 되는 되는 변수들를 처리하기 위해 작성되었는데 코드의 내용을 살펴보자.
-- `page` : 현재 페이지 번호
-- `perPageNum` : 페이지 당 출력되는 게시글의 갯수
-- `Criteria()` : 기본생성자, 현재페이지를 1, 페이지 당 출력할 게시글의 갯수를 10으로 기본 세팅
-- `set`메서드 : 음수와 같은 잘못된 값이 들어오지 않도록 validation체크를 통해 적절한 값으로 세팅
-- `get`메서드 : SQL Mapper가 사용할 `get`메서드를 정의
+예를 들어 위의 계산식을 통해 계산한 결과는 아래의 표와 같다.
+|페이지 번호의 갯수|현재 페이지|계산식|끝 페이지 번호|
+|---|---|---|---|
+|10|3|Math.ceil(3/10) * 10|10|
+|10|1|Math.ceil(1/10) * 10|10|
+|10|20|Math.ceil(20/10) * 10|20|
+|10|21|Math.ceil(21/10) * 10|30|
+|20|20|Math.ceil(20/20) * 20|20|
+|20|21|Math.ceil(21/20) * 20|40|
 
-위 코드에서 가장 주목해서 봐야할 점은 `getPageStart()`인데 SQL Mapper의 `LIMIT`구문에서 현재 페이지의 게시글의 시작위치를 지정할 때 사용한다. 예를 들어 10개씩 출력할 경우, 3페이지는 SQL이 `LIMIT 20, 10`과 같은 형태가 되어야 한다. 아래는 20을 얻기 위한 계산 공식이다.
-```
-현재 페이지의 시작 게시글 번호 = (현재 페이지번호 - 1) * 페이지 당 출력할 게시글의 갯수
-```
-
-## 8. 영속(Persistence)계층 수정 및 테스트
-매개변수를 `Criteria`타입의 변수로 가진 게시글 페이징 목록 메서드를 인터페이스에 선언하고, 클래스에서 구현해준다. SQL Mapper도 위와 같이 작성해준다.
-
-#### # `ArticleDAO`인터페이스
-아래와 같이 추상 메서드를 추가시킨다.
+#### # 시작 페이지 번호의 계산
+끝페이지 번호를 구했다면 시작 페이지 번호를 계산하는 것은 매우 쉽다.
 ```java
-List<ArticleVO> listCriteria(Criteria criteria) throws Exception;
+// 시작 페이지 번호 = (끝 페이지 번호 - 페이지 번호의 갯수) + 1
+int startPage = (endPage - displayPageNum) + 1;
 ```
+끝 페이지 번호에서 페이지 번호의 갯수를 빼고 1을 더해 주기만 하면 된다. 예를 들어 계산한 결과는 아래의 표와 같다.
+|끝 페이지 번호|페이지 번호의 갯수|계산식|시작 페이지 번호|
+|---|---|---|---|
+|10|10|(10-10)+1|1|
+|20|10|(20-10)+1|11|
+|30|10|(30-10)+1|21|
+|40|20|(40-20)+1|21|
+|60|30|(40-20)+1|31|
 
-#### # `ArticleDAOImpl`클래스
-인터페이스에 선언되 추상메서드를 아래와 같이 구현해준다.
+#### # 전체 게시글의 갯수와 끝 페이지 번호의 보정
+끝 페이지 번호는 실제 게시글의 전체 갯수와 관련되어 있기 때문에 다시 한번 계산을 통해 값을 보정해야할 필요가 있다.
 ```java
-@Override
-public List<ArticleVO> listCriteria(Criteria criteria) throws Exception {
-    return sqlSession.selectList(NAMESPACE + ".listCriteria", criteria);
+// 끝 페이지 번호 계산
+int endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
+
+// 100개의 게시글을 20개씩 보여줄 경우 끝 페이지 번호는 5이어야 함
+// 그런데 계산 결과 값은 20???
+20 = Math.ceil(1/20) * 20;
+
+// 계산식의 결과 값을 보정하기 위한 또 다른 계산식이 필요하다!
+```
+예를 들어 100개의 게시글을 10개씩 보여준다면 끝페이지 번호는 10이 되어야 하고, 20개씩 보여주는 경우는 5가 되어야 한다. 그러데 20개씩 보여줄 경우를 계산해보면 20이 나오게 된다. 이렇게 잘못 계산된 내용을 보정하기 위해 아래의 코드를 통해 다시 계산을 하고, 결과 값을 비교한 최종적으로 계산한 결과 값을 끝페이지 번호로 저장하게 된다.
+```java
+// 끝 페이지 번호 보정 계산식
+// 끝 페이지 번호 = Math.ceil(전체 게시글 갯수 / 페이지 당 출력할 게시글의 갯수)
+int tempEndPage = (int) (Math.ceil(totalCount / (double) criteria.getPerPageNum()));
+
+// 원하던 결과 같이 나왔다
+5 = Math.ceil(100/20);
+
+// 이전의 결과 값과 보정된 결과 값을 비교 후, 보정한 결과 값을 페이지 끝 번호 변수에 저장
+if (endPage > tempEndPage) {
+  endPage = tempEndPage;
 }
 ```
 
-#### # `articleMapper.xml`
-아래와 같이 select 쿼리를 작성해준다.
-```sql
-<select id="listCriteria" resultMap="ArticleResultMap">
-    <![CDATA[
-    SELECT
-        article_no,
-        title,
-        content,
-        writer,
-        regdate,
-        viewcnt
-    FROM tbl_article
-    WHERE article_no > 0
-    ORDER BY article_no DESC, regdate DESC
-    LIMIT #{pageStart}, #{perPageNum}
-    ]]>
-</select>
-```
-
-#### # `ArticleDAOTest`
-아래와 같이 테스트 코드를 작성하고 테스트를 실행해 원하는 페이지의 출력값이 콘솔창에 나오는지 확인해본다.
+#### # 이전과 다음 링크의 계산
+이전 링크의 경우 시작 페이지 번호가 1인지 아닌지 검사하는 것으로 충분하다. 삼항 연산자를 통해 1이면 `false`값을 아니면 `true`값을 가지도록 하면 된다.
 ```java
-@Test
-public void testListCriteria() throws Exception {
-    Criteria criteria = new Criteria();
-    criteria.setPage(3);
-    criteria.setPerPageNum(20);
-
-    List<ArticleVO> articles = articleDAO.listCriteria(criteria);
-
-    for (ArticleVO article : articles) {
-        logger.info(article.getArticleNo() + " : " + article.getTitle());
-    }
-}
+boolean prev = startPage == 1 ? false : true;
 ```
-```
-|-----------|-----------------|-----------------|-------|----------------------|--------|
-|article_no |title            |content          |writer |regdate               |viewcnt |
-|-----------|-----------------|-----------------|-------|----------------------|--------|
-|960        |960번째 글 제목입니다... |960번재 글 내용입니다... |user00 |2018-02-28 18:19:52.0 |0       |
-|959        |959번째 글 제목입니다... |959번재 글 내용입니다... |user09 |2018-02-28 18:19:52.0 |0       |
-|958        |958번째 글 제목입니다... |958번재 글 내용입니다... |user08 |2018-02-28 18:19:52.0 |0       |
-|957        |957번째 글 제목입니다... |957번재 글 내용입니다... |user07 |2018-02-28 18:19:52.0 |0       |
-|956        |956번째 글 제목입니다... |956번재 글 내용입니다... |user06 |2018-02-28 18:19:52.0 |0       |
-|955        |955번째 글 제목입니다... |955번재 글 내용입니다... |user05 |2018-02-28 18:19:52.0 |0       |
-|954        |954번째 글 제목입니다... |954번재 글 내용입니다... |user04 |2018-02-28 18:19:52.0 |0       |
-|953        |953번째 글 제목입니다... |953번재 글 내용입니다... |user03 |2018-02-28 18:19:52.0 |0       |
-|952        |952번째 글 제목입니다... |952번재 글 내용입니다... |user02 |2018-02-28 18:19:52.0 |0       |
-|951        |951번째 글 제목입니다... |951번재 글 내용입니다... |user01 |2018-02-28 18:19:52.0 |0       |
-|950        |950번째 글 제목입니다... |950번재 글 내용입니다... |user00 |2018-02-28 18:19:52.0 |0       |
-|949        |949번째 글 제목입니다... |949번재 글 내용입니다... |user09 |2018-02-28 18:19:52.0 |0       |
-|948        |948번째 글 제목입니다... |948번재 글 내용입니다... |user08 |2018-02-28 18:19:52.0 |0       |
-|947        |947번째 글 제목입니다... |947번재 글 내용입니다... |user07 |2018-02-28 18:19:52.0 |0       |
-|946        |946번째 글 제목입니다... |946번재 글 내용입니다... |user06 |2018-02-28 18:19:52.0 |0       |
-|945        |945번째 글 제목입니다... |945번재 글 내용입니다... |user05 |2018-02-28 18:19:52.0 |0       |
-|944        |944번째 글 제목입니다... |944번재 글 내용입니다... |user04 |2018-02-28 18:19:52.0 |0       |
-|943        |943번째 글 제목입니다... |943번재 글 내용입니다... |user03 |2018-02-28 18:19:52.0 |0       |
-|942        |942번째 글 제목입니다... |942번재 글 내용입니다... |user02 |2018-02-28 18:19:52.0 |0       |
-|941        |941번째 글 제목입니다... |941번재 글 내용입니다... |user01 |2018-02-28 18:19:52.0 |0       |
-|-----------|-----------------|-----------------|-------|----------------------|--------|
 
-INFO : jdbc.resultset - 1. ResultSet.next() returned false
-INFO : jdbc.resultset - 1. ResultSet.close() returned void
-INFO : jdbc.audit - 1. PreparedStatement.getConnection() returned net.sf.log4jdbc.sql.jdbcapi.ConnectionSpy@6f53b8a
-INFO : jdbc.audit - 1. Connection.getMetaData() returned com.mysql.jdbc.JDBC4DatabaseMetaData@5c80cf32
-INFO : jdbc.audit - 1. PreparedStatement.getMoreResults() returned false
-INFO : jdbc.audit - 1. PreparedStatement.getUpdateCount() returned -1
-INFO : jdbc.audit - 1. PreparedStatement.close() returned
-INFO : jdbc.connection - 1. Connection closed
-INFO : jdbc.audit - 1. Connection.close() returned
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 960 : 960번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 959 : 959번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 958 : 958번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 957 : 957번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 956 : 956번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 955 : 955번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 954 : 954번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 953 : 953번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 952 : 952번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 951 : 951번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 950 : 950번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 949 : 949번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 948 : 948번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 947 : 947번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 946 : 946번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 945 : 945번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 944 : 944번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 943 : 943번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 942 : 942번째 글 제목입니다...
-INFO : com.doubles.mvcboard.article.ArticleDAOTest - 941 : 941번째 글 제목입니다...
-INFO : org.springframework.context.support.GenericApplicationContext - Closing org.springframework.context.support.GenericApplicationContext@3c0f93f1: startup date [Thu Mar 01 18:03:18 KST 2018]; root of context hierarchy
-```
-## 9. 비지니스(Business) 계층 구현
-`ArticleService`는 아직까지는 큰 역할이 없다. 단지 `ArticleController`와 `ArticleDAO`를 연결하는 작업만을 담당하고 있다. `ArticleService`인터페이스에 페이징 목록 메서드를 추가하고, `ArticleServiceImpl`클래스에서 메서드를 구현을 완료해준다.
-
-#### # `ArticleService`인터페이스
+다음 링크의 경우는 예를 들어 설명해보겠다. 만약 페이지 당 출력할 페이지 번호의 갯수가 10이고, 끝 페이지 번호가 10인 상황에서 전체 게시글의 숫자가 101이라면 다음 링크는 `true`가 되어야 한다. 이 것을 삼항 연산자로 표현하면 다음과 같다.
 ```java
-List<ArticleVO> listCriteria(Criteria criteria) throws Exception;
+// 다음 링크 = 끝페이지 * 페이지 당 출력할 게시글의 갯수 >= 전체 게시글의 갯수 ? : false : true;
+boolean next = endPage * criteria.getPerPageNum() >= totalCount ? false : true;
+// true = 10 * 10 >= 101 ? false : true;
 ```
 
-#### # `ArticleServiceImpl`클래스
+## 4. 페이징 처리를 위한 클래스 설계
+위에서 정리한 계산식을 직접 JSP에서 처리할 수 있지만, 좀 더 편리하게 사용하기 위해서 별도의 클래스를 설계하여 처리하는 것이 좋다. 이렇게 클래스를 설계하여 처리하면 페이징이 필요한 모든 곳에서 사용할 수 있기 때문에 재사용에 장점을 가지게 된다.
+
+클래스 작성에 앞서 필요한 데이터를 혼동하지 않도록 다시 한번 체크해보자.
+
+**외부에서 입력되는 데이터**
+- `page` : 현재 페이지의 번호
+- `perPageNum` : 페이지당 출력할 게시글의 갯수
+
+**DB에서 계산되는 데이터**
+- `totalCount` : 전체 게시글의 갯수
+
+**계산식을 통해 만들어지는 데이터**
+- `startPage` : 시작 페이지 번호
+- `endPage` : 끝 페이지 번호
+- `prev` : 이전 링크
+- `next` : 다음 링크
+
+#### # `PageMaker`클래스 작성
+이제 하단의 페이지 번호 출력을 도와줄 클래스를 아래와 같이 작성한다.
 ```java
-@Override
-public List<ArticleVO> listCriteria(Criteria criteria) throws Exception {
-    return articleDAO.listCriteria(criteria);
-}
 ```
-
-## 10. 간단 요약 정리
-이번에는 게시글 목록의 페이징 처리의 영속, 비지니스 계층까지 구현해보았다. 지금까지의 내용 중에서 기억해야할 것들을 간단 요약 정리해보자.
-- 페이징 처리를 위한 SQL 키워드 : `LIMIT 시작데이터, 출력할 데이터의 갯수`
-- SQL Mapper의 규칙 : 객체 파라미터를 사용할 때 내부적으로 `get`메서드를 통해 필요한 값을 가져온다.
-- `Criteria`클래스
-  - `set`메서드의 내부에 값의 유효성검사 정의
-  - 현재 페이지의 시작 데이터를 가져오기 위한 계산식
-    ```
-    현재 페이지의 시작 데이터 = (현재 페이지 번호 - 1) 페이지 당 출력할 데이터의 갯수
-    ```
