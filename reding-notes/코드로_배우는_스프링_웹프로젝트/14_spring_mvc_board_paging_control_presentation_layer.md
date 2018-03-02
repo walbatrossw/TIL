@@ -32,10 +32,11 @@
 # Spring MVC 게시판 예제 08 - 페이징처리 개선, 게시글 조회시 목록페이지 정보 유지
 
 ## 1. 페이징 처리 개선
-![enhancement_before]()
-이전 포스팅까지 페이징 처리 구현을 완료했다. 하지만 아쉬운 점은 위의 사진과 같이 GET파라미터을 `page`만 처리했기 때문에 `perPageNum`이나 그 이상의 정보를 전달할 수 없다는 점이다. 그래서 이번 포스팅에서 페이징 처리를 좀더 나은 방식으로 개선할 수 있는 방법들에 대해 정리해보자.
+![enhancement_before](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2011-23-22.png?raw=true)
 - `<a herf="/article/listPaging?page=2"/>` : 페이지 번호만을 전달
 - `<a herf="/article/listPaging?page=2&perPageNum=10"/>` : 페이지 번호와 페이지당 출력할 게시글의 갯수도 함께 전달
+
+이전 포스팅까지 페이징 처리 구현을 완료했다. 하지만 아쉬운 점은 위의 사진과 같이 GET파라미터을 `page`만 처리했기 때문에 `perPageNum`이나 그 이상의 정보를 전달할 수 없다는 점이다. 그래서 이번 포스팅에서 페이징 처리를 개선하고, uri를 좀더 나은 방식으로 제어할 수 있는 방법들에 대해 정리해보자.
 
 #### # `UriComponentsBuilder`를 이용하는 방식
 스프링 MVC에서 웹개발에 필요한 유틸리티 클래스들을 제공하고 있는데 그중에 URI를 작성할 때 도움을 주는 클래스는 `UriComponentsBuilder`와 `UriComponents`클래스가 있다. 그렇다면 `UriComponentsBuilder`를 사용하기 위한 간단한 테스트 코드를 작성해보자.
@@ -83,7 +84,7 @@ INFO : com.doubles.mvcboard.article.ArticleDAOTest - /article/read?articleNo=12&
 ```
 그리고 만약 미리 필요한 경로를 설정해두고 `{module}`과 같은 경로를 `article`로 `{page}`를 `read`로 변경할 수도 있다. 테스트를 실행해보면 이것도 동일한 URI가 생성되는 것도 확인할 수가 있다.
 
-이제 `PageMaker`클래스에 `makeQuery()`메서드를 추가하고, URI가 자동으로 생성하도록 처리해보자.
+이제 `PageMaker`클래스에 `makeQuery()`메서드를 추가하고, URI를 자동으로 생성하도록 처리해보자.
 ```java
 public String makeQuery(int page) {
     UriComponents uriComponents = UriComponentsBuilder.newInstance()
@@ -128,8 +129,8 @@ public String makeQuery(int page) {
     </c:if>
 </ul>
 ```
-이제 어떻게 바뀌었는지 크롬의 개발자 도구를 통해 수정한 화면의 페이지 링크를 확인해보면 이전과 다르게 `page`와 `perPageNum`이 같이 연동되는 것을 볼 수 있다.
-![enhancement_uri]()
+이제 어떻게 바뀌었는지 크롬 개발자 도구를 통해 수정한 화면의 페이지 링크를 확인해보면 이전과 다르게 `page`와 `perPageNum`이 같이 연동되는 것을 볼 수 있다.
+![enhancement_uri](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2011-32-13.png?raw=true)
 
 
 #### # `javascript`를 이용하는 방식
@@ -176,5 +177,159 @@ $(".pagination li a").on("click", function (event) {
 ```
 `<a>`태그를 클릭하면 발생하는 이벤트는 `preventDefault()`를 통해 페이지 이동을 막는다. 그리고 이벤트가 발생한 `<a>`태그의 페이지 번호 값을 `<from>`태그의 `page`에 넣어 전송하게 된다.
 
-실제로 구글 개발자도구를 통해 확인해보면 아래의 사진과 같이 `<a>`태그의 링크는 앞서 설명한 것처럼 페이지 번호만을 의미하도록 나온다.
-![enhancement_js]()
+실제로 크롬 개발자도구를 통해 확인해보면 `<a>`태그의 링크는 앞서 설명한 것처럼 페이지 번호만을 의미하도록 나오고 페이지 이동시 `page`와 `perPageNum`도 연동이 되는 것을 확인할 수 있다.
+![enhancement_js](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2012-24-10.png?raw=true)
+
+## 2. 목록페이지 정보 유지
+페이징 처리 구현이 완료가 되었다. 이제 특정 목록페이지에서 특정 게시글을 조회, 수정, 삭제한 뒤 다시 목록을 이동할 때 특정 목록페이지로 다시 이동하도록 구현해보자.
+```
+3번의 목록페이지 -> 80번 게시물 조회 -> 목록 페이지 이동 버튼 클릭 -> 3번 목록 페이지 이동
+3번의 목록페이지 -> 80번 게시물 조회 -> 80번 게시글 수정 -> 게시글 수정 처리 완료 -> 3번 목록 페이지 이동
+3번의 목록페이지 -> 80번 게시물 조회 -> 80번 게시글 삭제 버튼 클릭 -> 게시글 삭제 처리 완료 -> 3번 목록 페이지 이동
+```
+바로 위의 내용은 페이지 이동의 흐름을 나타낸 것으로 조회, 수정, 삭제 처리 후에 다시 특정 목록 페이지로 이동하기 위해서는 아래와 같은 정보를 각 페이지를 이동할 때마다 가지고 있어야 한다.
+
+- 현재 목록페이지의 번호(`page`)
+- 페이지당 출력할 게시글의 갯수(`perPageNum`)
+- 조회게시글의 번호(`articleNo`)
+
+그래서 `AritcleController`의 게시글 조회, 수정, 삭제 메서드에 `page`, `perPageNum`를 가진 `Criteria`타입의 `criteria`변수를 파라미터로 추가 시켜주고, 각 `JSP`페이지에 값들을 `<form>`태그안에 `hidden`값으로 세팅해줘야 한다.
+
+#### # `ArticleController` : 조회, 수정, 삭제 메서드 추가
+기존의 조회, 수정, 삭제 메서드들을 수정해도 되지만 지금까지 작성한 메서드들과 차이점을 구분하기 위해서 새로 작성했다.
+```java
+@RequestMapping(value = "/readPaging", method = RequestMethod.GET)
+public String readPaging(@RequestParam("articleNo") int articleNo,
+                         @ModelAttribute("criteria") Criteria criteria,
+                         Model model) throws Exception {
+
+    model.addAttribute("article", articleService.read(articleNo));
+
+    return "/article/read_paging";
+}
+```
+```java
+@RequestMapping(value = "/modifyPaging", method = RequestMethod.GET)
+public String modifyGETPaging(@RequestParam("articleNo") int articleNo,
+                              @ModelAttribute("criteria") Criteria criteria,
+                              Model model) throws Exception {
+
+    logger.info("modifyGetPaging ...");
+    model.addAttribute("article", articleService.read(articleNo));
+
+    return "/article/modify_paging";
+}
+```
+```java
+@RequestMapping(value = "/modifyPaging", method = RequestMethod.POST)
+public String modifyPOSTPaging(ArticleVO articleVO,
+                               Criteria criteria,
+                               RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("modifyPOSTPaging ...");
+    articleService.update(articleVO);
+    redirectAttributes.addAttribute("page", criteria.getPage());
+    redirectAttributes.addAttribute("perPageNum", criteria.getPerPageNum());
+    redirectAttributes.addFlashAttribute("msg", "modSuccess");
+
+    return "redirect:/article/listPaging";
+}
+```
+```java
+@RequestMapping(value = "/removePaging", method = RequestMethod.POST)
+public String removePaging(@RequestParam("articleNo") int articleNo,
+                           Criteria criteria,
+                           RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("remove ...");
+    articleService.delete(articleNo);
+    redirectAttributes.addAttribute("page", criteria.getPage());
+    redirectAttributes.addAttribute("perPageNum", criteria.getPerPageNum());
+    redirectAttributes.addFlashAttribute("msg", "delSuccess");
+
+    return "redirect:/article/listPaging";
+}
+```
+
+#### # 목록 페이지의 정보를 저장하기 위한 `JSP`추가
+컨트롤러에서 작성했던 것과 마찬가지로 기존의 조회, 수정/삭제의 `JSP`수정하지 않고 각각의 `JSP`파일을 복사해 `_paging`이라는 접미사를 붙여 새로 작성해준다.
+`read_paging.jsp`
+```xml
+<div class="box-footer">
+    <form role="form" method="post">
+        <input type="hidden" name="articleNo" value="${article.articleNo}">
+        <input type="hidden" name="page" value="${criteria.page}">
+        <input type="hidden" name="perPageNum" value="${criteria.perPageNum}">
+    </form>
+    <button type="submit" class="btn btn-primary listBtn"><i class="fa fa-list"></i> 목록</button>
+    <div class="pull-right">
+        <button type="submit" class="btn btn-warning modBtn"><i class="fa fa-edit"></i> 수정</button>
+        <button type="submit" class="btn btn-danger delBtn"><i class="fa fa-trash"></i> 삭제</button>
+    </div>
+</div>
+```
+`<form>`태그 안에 `<input>`태그를 `hidden`으로 `page`와 `perPageNum`을 추가해준다.
+```js
+$(document).ready(function () {
+
+    var formObj = $("form[role='form']");
+    console.log(formObj);
+
+    $(".modBtn").on("click", function () {
+        formObj.attr("action", "/article/modifyPaging");
+        formObj.attr("method", "get");
+        formObj.submit();
+    });
+
+    $(".delBtn").on("click", function () {
+       formObj.attr("action", "/article/removePaging");
+       formObj.submit();
+    });
+
+    $(".listBtn").on("click", function () {
+       formObj.attr("method", "get");
+       formObj.attr("action", "/article/listPaging");
+       formObj.submit();
+    });
+
+});
+```
+수정, 삭제, 목록 페이지 URI을 컨트롤러에서 작성한 것과 같이 수정해준다.
+
+`modify_paging.jsp`
+```xml
+<input type="hidden" name="articleNo" value="${article.articleNo}">
+<input type="hidden" name="page" value="${criteria.page}">
+<input type="hidden" name="perPageNum" value="${criteria.perPageNum}">
+```
+`<form>`태그 안에 `<input>`태그를 `hidden`으로 `page`와 `perPageNum`을 추가해준다.
+```js
+$(document).ready(function () {
+
+    var formObj = $("form[role='form']");
+    console.log(formObj);
+
+    $(".modBtn").on("click", function () {
+        formObj.submit();
+    });
+
+    $(".cancelBtn").on("click", function () {
+        history.go(-1);
+    });
+
+    $(".listBtn").on("click", function () {
+        self.location = "/article/listPaging?page=${criteria.page}&perPageNum=${criteria.perPageNum}";
+    });
+
+});
+```
+목록 버튼 클릭했을 때 이동할 uri를 위와 같이 수정해준다.
+
+## 3. 페이징 처리 개선 작업과 목록 페이지 정보 유지 간단 요약정리
+지금까지 정리한 내용 중에서 기억해야할 내용을 정리해보자.
+- 페이징 처리 개선 작업 요약
+  - `UriComponentsBuilder`를 이용하여 원하는 URI를 자동 생성할 수 있다.
+  - 자바스크립트의 클릭이벤트 발생시 `attr()`을 이용하여 URI를 제어할 수 있다.
+- 목록 페이지 정보 유지 작업 요약
+  - 현재 목록페이지 번호(`page`), 목록 페이지 당 출력할 게시글 갯수(`perPageNum`), 게시글 번호(`articleNo`)를 가지고 페이지를 이동해야한다.
+  - 컨트롤러에 위의 정보를 파라미터로 받아 각각의 `JSP`페이지에 세팅해준다.
