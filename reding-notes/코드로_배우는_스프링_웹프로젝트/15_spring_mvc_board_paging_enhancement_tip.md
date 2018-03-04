@@ -26,329 +26,310 @@
 |4|[기본적인 CRUD 구현 : Control, Presentation 계층](http://doublesprogramming.tistory.com/196)|
 |5|[예외처리](http://doublesprogramming.tistory.com/197)|
 |6|[페이징처리 : Persistence, Business 계층](http://doublesprogramming.tistory.com/198)|
+|7|[페이징처리 : Control, Presentation 계층](http://doublesprogramming.tistory.com/199)|
 ---
 
-# Spring MVC 게시판 예제 07 - 페이징처리 : Control, Presentation 계층
+# Spring MVC 게시판 예제 08 - 페이징처리 개선, 게시글 조회시 목록페이지 정보 유지
 
-## 1. 페이징처리를 위한 컨트롤러 메서드 작성
-#### #`ArticleController`
-아래와 같이 페이징된 목록의 요청을 처리할 메서드를 아래와 같이 작성해준다.
+## 1. 페이징 처리 개선
+![enhancement_before](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2011-23-22.png?raw=true)
+- `<a herf="/article/listPaging?page=2"/>` : 페이지 번호만을 전달
+- `<a herf="/article/listPaging?page=2&perPageNum=10"/>` : 페이지 번호와 페이지당 출력할 게시글의 갯수도 함께 전달
+
+이전 포스팅까지 페이징 처리 구현을 완료했다. 하지만 아쉬운 점은 위의 사진과 같이 GET파라미터을 `page`만 처리했기 때문에 `perPageNum`이나 그 이상의 정보를 전달할 수 없다는 점이다. 그래서 이번 포스팅에서 페이징 처리를 개선하고, uri를 좀더 나은 방식으로 제어할 수 있는 방법들에 대해 정리해보자.
+
+#### # `UriComponentsBuilder`를 이용하는 방식
+스프링 MVC에서 웹개발에 필요한 유틸리티 클래스들을 제공하고 있는데 그중에 URI를 작성할 때 도움을 주는 클래스는 `UriComponentsBuilder`와 `UriComponents`클래스가 있다. 그렇다면 `UriComponentsBuilder`를 사용하기 위한 간단한 테스트 코드를 작성해보자.
 ```java
-@RequestMapping(value = "/listCriteria", method = RequestMethod.GET)
-public String listCriteria(Model model, Criteria criteria) throws Exception {
-    logger.info("listCriteria ...");
-    model.addAttribute("articles", articleService.listCriteria(criteria));
-    return "/article/list_criteria";
+@Test
+public void testURI() throws Exception {
+
+    UriComponents uriComponents = UriComponentsBuilder.newInstance()
+            .path("/article/read")
+            .queryParam("articleNo", 12)
+            .queryParam("perPageNum", 20)
+            .build();
+
+    logger.info("/article/read?articleNo=12&perPageNum=20");
+    logger.info(uriComponents.toString());
+
+}
+```
+```
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - /article/read?articleNo=12&perPageNum=20
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - /article/read?articleNo=12&perPageNum=20
+```
+위와 같이 `UriComponents`클래스를 통해 `path`나 `query`에 해당하는 문자열을 추가해서 원하는 URI를 생성할 수가 있다. 위 테스트를 실행해보면 콘솔창에 동일한 URI가 생성되는 것을 확인할 수 있다.
+
+```java
+@Test
+public void testURI2() throws Exception {
+
+    UriComponents uriComponents = UriComponentsBuilder.newInstance()
+            .path("/{module}/{page}")
+            .queryParam("articleNo", 12)
+            .queryParam("perPageNum", 20)
+            .build()
+            .expand("article", "read")
+            .encode();
+
+    logger.info("/article/read?articleNo=12&perPageNum=20");
+    logger.info(uriComponents.toString());
+
+}
+```
+```
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - /article/read?articleNo=12&perPageNum=20
+INFO : com.doubles.mvcboard.article.ArticleDAOTest - /article/read?articleNo=12&perPageNum=20
+```
+그리고 만약 미리 필요한 경로를 설정해두고 `{module}`과 같은 경로를 `article`로 `{page}`를 `read`로 변경할 수도 있다. 테스트를 실행해보면 이것도 동일한 URI가 생성되는 것도 확인할 수가 있다.
+
+이제 `PageMaker`클래스에 `makeQuery()`메서드를 추가하고, URI를 자동으로 생성하도록 처리해보자.
+```java
+public String makeQuery(int page) {
+    UriComponents uriComponents = UriComponentsBuilder.newInstance()
+            .queryParam("page", page)
+            .queryParam("perPageNum", criteria.getPerPageNum())
+            .build();
+
+    return uriComponents.toUriString();
+}
+```
+`list_paging.jsp`에서 게시글 제목, 페이지 번호, 다음, 이전의 `<a>`태그를 아래의 코드와 같이 수정한다.
+```xml
+<tr>
+    <td>${article.articleNo}</td>
+    <%--<td><a href="${path}/article/read?articleNo=${article.articleNo}">${article.title}</a></td>--%>
+    <td>
+      <a href="${path}/article/read${pageMaker.makeQuery(pageMaker.criteria.page)}&articleNo=${article.articleNo}">
+        ${article.title}
+      </a>
+    </td>
+    <td>${article.writer}</td>
+    <td><fmt:formatDate value="${article.regDate}" pattern="yyyy-MM-dd a HH:mm"/></td>
+    <td><span class="badge bg-red">${article.viewCnt}</span></td>
+</tr>
+```
+
+```xml
+<ul class="pagination">
+    <c:if test="${pageMaker.prev}">
+        <%--<li><a href="${path}/article/listPaging?page=${pageMaker.startPage - 1}">이전</a></li>--%>
+        <li><a href="${path}/article/listPaging${pageMaker.makeQuery(pageMaker.startPage - 1)}">이전</a></li>
+    </c:if>
+    <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="idx">
+        <li <c:out value="${pageMaker.criteria.page == idx ? 'class=active' : ''}"/>>
+            <%-- <a href="${path}/article/listPaging?page=${idx}">${idx}</a> --%>
+            <a href="${path}/article/listPaging${pageMaker.makeQuery(idx)}">${idx}</a>
+        </li>
+    </c:forEach>
+    <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
+        <%--<li><a href="${path}/article/listPaging?page=${pageMaker.endPage + 1}">다음</a></li>--%>
+        <li><a href="${path}/article/listPaging?${pageMaker.makeQuery(pageMaker.endPage + 1)}">다음</a></li>
+    </c:if>
+</ul>
+```
+이제 어떻게 바뀌었는지 크롬 개발자 도구를 통해 수정한 화면의 페이지 링크를 확인해보면 이전과 다르게 `page`와 `perPageNum`이 같이 연동되는 것을 볼 수 있다.
+![enhancement_uri](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2011-32-13.png?raw=true)
+
+
+#### # `javascript`를 이용하는 방식
+자바스크립트를 이용하는 방식은 페이지 번호를 클릭했을 때 이벤트를 제어하는 방식이다. 이벤트를 제어하기 위해서는 페이지 번호에 걸어둔 `<a>`태그의 `herf`속성을 단순히 페이지 번호만을 의미하도록 변경해줘야 한다.
+```xml
+<ul class="pagination">
+    <c:if test="${pageMaker.prev}">
+        <%--<li><a href="${path}/article/listPaging?page=${pageMaker.startPage - 1}">이전</a></li>--%>
+        <%--<li><a href="${path}/article/listPaging${pageMaker.makeQuery(pageMaker.startPage - 1)}">이전</a></li>--%>
+        <li><a href="${pageMaker.startPage - 1}">이전</a></li>
+    </c:if>
+    <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="idx">
+        <li <c:out value="${pageMaker.criteria.page == idx ? 'class=active' : ''}"/>>
+            <%--<a href="${path}/article/listPaging?page=${idx}">${idx}</a>--%>
+            <%--<a href="${path}/article/listPaging${pageMaker.makeQuery(idx)}">${idx}</a>--%>
+            <a href="${idx}">${idx}</a>
+        </li>
+    </c:forEach>
+    <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
+        <%--<li><a href="${path}/article/listPaging?page=${pageMaker.endPage + 1}">다음</a></li>--%>
+        <%--<li><a href="${path}/article/listPaging?${pageMaker.makeQuery(pageMaker.endPage + 1)}">다음</a></li>--%>
+        <li><a href="${pageMaker.endPage + 1}">다음</a></li>
+    </c:if>
+</ul>
+```
+위와 같이 코드를 변경해주고, `<form>`태그를 추가해 페이지 이동시 `page`와 `perPageNum`값을 넘겨주도록 한다.
+```xml
+<form id="listPageForm">
+    <input type="hidden" name="page" value="${pageMaker.criteria.page}">
+    <input type="hidden" name="perPageNum" value="${pageMaker.criteria.perPageNum}">
+</form>
+```
+이제 마지막으로 페이지 번호를 클릭하면 이벤트를 처리할 자바스크립트 코드를 작성해준다.
+```js
+$(".pagination li a").on("click", function (event) {
+    event.preventDefault();
+
+    var targetPage = $(this).attr("href");
+    var listPageForm = $("#listPageForm");
+    listPageForm.find("[name='page']").val(targetPage);
+    listPageForm.attr("action", "/article/listPaging").attr("method", "get");
+    listPageForm.submit();
+});
+```
+`<a>`태그를 클릭하면 발생하는 이벤트는 `preventDefault()`를 통해 페이지 이동을 막는다. 그리고 이벤트가 발생한 `<a>`태그의 페이지 번호 값을 `<from>`태그의 `page`에 넣어 전송하게 된다.
+
+실제로 크롬 개발자도구를 통해 확인해보면 `<a>`태그의 링크는 앞서 설명한 것처럼 페이지 번호만을 의미하도록 나오고 페이지 이동시 `page`와 `perPageNum`도 연동이 되는 것을 확인할 수 있다.
+![enhancement_js](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2012-24-10.png?raw=true)
+
+## 2. 목록페이지 정보 유지
+페이징 처리 구현이 완료가 되었다. 이제 특정 목록페이지에서 특정 게시글을 조회, 수정, 삭제한 뒤 다시 목록을 이동할 때 특정 목록페이지로 다시 이동하도록 구현해보자.
+```
+3번의 목록페이지 -> 80번 게시물 조회 -> 목록 페이지 이동 버튼 클릭 -> 3번 목록 페이지 이동
+3번의 목록페이지 -> 80번 게시물 조회 -> 80번 게시글 수정 -> 게시글 수정 처리 완료 -> 3번 목록 페이지 이동
+3번의 목록페이지 -> 80번 게시물 조회 -> 80번 게시글 삭제 버튼 클릭 -> 게시글 삭제 처리 완료 -> 3번 목록 페이지 이동
+```
+바로 위의 내용은 페이지 이동의 흐름을 나타낸 것으로 조회, 수정, 삭제 처리 후에 다시 특정 목록 페이지로 이동하기 위해서는 아래와 같은 정보를 각 페이지를 이동할 때마다 가지고 있어야 한다.
+
+- 현재 목록페이지의 번호(`page`)
+- 페이지당 출력할 게시글의 갯수(`perPageNum`)
+- 조회게시글의 번호(`articleNo`)
+
+그래서 `AritcleController`의 게시글 조회, 수정, 삭제 메서드에 `page`, `perPageNum`를 가진 `Criteria`타입의 `criteria`변수를 파라미터로 추가 시켜주고, 각 `JSP`페이지에 값들을 `<form>`태그안에 `hidden`값으로 세팅해줘야 한다.
+
+#### # `ArticleController` : 조회, 수정, 삭제 메서드 추가
+기존의 조회, 수정, 삭제 메서드들을 수정해도 되지만 지금까지 작성한 메서드들과 차이점을 구분하기 위해서 새로 작성했다.
+```java
+@RequestMapping(value = "/readPaging", method = RequestMethod.GET)
+public String readPaging(@RequestParam("articleNo") int articleNo,
+                         @ModelAttribute("criteria") Criteria criteria,
+                         Model model) throws Exception {
+
+    model.addAttribute("article", articleService.read(articleNo));
+
+    return "/article/read_paging";
+}
+```
+```java
+@RequestMapping(value = "/modifyPaging", method = RequestMethod.GET)
+public String modifyGETPaging(@RequestParam("articleNo") int articleNo,
+                              @ModelAttribute("criteria") Criteria criteria,
+                              Model model) throws Exception {
+
+    logger.info("modifyGetPaging ...");
+    model.addAttribute("article", articleService.read(articleNo));
+
+    return "/article/modify_paging";
+}
+```
+```java
+@RequestMapping(value = "/modifyPaging", method = RequestMethod.POST)
+public String modifyPOSTPaging(ArticleVO articleVO,
+                               Criteria criteria,
+                               RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("modifyPOSTPaging ...");
+    articleService.update(articleVO);
+    redirectAttributes.addAttribute("page", criteria.getPage());
+    redirectAttributes.addAttribute("perPageNum", criteria.getPerPageNum());
+    redirectAttributes.addFlashAttribute("msg", "modSuccess");
+
+    return "redirect:/article/listPaging";
+}
+```
+```java
+@RequestMapping(value = "/removePaging", method = RequestMethod.POST)
+public String removePaging(@RequestParam("articleNo") int articleNo,
+                           Criteria criteria,
+                           RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("remove ...");
+    articleService.delete(articleNo);
+    redirectAttributes.addAttribute("page", criteria.getPage());
+    redirectAttributes.addAttribute("perPageNum", criteria.getPerPageNum());
+    redirectAttributes.addFlashAttribute("msg", "delSuccess");
+
+    return "redirect:/article/listPaging";
 }
 ```
 
-## 2. 페이징처리를 위한 `JSP`페이지 작성
-`/WEB-INF/views/article/`디렉토리에 `list_criteria.jsp`파일을 생성하고, `list.jsp`내용을 전체 복사해 붙여 넣어준다.
-
-#### # 페이징 처리전의 게시글 목록과 처리 후의 게시글 목록 차이 비교
-
-페이지 처리 전의 게시글 목록
-![list.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2020-58-17.png?raw=true)
-
-페이징 처리 후의 게시글 목록1 : 기본값 페이지
-![list_criteria.jsp1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2020-58-46.png?raw=true)
-
-페이징 처리 후의 게시글 목록2 : GET파라미터의 page 값이 4일때
-![list_criteria.jsp2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2021-01-37.png?raw=true)
-
-페이징 처리 후의 게시글 목록3 : GET파라미터 page값이 4이고, perPageNum의 값이 20일때
-![list_criteria.jsp3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-01%2021-03-30.png?raw=true)
-
-## 3. 목록 하단의 페이지 번호 출력을 위한 계산식 정리
-위와 같이 매번 원하는 페이지로 이동하기 위해서 매번 URI를 직접 써서 이동할 수 없기 때문에 화면의 하단에 페이지번호가 출력되는 작업을 진행해보자.
-
-#### # 하단 페이지 번호 출력을 위한 데이터들
-화면 하단에 페이지 번호를 출력하기 위해서는 아래와 같은 데이터들이 필요하다.
-
-```
-// 시작 페이지 번호는 1
-[1] [2] [3] [4] [5] ... [9] [10] [다음]
-```
-**시작 페이지 번호** : 하단에 출력할 페이지 번호의 갯수가 10이고, 현재 페이지 번호가 1~10사이라면 시작번호는 1이어야한다.
-```
-// 끝 페이지 번호는 7
-[1] [2] [3] [4] [5] [6] [7]
-```  
-**끝 페이지 번호** : 만약 전체 게시글의 갯수가 만약 65개라면, 끝페이지 번호는 7이어야 한다.
-**전체 게시글의 갯수** : 끝 페이지의 번호 계산을 위해서는 전체 게시글의 전체 갯수가 반드시 필요하다.
-```
-// 이전 페이지 링크
-[이전] [11] [12] [13] [14] [15] ... [19] [20]
-```
-**이전 페이지 링크** : 시작 페이지 번호가 1이 아니라면 이전 페이지를 조회 할 수 있어야 한다.
-```
-// 다음 페이지 링크
-[1] [2] [3] [4] [5] ... [9] [10] [다음]
-```
-**다음 페이지 링크** : 끝 페이지의 번호 이후에 더 많은 게시글이 존재한다면 다음 페이지를 조회 할 수 있어야 한다.
-
-이제 각 데이터들이 어떻게 계산되는지 정리해보자.
-
-#### # 끝 페이지 번호의 계산
-시작페이지 번호부터 계산하는 것보다 끝 페이지 번호를 계산하는 것이 산술적으로 더 편할 수 있다.
-```java
-// 끝 페이지번호 = Math.ceil(현재페이지 / 페이지 번호의 갯수) * 페이지 번호의 갯수
-int endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
-```
-예를 들어 위의 계산식을 통해 계산한 결과는 아래의 표와 같다.
-
-|페이지 번호의 갯수|현재 페이지|계산식|끝 페이지 번호|
-|---|---|---|---|
-|10|3|Math.ceil(3/10) * 10|10|
-|10|1|Math.ceil(1/10) * 10|10|
-|10|20|Math.ceil(20/10) * 10|20|
-|10|21|Math.ceil(21/10) * 10|30|
-|20|20|Math.ceil(20/20) * 20|20|
-|20|21|Math.ceil(21/20) * 20|40|
-
-#### # 시작 페이지 번호의 계산
-끝페이지 번호를 구했다면 시작 페이지 번호를 계산하는 것은 매우 쉽다.
-```java
-// 시작 페이지 번호 = (끝 페이지 번호 - 페이지 번호의 갯수) + 1
-int startPage = (endPage - displayPageNum) + 1;
-```
-끝 페이지 번호에서 페이지 번호의 갯수를 빼고 1을 더해 주기만 하면 된다. 예를 들어 계산한 결과는 아래의 표와 같다.
-
-|끝 페이지 번호|페이지 번호의 갯수|계산식|시작 페이지 번호|
-|---|---|---|---|
-|10|10|(10-10)+1|1|
-|20|10|(20-10)+1|11|
-|30|10|(30-10)+1|21|
-|40|20|(40-20)+1|21|
-|60|30|(40-20)+1|31|
-
-#### # 전체 게시글의 갯수와 끝 페이지 번호의 보정
-끝 페이지 번호는 실제 게시글의 전체 갯수와 관련되어 있기 때문에 다시 한번 계산을 통해 값을 보정해야할 필요가 있다.
-```java
-// 끝 페이지 번호 계산
-int endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
-
-// 100개의 게시글을 20개씩 보여줄 경우 끝 페이지 번호는 5이어야 함
-// 그런데 계산 결과 값은 20???
-20 = Math.ceil(1/20) * 20;
-
-// 계산식의 결과 값을 보정하기 위한 또 다른 계산식이 필요하다!
-```
-예를 들어 100개의 게시글을 10개씩 보여준다면 끝페이지 번호는 10이 되어야 하고, 20개씩 보여주는 경우는 5가 되어야 한다. 그러데 20개씩 보여줄 경우를 계산해보면 20이 나오게 된다. 이렇게 잘못 계산된 내용을 보정하기 위해 아래의 코드를 통해 다시 계산을 하고, 결과 값을 비교한 최종적으로 계산한 결과 값을 끝페이지 번호로 저장하게 된다.
-```java
-// 끝 페이지 번호 보정 계산식
-// 끝 페이지 번호 = Math.ceil(전체 게시글 갯수 / 페이지 당 출력할 게시글의 갯수)
-int tempEndPage = (int) (Math.ceil(totalCount / (double) criteria.getPerPageNum()));
-
-// 원하던 결과 같이 나왔다
-5 = Math.ceil(100/20);
-
-// 이전의 결과 값과 보정된 결과 값을 비교 후, 보정한 결과 값을 페이지 끝 번호 변수에 저장
-if (endPage > tempEndPage) {
-  endPage = tempEndPage;
-}
-```
-
-#### # 이전과 다음 링크의 계산
-이전 링크의 경우 시작 페이지 번호가 1인지 아닌지 검사하는 것으로 충분하다. 삼항 연산자를 통해 1이면 `false`값을 아니면 `true`값을 가지도록 하면 된다.
-```java
-boolean prev = startPage == 1 ? false : true;
-```
-
-다음 링크의 경우는 예를 들어 설명해보겠다. 만약 페이지 당 출력할 페이지 번호의 갯수가 10이고, 끝 페이지 번호가 10인 상황에서 전체 게시글의 숫자가 101이라면 다음 링크는 `true`가 되어야 한다. 이 것을 삼항 연산자로 표현하면 다음과 같다.
-```java
-// 다음 링크 = 끝페이지 * 페이지 당 출력할 게시글의 갯수 >= 전체 게시글의 갯수 ? : false : true;
-boolean next = endPage * criteria.getPerPageNum() >= totalCount ? false : true;
-// true = 10 * 10 >= 101 ? false : true;
-```
-
-## 4. 페이징 처리를 위한 계산 클래스 설계
-위에서 정리한 계산식을 직접 JSP에서 처리할 수 있지만, 좀 더 편리하게 사용하기 위해서 별도의 클래스를 설계하여 처리하는 것이 좋다. 이렇게 클래스를 설계하여 처리하면 페이징이 필요한 모든 곳에서 사용할 수 있기 때문에 재사용에 장점을 가지게 된다.
-
-클래스 작성에 앞서 필요한 데이터 변수들을 혼동하지 않도록 다시 한번 체크해보자.
-
-**외부에서 입력되는 데이터**
-- `page` : 현재 페이지의 번호
-- `perPageNum` : 페이지당 출력할 게시글의 갯수
-
-**DB에서 계산되는 데이터**
-- `totalCount` : 전체 게시글의 갯수
-
-**계산식을 통해 만들어지는 데이터**
-- `startPage` : 시작 페이지 번호
-- `endPage` : 끝 페이지 번호
-- `prev` : 이전 링크
-- `next` : 다음 링크
-
-#### # `PageMaker`클래스 작성
-이제 하단의 페이지 번호 출력을 도와줄 클래스를 아래와 같이 작성한다.
-```java
-public class PageMaker {
-
-    private int totalCount;
-    private int startPage;
-    private int endPage;
-    private boolean prev;
-    private boolean next;
-
-    private int displayPageNum = 10;
-
-    private Criteria criteria;
-
-    public void setCriteria(Criteria criteria) {
-        this.criteria = criteria;
-    }
-
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
-        calcData();
-    }
-
-    private void calcData() {
-
-        endPage = (int) (Math.ceil(criteria.getPage() / (double) displayPageNum) * displayPageNum);
-
-        startPage = (endPage - displayPageNum) + 1;
-
-        int tempEndPage = (int) (Math.ceil(totalCount / (double) criteria.getPerPageNum()));
-
-        if (endPage > tempEndPage) {
-            endPage = tempEndPage;
-        }
-
-        prev = startPage == 1 ? false : true;
-
-        next = endPage * criteria.getPerPageNum() >= totalCount ? false : true;
-
-    }
-}
-```
-위 코드에서 주목해서 봐야할 점은 아래와 같이 2가지이다.
-- `displayPageNum` : 하단의 페이지 번호의 갯수를 의미한다.
-- `calcData()` : 게시글의 전체 갯수가 설정되는 시점에 `calcData()`메서드를 호출하여 필요한 데이터들를 계산한다.
-
-## 5. 컨트롤러와 JSP페이지 작성
-
-#### # `ArticleController`
-`ArticleController`에 페이지 번호 출력처리가 된 목록페이지를 처리할 메서드를 아래와 같이 작성해준다.
-```java
-@RequestMapping(value = "/listPaging", method = RequestMethod.GET)
-public String listPaging(Model model, Criteria criteria) throws Exception {
-    logger.info("listPaging ...");
-
-    PageMaker pageMaker = new PageMaker();
-    pageMaker.setCriteria(criteria);
-    pageMaker.setTotalCount(1000);
-
-    model.addAttribute("articles", articleService.listCriteria(criteria));
-    model.addAttribute("pageMaker", pageMaker);
-
-    return "/article/list_paging";
-}
-```
-위의 코드에 눈여겨 볼 점은 아래와 같다.
-- `Criteria`, `Model`타입의 변수 `criteria`와 `model`를 파라미터로 사용한다.
-- `Model`객체를 사용하여 `PageMaker`에서 계산한 결과 값을 저장한다.
-- 아직 영속계층에서 전체 게시글의 갯수를 구하는 로직을 구현하지 않았기 때문에 `setTotalCount()`의 매개변수는 1000을 임의로 넣어주었다.
-
-#### # `list_paging.jsp`
-`/WEB-INF/views/article/`디렉토리에 `list_paging.jsp`파일을 생성하고, `list.jsp`의 내용을 전체 복사한 뒤 붙여 넣는다. 그리고 `<div class="box-body"></div>`태그 바로 밑에 추가적으로 아래의 코드를 작성해준다.
+#### # 목록 페이지의 정보를 저장하기 위한 `JSP`추가
+컨트롤러에서 작성했던 것과 마찬가지로 기존의 조회, 수정/삭제의 `JSP`수정하지 않고 각각의 `JSP`파일을 복사해 `_paging`이라는 접미사를 붙여 새로 작성해준다.
+`read_paging.jsp`
 ```xml
 <div class="box-footer">
-    <div class="text-center">
-        <ul class="pagination">
-            <c:if test="${pageMaker.prev}">
-                <li><a href="${path}/article/listPaging?page=${pageMaker.startPage - 1}">이전</a></li>
-            </c:if>
-            <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="idx">
-                <li <c:out value="${pageMaker.criteria.page == idx ? 'class=active' : ''}"/>>
-                    <a href="${path}/article/listPaging?page=${idx}">${idx}</a>
-                </li>
-            </c:forEach>
-            <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
-                <li><a href="${path}/article/listPaging?page=${pageMaker.endPage + 1}">다음</a></li>
-            </c:if>
-        </ul>
+    <form role="form" method="post">
+        <input type="hidden" name="articleNo" value="${article.articleNo}">
+        <input type="hidden" name="page" value="${criteria.page}">
+        <input type="hidden" name="perPageNum" value="${criteria.perPageNum}">
+    </form>
+    <button type="submit" class="btn btn-primary listBtn"><i class="fa fa-list"></i> 목록</button>
+    <div class="pull-right">
+        <button type="submit" class="btn btn-warning modBtn"><i class="fa fa-edit"></i> 수정</button>
+        <button type="submit" class="btn btn-danger delBtn"><i class="fa fa-trash"></i> 삭제</button>
     </div>
 </div>
 ```
-위의 코드에서 살펴볼 점을 정리한 내용은 아래와 같다.
-- `JSTL`의 `<c:if>` 조건문을 통해 이전 링크와 다음 링크의 활성/비활성 처리를 하였다.
-- `<c:forEach>` 반복문을 통해 `pageMaker`클래스에서 계산된 페이지 번호를 출력해준다.
-- `<c:out>`에서 삼항연산자를 통해 `<li>`태그의 속성을 제어하여 페이지 번호들 중에서 현재 페이지 번호임을 알 수 있게 색을 변경한다.
+`<form>`태그 안에 `<input>`태그를 `hidden`으로 `page`와 `perPageNum`을 추가해준다.
+```js
+$(document).ready(function () {
 
-#### # 페이지 번호 출력까지 한 목록 페이지 화면
-첫 페이지와 이전 링크 비활성화
-![1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2000-34-31.png?raw=true)
+    var formObj = $("form[role='form']");
+    console.log(formObj);
 
-중간 페이지와 이전, 다음 링크 활성화
-![2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2000-36-00.png?raw=true)
+    $(".modBtn").on("click", function () {
+        formObj.attr("action", "/article/modifyPaging");
+        formObj.attr("method", "get");
+        formObj.submit();
+    });
 
-끝 페이지와 다음 링크 비활성화
-![3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-02%2000-36-23.png?raw=true)
+    $(".delBtn").on("click", function () {
+       formObj.attr("action", "/article/removePaging");
+       formObj.submit();
+    });
 
-## 6. 페이징 처리를 위한 전체 게시글의 갯수 구하기
-#### # `ArticleDAO`인터페이스, `ArticleDAOImpl`클래스 메서드 추가
-아래와 같이 인터페이스에 추상메서드를 추가하고, 구현 클래스에서 메서드를 구현해준다.
-```java
-int countArticles(Criteria criteria) throws Exception;
+    $(".listBtn").on("click", function () {
+       formObj.attr("method", "get");
+       formObj.attr("action", "/article/listPaging");
+       formObj.submit();
+    });
+
+});
 ```
-```java
-@Override
-public int countArticles(Criteria criteria) throws Exception {
-    return sqlSession.selectOne(NAMESPACE + ".countArticles", criteria);
-}
+수정, 삭제, 목록 페이지 URI을 컨트롤러에서 작성한 것과 같이 수정해준다.
+
+`modify_paging.jsp`
+```xml
+<input type="hidden" name="articleNo" value="${article.articleNo}">
+<input type="hidden" name="page" value="${criteria.page}">
+<input type="hidden" name="perPageNum" value="${criteria.perPageNum}">
 ```
+`<form>`태그 안에 `<input>`태그를 `hidden`으로 `page`와 `perPageNum`을 추가해준다.
+```js
+$(document).ready(function () {
 
-#### # `articleMapper.xml` SQL작성
-아래와 같이 SQL Mapper에 `COUNT`쿼리를 작성해준다.
-```sql
-<select id="countArticles" resultType="int">
-    <![CDATA[
-    SELECT
-        COUNT(article_no)
-    FROM tbl_article
-    WHERE article_no > 0
-    ]]>
-</select>
+    var formObj = $("form[role='form']");
+    console.log(formObj);
+
+    $(".modBtn").on("click", function () {
+        formObj.submit();
+    });
+
+    $(".cancelBtn").on("click", function () {
+        history.go(-1);
+    });
+
+    $(".listBtn").on("click", function () {
+        self.location = "/article/listPaging?page=${criteria.page}&perPageNum=${criteria.perPageNum}";
+    });
+
+});
 ```
+목록 버튼 클릭했을 때 이동할 uri를 위와 같이 수정해준다.
 
-#### # `ArticleService`인터페이스, `ArticleServiceImpl`클래스 메서드 추가
-아래와 같이 인터페이스에 추상메서드를 추가하고, 구현 클래스에서 메서드를 구현해준다.
-```java
-int countArticles(Criteria criteria) throws Exception;
-```
-```java
-@Override
-public int countArticles(Criteria criteria) throws Exception {
-    return articleDAO.countArticles(criteria);
-}
-```
-
-#### # `ArticleController` 수정
-이전에 임의로 전체 게시글의 숫자를 임의로 넣어 줬던 것을 아래와 같이 변경해준다.
-```java
-@RequestMapping(value = "/listPaging", method = RequestMethod.GET)
-public String listPaging(Model model, Criteria criteria) throws Exception {
-    logger.info("listPaging ...");
-
-    PageMaker pageMaker = new PageMaker();
-    pageMaker.setCriteria(criteria);
-    // 수정
-    pageMaker.setTotalCount(articleService.countArticles(criteria));
-
-    model.addAttribute("articles", articleService.listCriteria(criteria));
-    model.addAttribute("pageMaker", pageMaker);
-
-    return "/article/list_paging";
-}
-```
-
-## 7. 페이징 처리 간단 요약 정리
-지금까지 페이징 처리구현을 위해 컨트롤러와 뷰까지 구현을 완료해보았는데 기억해두어야할 사항들을 간단 요약 정리해보자.
-- 페이지 번호 출력처리를 위한 데이터들 : 시작 페이지 번호, 끝 페이지 번호, 전체 게시글의 갯수, 이전 링크, 다음 링크
-- 끝 페이지 번호 계산식 : `Math.ceil(현재 페이지 번호 / 페이지 번호의 갯수) * 페이지번호의 갯수`
-- 시작 페이지 번호 계산식 : `(끝 페이지 번호 - 페이지 번호의 갯수) + 1`
-- 끝 페이지 번호의 보정 계산식 : `Math.ceil(전체 게시글의 갯수 / 페이지 당 출력할 게시글의 갯수)`
-- 이전 링크 활성/비활성 계산식 : `시작 페이지 번호 == 1 ? fales : true`
-- 다음 링크 활성/비활성 계산식 : `끝 페이지 번호 * 페이지 당 출력할 게시글 갯수 >= 전체 게시글의 갯수 ? fales : true`
+## 3. 페이징 처리 개선 작업과 목록 페이지 정보 유지 간단 요약정리
+지금까지 정리한 내용 중에서 기억해야할 내용을 정리해보자.
+- 페이징 처리 개선 작업 요약
+  - `UriComponentsBuilder`를 이용하여 원하는 URI를 자동 생성할 수 있다.
+  - 자바스크립트의 클릭이벤트 발생시 `attr()`을 이용하여 URI를 제어할 수 있다.
+- 목록 페이지 정보 유지 작업 요약
+  - 현재 목록페이지 번호(`page`), 목록 페이지 당 출력할 게시글 갯수(`perPageNum`), 게시글 번호(`articleNo`)를 가지고 페이지를 이동해야한다.
+  - 컨트롤러에 위의 정보를 파라미터로 받아 각각의 `JSP`페이지에 세팅해준다.
