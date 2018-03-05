@@ -27,12 +27,12 @@
 |5|[예외처리](http://doublesprogramming.tistory.com/197)|
 |6|[페이징처리 : Persistence, Business 계층](http://doublesprogramming.tistory.com/198)|
 |7|[페이징처리 : Control, Presentation 계층](http://doublesprogramming.tistory.com/199)|
-|8|[페이징처리 개선, 목록페이지 정보 유지](http://doublesprogramming.tistory.com/198)|
+|8|[페이징처리 개선, 목록페이지 정보 유지](http://doublesprogramming.tistory.com/200)|
 ---
 
-# Spring MVC 게시판 예제 08 - 프로젝트 구조 변경 및 수정사항
+# Spring MVC 게시판 예제 09 - 프로젝트 구조 변경 및 수정사항
 
-이전 포스팅까지 게시판 프로젝트를 생성하고, 기본적인 CURD와 페이징 처리까지 구현해보았다. 이어서 게시글 검색 기능을 추가할 예정인데 그에 앞서 지금까지 구현한 프로젝트의 예제 구조를 변경하고, View페이지를 수정하려고 한다. 그 이유는 지금까지 게시글과 관련된 기능들을 구현하면서 단계별로 어떻게 수정되고 변경되었는지 차이점을 구분해보기 위해서이다. 프로젝트의 변경 및 수정사항을 아래와 같다.
+이전 포스팅까지 게시판 프로젝트를 생성하고, 기본적인 CURD와 페이징 처리까지 구현해보았다. 이어서 게시글 검색 기능을 추가할 예정인데 그에 앞서 지금까지 구현한 프로젝트의 예제 구조를 변경하고, View페이지를 수정하려고 한다. 그 이유는 지금까지 게시글과 관련된 기능들을 구현하면서 단계별로 어떻게 수정되고 변경되었는지 차이점을 구분하기 위해서이다. 프로젝트의 변경 및 수정사항을 아래와 같다.
 
 ## 1. `Controller`의 변경
 게시글 관련 컨트롤러의 경우 아래와 같이 기능이 추가되거나 변경될 경우 기존의 컨트롤러에 메서드를 새로 추가하거나, 변경하지 않고 새로운 컨트롤러를 추가 해서 아래와 같이 작성해준다.
@@ -240,10 +240,9 @@ public class ArticlePagingController {
 #### # `ArticlePagingSearchController` : 기본적인 게시글 CRUD + 페이징처리 + 검색처리까지 구현 예정
 
 ## 2. `JSP`파일들의 변경 및 수정사항
-`JSP`파일의 경우 기능이 추가될 경우 아래와 같이 디렉토리를 새로 생성하고, 기존의 `JSP`파일을 복사해서 추가시켜준다.
+
 
 #### # 게시글 관련 `views`디렉토리 변경 및 `JSP`파일 추가
-
 ```
 WEB-INF/views/article : 게시글관련 JSP디렉토리
                   |
@@ -251,18 +250,21 @@ WEB-INF/views/article : 게시글관련 JSP디렉토리
                   ├── /paging (write.jsp, list.jsp, read.jsp, modify.jsp) : 기본적인 게시글 CRUD + 페이징처리
                   └── /search (write.jsp, list.jsp, read.jsp, modify.jsp) : 기본적인 게시글 CRUD + 페이징처리 + 검색처리
 ```
+`JSP`파일의 경우 기능이 추가될 경우 위와 같이 디렉토리를 새로 생성하고, 기존의 `JSP`파일을 복사해서 추가시켜준다. 그리고 기능 구현 단계에 따라 구분해준 컨트롤러의 매핑URI로 `JSP`의 코드를 수정해준다.
 
 #### # 레이아웃 변경
 아래와 같이 `JSP`파일의 `<body>`태그의 클래스 속성에 `layout-boxed`를 추가시켜 아래와 같이 레이아웃을 수정해준다.
 
 `<body class="hold-transition skin-blue sidebar-mini">` : 변경 전
-![]()
+![before](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-04%2017-14-57.png?raw=true)
 
 `<body class="hold-transition skin-blue sidebar-mini layout-boxed">` : 변경 후
-![]()
+![after](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-04%2017-13-45.png?raw=true)
 
 #### # 사이드 메뉴의 변경
 `left_column.jsp`의 사이드 메뉴는 아래와 같이 기능별 구현 단계에 따라 구분할 수 있도록 변경한다.
+
+![menu](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-04%2017-17-32.png?raw=true)
 
 ```xml
 <ul class="sidebar-menu" data-widget="tree">
