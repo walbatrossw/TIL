@@ -33,7 +33,7 @@
 
 # Spring MVC 게시판 예제 08 - 검색처리, 동적SQL
 
-이제 게시글 검색 처리를 구현해보자. 일반적으로 검색기능의 구현은 검색조건과 검색키워드로 이루어진다. 검색 조건의 경우 select박스를 통해 조건을 선택할 수 있도록 하고, 게시글의 제목, 내용, 작성자를 기준으로 아래와 같은 6가지의 경우의 수에 따라 검색결과를 반환하도록 구현할 예정이다.
+이제 게시글 검색 처리 구현을 정리해보자. 일반적으로 검색기능의 구현은 **검색조건** 과 **검색키워드** 로 이루어진다. 검색 조건의 경우 select박스를 통해 조건을 선택할 수 있도록 하고, 게시글의 제목, 내용, 작성자를 기준으로 아래와 같은 6가지의 경우의 수에 따라 검색결과를 반환하도록 구현한다.
 
 - 제목
 - 내용
@@ -42,23 +42,25 @@
 - 내용 or 작성자
 - 작성자 or 내용 or 작성자
 
-그리고 페이징 처리를 구현할 때와 마찬가지로 조회, 수정, 삭제 시에도 검색된 목록의 정보를 유지하도록 처리하는 것까지 같이 구현한다.
+그리고 페이징 처리를 구현할 때와 마찬가지로 조회, 수정, 삭제 시에도 **검색된 목록의 정보를 유지하도록 처리** 하는 것까지 같이 구현한다.
 
 ## 1. 검색처리를 위한 데이터와 클래스
-게시글의 검색결과를 반환하기 위해서는 다음과 같은 정보가 필요하다.
 
-- 현재 페이지 번호 : `Criteria`클래스 멤버변수
-- 목록 페이지 당 출력할 게시글의 갯수 : `Criteria`클래스 멤버변수
-- 검색 조건 : `SearchCriteria`클래스 멤버변수
-- 검색 키워드 : `SearchCriteria`클래스 멤버변수
+사용자가 원하는 게시글 검색결과를 반환하기 위해서는 다음과 같은 정보가 필요하다.
 
-위의 정보 중에서 "현재 페이지 번호"와 "목록 페이지 당 출력할 게시글의 갯수"는 이미 `Criteria`클래스에 선언되있고, "검색 조건"과 "검색 키워드"를 추가해주면 된다. 기존의 `Criteria`클래스에 "검색 조건"과 "검색 키워드"를 작성해줘도 되지만, `Criteria`클래스를 상속받는 `SerachCriteria`클래스를 생성하고, 그 클래스에 멤버변수로 선언한다. 이렇게 상속을 통해 클래스를 작성하고, 사용하면 기존의 코드의 변경을 최소화할 수 있기 때문이다.
+- **현재 페이지 번호(`page`)** : `Criteria`클래스 멤버변수
+- **목록 페이지 당 출력할 게시글의 갯수(`perPageNum`)** : `Criteria`클래스 멤버변수
+- **검색 조건(`searchType`)** : `SearchCriteria`클래스 멤버변수
+- **검색 키워드(`keyword`)** : `SearchCriteria`클래스 멤버변수
+
+위의 정보 중에서 "현재 페이지 번호"와 "목록 페이지 당 출력할 게시글의 갯수"는 이미 `Criteria`클래스에 선언되있다. 그래서 "검색 조건"과 "검색 키워드"를 추가해주면 된다. 기존의 `Criteria`클래스에 "검색 조건"과 "검색 키워드"를 추가해서 작성해줘도 되지만, `Criteria`클래스를 상속받는 `SerachCriteria`라는 새로운 클래스를 생성하고, 그 클래스에 멤버변수로 선언하는 방식으로 진행한다. 이렇게 작성하는 이유는 기존의 코드와 차이점을 구분하기 위해서이기도 하지만 기존 코드의 변경을 최소화할 수 있기 때문이다.
+
 ```
 SearchCriteria(자손클래스) ---> Criteria(부모클래스)
 ```
 
 #### # `SerachCriteria`클래스
-`/src/main/java/기본패키지/commons/paging`패키지를 생성하고, 아래와 같이 `Criteria`클래스를 상속받는 `SearchCriteria`클래스를 만들어준다.
+`/src/main/java/기본패키지/commons/paging`패키지에 아래와 같이 `Criteria`클래스를 상속받는 `SearchCriteria`클래스를 만들고, 검색조건(`searchType`)과 검색키워드(`keyword`)를 멤버변수로 선언해준다.
 ```java
 public class SearchCriteria extends Criteria {
 
@@ -69,9 +71,14 @@ public class SearchCriteria extends Criteria {
 }
 ```
 
-## 2. 검색관련 컨트롤러 작성
-`/src/main/java/기본패키지/article/controller`패키지에 `ArticlePagingSearchController`클래스를 생성하고, 아래와 같이 작성해준다.
+## 2. 페이징, 검색기능이 추가된 게시글 관련 컨트롤러 작성
+`/src/main/java/기본패키지/article/controller`패키지에 `ArticlePagingSearchController`클래스를 생성하고, 아래와 같이 작성하는데 기존의 `ArticlePagingController`와 `ArticlePagingSearchController`의 차이점은 아래와 같다.
+
+- 각 메서드의 매개변수들 중에서 `Criteria`타입의 변수는 `SerachCriteria`타입으로 변경
+- 리다이렉트될 때 전달되는 검색 정보(`searchType`, `keyword`)를 추가
+
 #### # `ArticlePagingSearchController` 클래스
+
 ```java
 @Controller
 @RequestMapping("/article/paging/search")
@@ -88,7 +95,7 @@ public class ArticlePagingSearchController {
 }
 ```
 
-#### # 게시글 작성 매핑 메서드
+#### # 게시글 작성관련 매핑 메서드 추가
 ```java
 // 게시글 작성 페이지
 @RequestMapping(value = "/write", method = RequestMethod.GET)
@@ -99,25 +106,29 @@ public String writeGET() throws Exception {
     return "article/search/write";
 }
 ```
+
 ```java
-// 게시글 등록 처리
+// 게시글 작성 처리
 @RequestMapping(value = "/write", method = RequestMethod.POST)
-public String writePOST() throws Exception {
+public String writePOST(ArticleVO articleVO,
+                        RedirectAttributes redirectAttributes) throws Exception {
 
     logger.info("search writePOST() called ...");
+    articleService.create(articleVO);
+    redirectAttributes.addFlashAttribute("msg", "regSuccess");
 
     return "redirect:/article/paging/search/list";
 }
 ```
 
-#### # 게시글 목록 매핑 메서드
+#### # 게시글 목록관련 매핑 메서드 추가
 ```java
-// 게시글 목록
+// 게시글 목록 페이지
 @RequestMapping(value = "/list", method = RequestMethod.GET)
 public String list(@ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
                    Model model) throws Exception {
 
-    logger.info("list ...");
+    logger.info("search list() called ...");
 
     PageMaker pageMaker = new PageMaker();
     pageMaker.setCriteria(searchCriteria);
@@ -130,35 +141,36 @@ public String list(@ModelAttribute("searchCriteria") SearchCriteria searchCriter
 }
 ```
 
-#### # 게시글 조회 매핑 메서드
+#### # 게시글 조회관련 매핑 메서드 추가
 ```java
-// 게시글 조회
 @RequestMapping(value = "/read", method = RequestMethod.GET)
 public String read(@RequestParam("articleNo") int articleNo,
-                   @ModelAttribute("SearchCriteria") SearchCriteria searchCriteria,
+                   @ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
                    Model model) throws Exception {
 
     logger.info("search read() called ...");
     model.addAttribute("article", articleService.read(articleNo));
 
-    return "article/paging/read";
+    return "article/search/read";
 }
 ```
 
-#### # 게시글 수정 매핑 메서드
+#### # 게시글 수정관련 매핑 메서드 추가
 ```java
 // 게시글 수정 페이지
 @RequestMapping(value = "/modify", method = RequestMethod.GET)
 public String modifyGET(@RequestParam("articleNo") int articleNo,
-                        @ModelAttribute("SearchCriteria") SearchCriteria searchCriteria,
+                        @ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
                         Model model) throws Exception {
 
     logger.info("search modifyGet() called ...");
+    logger.info(searchCriteria.toString());
     model.addAttribute("article", articleService.read(articleNo));
 
-    return "article/paging/modify";
+    return "article/search/modify";
 }
 ```
+
 ```java
 // 게시글 수정 처리
 @RequestMapping(value = "/modify", method = RequestMethod.POST)
@@ -170,16 +182,103 @@ public String modifyPOST(ArticleVO articleVO,
     articleService.update(articleVO);
     redirectAttributes.addAttribute("page", searchCriteria.getPage());
     redirectAttributes.addAttribute("perPageNum", searchCriteria.getPerPageNum());
+    redirectAttributes.addAttribute("searchType", searchCriteria.getSearchType());
+    redirectAttributes.addAttribute("keyword", searchCriteria.getKeyword());
     redirectAttributes.addFlashAttribute("msg", "modSuccess");
 
-    return "redirect:/article/paging/list";
+    return "redirect:/article/paging/search/list";
 }
 ```
-#### # 게시글 삭제 매핑 메서드
+
+#### # 게시글 삭제관련 매핑 메서드 추가
 ```java
+// 게시글 삭제 처리
+@RequestMapping(value = "/remove", method = RequestMethod.POST)
+public String remove(@RequestParam("articleNo") int articleNo,
+                     SearchCriteria searchCriteria,
+                     RedirectAttributes redirectAttributes) throws Exception {
+
+    logger.info("search remove() called ...");
+    articleService.delete(articleNo);
+    redirectAttributes.addAttribute("page", searchCriteria.getPage());
+    redirectAttributes.addAttribute("perPageNum", searchCriteria.getPerPageNum());
+    redirectAttributes.addAttribute("searchType", searchCriteria.getSearchType());
+    redirectAttributes.addAttribute("keyword", searchCriteria.getKeyword());
+    redirectAttributes.addFlashAttribute("msg", "delSuccess");
+
+    return "redirect:/article/paging/search/list";
+}
 ```
 
 ## 3. 검색을 위한 JSP작성
+`WEB-INF/views/article/search`디렉토리 하위에 기존의 jsp파일들(`write.jsp`, `list.jsp`, `read.jsp`, `modify.jsp`)을 복사해 붙여 넣는다.
+
+#### # 게시글 작성페이지 : `write.jsp`
+아래와 같이 `<form>`태그의 `action`속성을 변경한다.
+```xml
+<form role="form" id="writeForm" method="post" action="${path}/article/paging/search/write">
+```
+
+#### # 게시글 목록페이지 : `list.jsp`
+**HTML 코드**
+![]()
+```xml
+<div class="box-footer">
+    <div class="form-group col-sm-2">
+        <select class="form-control" name="searchType" id="searchType">
+            <option value="n" <c:out value="${searchCriteria.searchType == null ? 'selected' : ''}"/>>:::::: 선택 ::::::</option>
+            <option value="t" <c:out value="${searchCriteria.searchType eq 't' ? 'selected' : ''}"/>>제목</option>
+            <option value="c" <c:out value="${searchCriteria.searchType eq 'c' ? 'selected' : ''}"/>>내용</option>
+            <option value="w" <c:out value="${searchCriteria.searchType eq 'w' ? 'selected' : ''}"/>>작성자</option>
+            <option value="tc" <c:out value="${searchCriteria.searchType eq 'tc' ? 'selected' : ''}"/>>제목+내용</option>
+            <option value="cw" <c:out value="${searchCriteria.searchType eq 'cw' ? 'selected' : ''}"/>>내용+작성자</option>
+            <option value="tcw" <c:out value="${searchCriteria.searchType eq 'tcw' ? 'selected' : ''}"/>>제목+내용+작성자</option>
+        </select>
+    </div>
+    <div class="form-group col-sm-10">
+        <div class="input-group">
+            <input type="text" class="form-control" name="keyword" id="keywordInput" value="${searchCriteria.keyword}" placeholder="검색어">
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-primary btn-flat" id="searchBtn">
+                    <i class="fa fa-search"></i> 검색
+                </button>
+            </span>
+        </div>
+    </div>
+    <div class="pull-right">
+        <button type="button" class="btn btn-success btn-flat" id="writeBtn">
+            <i class="fa fa-pencil"></i> 글쓰기
+        </button>
+    </div>
+</div>
+```
+**JS코드**
+```js
+$(document).ready(function () {
+
+    $("#searchBtn").on("click", function (event) {
+        self.location =
+            "/article/paging/search/list${pageMaker.makeQuery(1)}"
+            + "&searchType=" + $("select option:selected").val()
+            + "&keyword=" + encodeURIComponent($("#keywordInput").val());
+    });
+
+    $("#writeBtn").on("click", function (event) {
+        self.location = "/article/paging/search/write";
+    });
+
+});
+```
+
+#### # 게시글 조회페이지 : `read.jsp`
+```xml
+
+```
+
+#### # 게시글 수정페이지 : `modify.jsp`
+```xml
+
+```
 
 ## 4. MyBatis 동적 SQL
 
