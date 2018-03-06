@@ -213,15 +213,54 @@ public String remove(@RequestParam("articleNo") int articleNo,
 ## 3. 검색을 위한 JSP작성
 `WEB-INF/views/article/search`디렉토리 하위에 기존의 jsp파일들(`write.jsp`, `list.jsp`, `read.jsp`, `modify.jsp`)을 복사해 붙여 넣는다.
 
-#### # 게시글 작성페이지 : `write.jsp`
+#### # 게시글 작성페이지 구현 : `write.jsp`
 아래와 같이 `<form>`태그의 `action`속성을 변경한다.
 ```xml
 <form role="form" id="writeForm" method="post" action="${path}/article/paging/search/write">
 ```
 
-#### # 게시글 목록페이지 : `list.jsp`
+#### # 게시글 목록페이지 구현 : `pageMaker`클래스, `list.jsp`
+
+**pageMaker** 클래스
+게시글 목록에서 특정게시글의 조회페이지로 이동을 위한 URI를 생성하는 메서드를 아래와 같이 작성한다.
+```java
+// 검색결과를 가진 게시글 목록페이지 URI 자동생성 메서드
+public String makeSearch(int page) {
+
+    UriComponents uriComponents = UriComponentsBuilder.newInstance()
+            .queryParam("page", page)
+            .queryParam("pagePageNum", criteria.getPerPageNum())
+            .queryParam("searchType", ((SearchCriteria) criteria).getSearchType())
+            .queryParam("keyword", encoding(((SearchCriteria) criteria).getKeyword()))
+            .build();
+
+    return uriComponents.toUriString();
+}
+
+// 검색 키워드 인코딩 처리 메서드
+private String encoding(String keyword) {
+    if (keyword == null || keyword.trim().length() == 0) {
+        return "";
+    }
+
+    try {
+        return URLEncoder.encode(keyword, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+        return "";
+    }
+}
+```
+
 **HTML 코드**
-![]()
+`PageMaker`클래스의 `makeSearch()`를 이용해 특정 게시글의 조회를 위한 URI를 아래와 같이 수정해준다.
+```xml
+<td>
+  <a href="${path}/article/paging/search/read${pageMaker.makeSearch(pageMaker.criteria.page)}&articleNo=${article.articleNo}">
+    ${article.title}
+  </a>
+</td>
+```
+게시글 목록의 검색창은 페이징 처리 영역 아래에 `<div class="box-footer"></div>`을 추가하고, 아래와 같이 코드를 작성해준다.
 ```xml
 <div class="box-footer">
     <div class="form-group col-sm-2">
@@ -252,6 +291,8 @@ public String remove(@RequestParam("articleNo") int articleNo,
     </div>
 </div>
 ```
+위의 코드에서 주목해서 봐야할 점은 입력/수정/조회/삭제 처리후 다시 검색된 페이지로 리다이렉트하면서 저장한 "검색조건"과 "검색키워드"를 화면에 뿌려주기 위해 `JSTL`의`<c:out>`을 이용한다.
+
 **JS코드**
 ```js
 $(document).ready(function () {
@@ -269,6 +310,10 @@ $(document).ready(function () {
 
 });
 ```
+검색버튼 클릭 이벤트가 발생하면 GET방식으로 "검색조건"과 "키워드"에 URI를 붙여서 요청한다. `encodeURIComponent()`은 URI로 데이터를 전달하기 위해서 문자열을 인코딩해준다.
+
+위의 코드를 구현한 모습은 아래와 같다.
+![list.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180306_190759.png?raw=true)
 
 #### # 게시글 조회페이지 : `read.jsp`
 ```xml
