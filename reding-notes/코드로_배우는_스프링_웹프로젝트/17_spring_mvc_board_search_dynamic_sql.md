@@ -31,7 +31,7 @@
 |9|[프로젝트 구조 변경 및 수정사항](http://doublesprogramming.tistory.com/201)|
 ---
 
-# Spring MVC 게시판 예제 08 - 검색처리, 동적SQL
+# Spring MVC 게시판 예제 10 - 검색처리, 동적SQL
 
 ## 1. 검색에 필요한 데이터와 `SearchCriteria`클래스 작성하기
 
@@ -724,14 +724,17 @@ $(document).ready(function () {
 
 ## 8. 최종적으로 구현된 검색처리 모습
 
-#### # 조회 페이지
-![]()
+#### # 99로 게시글 검색 이후 목록페이지
+![list.jsp2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180307_154125.png?raw=true)
 
-#### # 수정 페이지
-![]()
+#### # 게시글 검색 이후 조회 페이지
+![read.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180307_154202.png?raw=true)
+
+#### # 게시글 검색 이후 수정 페이지
+![modify.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180307_154221.png?raw=true)
 
 #### # 수정 처리후 목록페이지로 리다이렉트
-![]()
+![list.jsp3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180307_154251.png?raw=true)
 
 #### # 삭제 처리후 목록페이지로 리다이렉트
-![]()
+![list.jsp4](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180307_154320.png?raw=true)
