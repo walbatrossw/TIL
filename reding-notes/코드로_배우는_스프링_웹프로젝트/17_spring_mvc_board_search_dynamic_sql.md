@@ -33,52 +33,33 @@
 
 # Spring MVC 게시판 예제 08 - 검색처리, 동적SQL
 
-이제 게시글 검색 처리 구현을 정리해보자. 일반적으로 검색기능의 구현은 **검색조건** 과 **검색키워드** 로 이루어진다. 검색 조건의 경우 select박스를 통해 조건을 선택할 수 있도록 하고, 게시글의 제목, 내용, 작성자를 기준으로 아래와 같은 6가지의 경우의 수에 따라 검색결과를 반환하도록 구현한다.
+## 1. 검색에 필요한 데이터와 `SearchCriteria`클래스 작성하기
+완전한 검색 기능을 구현하기 위해서는 아래와 같이 4가지의 정보가 필요하다.
 
-- 제목
-- 내용
-- 작성자
-- 제목 or 내용
-- 내용 or 작성자
-- 작성자 or 내용 or 작성자
+- 현재 페이지 번호(`page`)
+- 페이지 당 출력할 게시글의 갯수(`perPageNum`)
+- 검색 조건(`searchType`)
+- 검색 키워드(`keyword`)
 
-그리고 페이징 처리를 구현할 때와 마찬가지로 조회, 수정, 삭제 시에도 **검색된 목록의 정보를 유지하도록 처리** 하는 것까지 같이 구현한다.
-
-## 1. 검색처리를 위한 데이터와 클래스
-
-사용자가 원하는 게시글 검색결과를 반환하기 위해서는 다음과 같은 정보가 필요하다.
-
-- **현재 페이지 번호(`page`)** : `Criteria`클래스 멤버변수
-- **목록 페이지 당 출력할 게시글의 갯수(`perPageNum`)** : `Criteria`클래스 멤버변수
-- **검색 조건(`searchType`)** : `SearchCriteria`클래스 멤버변수
-- **검색 키워드(`keyword`)** : `SearchCriteria`클래스 멤버변수
-
-위의 정보 중에서 "현재 페이지 번호"와 "목록 페이지 당 출력할 게시글의 갯수"는 이미 `Criteria`클래스에 선언되있다. 그래서 "검색 조건"과 "검색 키워드"를 추가해주면 된다. 기존의 `Criteria`클래스에 "검색 조건"과 "검색 키워드"를 추가해서 작성해줘도 되지만, `Criteria`클래스를 상속받는 `SerachCriteria`라는 새로운 클래스를 생성하고, 그 클래스에 멤버변수로 선언하는 방식으로 진행한다. 이렇게 작성하는 이유는 기존의 코드와 차이점을 구분하기 위해서이기도 하지만 기존 코드의 변경을 최소화할 수 있기 때문이다.
-
+위의 정보 중에서 `page`와 `perPageNum`의 경우 페이징처리를 구현하면서 사용한 `Criteria`클래스에 이미 멤버변수로 선언이 되있다. 하지만  `searchType`과 `keyword`는 어디에도 사용한 적이 없기 때문에 새로 추가해줘야한다. `Criteria`클래스의 멤버변수로 추가해 사용해도 되지만 이전의 코드와 차이점을 구분하기 위해 `Criteria`를 상속받은 `SearchCriteria`라는 클래스에 멤버 변수로 작성해준다. 이렇게 하면 기존 코드의 수정을 최소화할 수 있다는 장점도 생기게 된다.
 ```
-SearchCriteria(자손클래스) ---> Criteria(부모클래스)
+SearchCriteria(자손클래스) -------------> Criteria(부모클래스)
 ```
 
-#### # `SerachCriteria`클래스
-`/src/main/java/기본패키지/commons/paging`패키지에 아래와 같이 `Criteria`클래스를 상속받는 `SearchCriteria`클래스를 만들고, 검색조건(`searchType`)과 검색키워드(`keyword`)를 멤버변수로 선언해준다.
+#### # `SearchCriteria`클래스 생성
+`src/main/java/기본패키지/commons/paging`패키지에 아래와 같이 검색조건과 검색 키워드를 멤버변수로 가지는 클래스를 작성한다.
 ```java
 public class SearchCriteria extends Criteria {
 
     private String searchType;
     private String keyword;
 
-    // getter(), setter(), toString() 생략...
+    // Getter, Setter, toString() 생략
 }
 ```
 
-## 2. 페이징, 검색기능이 추가된 게시글 관련 컨트롤러 작성
-`/src/main/java/기본패키지/article/controller`패키지에 `ArticlePagingSearchController`클래스를 생성하고, 아래와 같이 작성하는데 기존의 `ArticlePagingController`와 `ArticlePagingSearchController`의 차이점은 아래와 같다.
-
-- 각 메서드의 매개변수들 중에서 `Criteria`타입의 변수는 `SerachCriteria`타입으로 변경
-- 리다이렉트될 때 전달되는 검색 정보(`searchType`, `keyword`)를 추가
-
-#### # `ArticlePagingSearchController` 클래스
-
+## 2. 컨트롤러(`ArticlePagingSearchController`) 작성
+`src/main/java/기본패키지/article/controller`패키지에 컨트롤러 클래스를 작성해준다.
 ```java
 @Controller
 @RequestMapping("/article/paging/search")
@@ -92,175 +73,41 @@ public class ArticlePagingSearchController {
     public ArticlePagingSearchController(ArticleService articleService) {
         this.articleService = articleService;
     }
-}
-```
 
-#### # 게시글 작성관련 매핑 메서드 추가
-```java
-// 게시글 작성 페이지
-@RequestMapping(value = "/write", method = RequestMethod.GET)
-public String writeGET() throws Exception {
+    @RequestMapping(value = "/write", method = RequestMethod.GET)
+    public String writeGET() throws Exception {
 
-    logger.info("search writeGET() called ...");
+        logger.info("search writeGET() called ...");
 
-    return "article/search/write";
-}
-```
-
-```java
-// 게시글 작성 처리
-@RequestMapping(value = "/write", method = RequestMethod.POST)
-public String writePOST(ArticleVO articleVO,
-                        RedirectAttributes redirectAttributes) throws Exception {
-
-    logger.info("search writePOST() called ...");
-    articleService.create(articleVO);
-    redirectAttributes.addFlashAttribute("msg", "regSuccess");
-
-    return "redirect:/article/paging/search/list";
-}
-```
-
-#### # 게시글 목록관련 매핑 메서드 추가
-```java
-// 게시글 목록 페이지
-@RequestMapping(value = "/list", method = RequestMethod.GET)
-public String list(@ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
-                   Model model) throws Exception {
-
-    logger.info("search list() called ...");
-
-    PageMaker pageMaker = new PageMaker();
-    pageMaker.setCriteria(searchCriteria);
-    pageMaker.setTotalCount(articleService.countSearchedArticles(searchCriteria));
-
-    model.addAttribute("articles", articleService.listSearch(searchCriteria));
-    model.addAttribute("pageMaker", pageMaker);
-
-    return "article/search/list";
-}
-```
-
-#### # 게시글 조회관련 매핑 메서드 추가
-```java
-@RequestMapping(value = "/read", method = RequestMethod.GET)
-public String read(@RequestParam("articleNo") int articleNo,
-                   @ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
-                   Model model) throws Exception {
-
-    logger.info("search read() called ...");
-    model.addAttribute("article", articleService.read(articleNo));
-
-    return "article/search/read";
-}
-```
-
-#### # 게시글 수정관련 매핑 메서드 추가
-```java
-// 게시글 수정 페이지
-@RequestMapping(value = "/modify", method = RequestMethod.GET)
-public String modifyGET(@RequestParam("articleNo") int articleNo,
-                        @ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
-                        Model model) throws Exception {
-
-    logger.info("search modifyGet() called ...");
-    logger.info(searchCriteria.toString());
-    model.addAttribute("article", articleService.read(articleNo));
-
-    return "article/search/modify";
-}
-```
-
-```java
-// 게시글 수정 처리
-@RequestMapping(value = "/modify", method = RequestMethod.POST)
-public String modifyPOST(ArticleVO articleVO,
-                         SearchCriteria searchCriteria,
-                         RedirectAttributes redirectAttributes) throws Exception {
-
-    logger.info("search modifyPOST() called ...");
-    articleService.update(articleVO);
-    redirectAttributes.addAttribute("page", searchCriteria.getPage());
-    redirectAttributes.addAttribute("perPageNum", searchCriteria.getPerPageNum());
-    redirectAttributes.addAttribute("searchType", searchCriteria.getSearchType());
-    redirectAttributes.addAttribute("keyword", searchCriteria.getKeyword());
-    redirectAttributes.addFlashAttribute("msg", "modSuccess");
-
-    return "redirect:/article/paging/search/list";
-}
-```
-
-#### # 게시글 삭제관련 매핑 메서드 추가
-```java
-// 게시글 삭제 처리
-@RequestMapping(value = "/remove", method = RequestMethod.POST)
-public String remove(@RequestParam("articleNo") int articleNo,
-                     SearchCriteria searchCriteria,
-                     RedirectAttributes redirectAttributes) throws Exception {
-
-    logger.info("search remove() called ...");
-    articleService.delete(articleNo);
-    redirectAttributes.addAttribute("page", searchCriteria.getPage());
-    redirectAttributes.addAttribute("perPageNum", searchCriteria.getPerPageNum());
-    redirectAttributes.addAttribute("searchType", searchCriteria.getSearchType());
-    redirectAttributes.addAttribute("keyword", searchCriteria.getKeyword());
-    redirectAttributes.addFlashAttribute("msg", "delSuccess");
-
-    return "redirect:/article/paging/search/list";
-}
-```
-
-## 3. 검색을 위한 JSP작성
-`WEB-INF/views/article/search`디렉토리 하위에 기존의 jsp파일들(`write.jsp`, `list.jsp`, `read.jsp`, `modify.jsp`)을 복사해 붙여 넣는다.
-
-#### # 게시글 작성페이지 구현 : `write.jsp`
-아래와 같이 `<form>`태그의 `action`속성을 변경한다.
-```xml
-<form role="form" id="writeForm" method="post" action="${path}/article/paging/search/write">
-```
-
-#### # 게시글 목록페이지 구현 : `pageMaker`클래스, `list.jsp`
-
-**pageMaker** 클래스
-게시글 목록에서 특정게시글의 조회페이지로 이동을 위한 URI를 생성하는 메서드를 아래와 같이 작성한다.
-```java
-// 검색결과를 가진 게시글 목록페이지 URI 자동생성 메서드
-public String makeSearch(int page) {
-
-    UriComponents uriComponents = UriComponentsBuilder.newInstance()
-            .queryParam("page", page)
-            .queryParam("pagePageNum", criteria.getPerPageNum())
-            .queryParam("searchType", ((SearchCriteria) criteria).getSearchType())
-            .queryParam("keyword", encoding(((SearchCriteria) criteria).getKeyword()))
-            .build();
-
-    return uriComponents.toUriString();
-}
-
-// 검색 키워드 인코딩 처리 메서드
-private String encoding(String keyword) {
-    if (keyword == null || keyword.trim().length() == 0) {
-        return "";
+        return "article/search/write";
     }
 
-    try {
-        return URLEncoder.encode(keyword, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-        return "";
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public String list(@ModelAttribute("searchCriteria") SearchCriteria searchCriteria,
+                       Model model) throws Exception {
+
+        logger.info("search list() called ...");
+
+        PageMaker pageMaker = new PageMaker();
+        pageMaker.setCriteria(searchCriteria);
+        pageMaker.setTotalCount(articleService.countSearchedArticles(searchCriteria));
+
+        model.addAttribute("articles", articleService.listSearch(searchCriteria));
+        model.addAttribute("pageMaker", pageMaker);
+
+        return "article/search/list";
     }
+
 }
 ```
+이전의 컨트롤러와 비교해보면 `list()`의 매개변수의 타입이 `Criteria`에서 `SearchCriteria`로 변경되었다는 것 외에는 차이점은 없다.
 
-**HTML 코드**
-`PageMaker`클래스의 `makeSearch()`를 이용해 특정 게시글의 조회를 위한 URI를 아래와 같이 수정해준다.
-```xml
-<td>
-  <a href="${path}/article/paging/search/read${pageMaker.makeSearch(pageMaker.criteria.page)}&articleNo=${article.articleNo}">
-    ${article.title}
-  </a>
-</td>
-```
-게시글 목록의 검색창은 페이징 처리 영역 아래에 `<div class="box-footer"></div>`을 추가하고, 아래와 같이 코드를 작성해준다.
+## 3. 목록 페이지 : 검색창 만들기, `searchType`와 `keyword`링크 처리
+
+#### # 검색창 만들기
+
+`/WEB-INF/views/article/search`디렉토리를 생성하고, 기존의 `list.jsp`를 복사하여 붙어 넣어준다. 기존의 `jsp`파일을 수정하지 않고, 새로 만들어주는 이유는 기존의 코드와 차이점을 구분하기 위해서이다.
+
 ```xml
 <div class="box-footer">
     <div class="form-group col-sm-2">
@@ -291,46 +138,82 @@ private String encoding(String keyword) {
     </div>
 </div>
 ```
-위의 코드에서 주목해서 봐야할 점은 입력/수정/조회/삭제 처리후 다시 검색된 페이지로 리다이렉트하면서 저장한 "검색조건"과 "검색키워드"를 화면에 뿌려주기 위해 `JSTL`의`<c:out>`을 이용한다.
+검색 조건은 selectbox를 통해 값을 선택하는데 값이 가지는 의미는 아래와 같다.
 
-**JS코드**
-```js
-$(document).ready(function () {
+- 검색조건 없음 : `n`
+- 제목 : `t`
+- 내용 : `c`
+- 작성자 : `w`
+- 제목 or 내용 : `tc`
+- 내용 or 작성자 : `cw`
+- 제목 or 내용 or 작성자 : `tcw`
 
-    $("#searchBtn").on("click", function (event) {
-        self.location =
-            "/article/paging/search/list${pageMaker.makeQuery(1)}"
-            + "&searchType=" + $("select option:selected").val()
-            + "&keyword=" + encodeURIComponent($("#keywordInput").val());
-    });
-
-    $("#writeBtn").on("click", function (event) {
-        self.location = "/article/paging/search/write";
-    });
-
-});
 ```
-검색버튼 클릭 이벤트가 발생하면 GET방식으로 "검색조건"과 "키워드"에 URI를 붙여서 요청한다. `encodeURIComponent()`은 URI로 데이터를 전달하기 위해서 문자열을 인코딩해준다.
+검색한 목록 페이지 ------> 특정 게시글 조회/수정/삭제 처리 ------> 검색한 목록 페이지
+```
+그리고 검색된 목록에서 사용자가 특정게시글을 조회하거나 수정/삭제한 뒤 다시 목록으로 돌아가기 위해서는 검색한 목록의 정보(검색조건, 검색키워드)를 유지할 필요가 있다. 그래서 jstl의 `<c:out>`을 이용하여 정보를 `list.jsp`에 다시 세팅해준다.
 
-위의 코드를 구현한 모습은 아래와 같다.
-![list.jsp](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180306_190759.png?raw=true)
+#### # `searchType`과 `keyword`링크 처리
+게시글 목록의 페이지번호의 링크와 게시글 조회 페이지 링크의 URI에 `searchType`과 `keyword`을 붙이기 위한 작업을 아래와 같이 해준다.
 
-#### # 게시글 조회페이지 : `read.jsp`
+**`PageMaker` 클래스**
+`makeSearch()`메서드를 추가해 URI가 자동으로 생성되게 처리해주고, `encoding()`는 검색키워드를 `UTF-8`로 변환해주도록 작성한다.
+```java
+public String makeSearch(int page) {
+
+    UriComponents uriComponents = UriComponentsBuilder.newInstance()
+            .queryParam("page", page)
+            .queryParam("pagePageNum", criteria.getPerPageNum())
+            .queryParam("searchType", ((SearchCriteria) criteria).getSearchType())
+            .queryParam("keyword", encoding(((SearchCriteria) criteria).getKeyword()))
+            .build();
+
+    return uriComponents.toUriString();
+}
+
+private String encoding(String keyword) {
+    if (keyword == null || keyword.trim().length() == 0) {
+        return "";
+    }
+
+    try {
+        return URLEncoder.encode(keyword, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+        return "";
+    }
+}
+```
+**`list.jsp`의 페이지 번호 링크 수정**
 ```xml
-
+<div class="box-footer">
+    <div class="text-center">
+        <ul class="pagination">
+            <c:if test="${pageMaker.prev}">
+                <li><a href="${path}/article/paging/search/list${pageMaker.makeSearch(pageMaker.startPage - 1)}">이전</a></li>
+            </c:if>
+            <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="idx">
+                <li <c:out value="${pageMaker.criteria.page == idx ? 'class=active' : ''}"/>>
+                    <a href="${path}/article/paging/search/list${pageMaker.makeSearch(idx)}">${idx}</a>
+                </li>
+            </c:forEach>
+            <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
+                <li><a href="${path}/article/paging/search/list?${pageMaker.makeSearch(pageMaker.endPage + 1)}">다음</a></li>
+            </c:if>
+        </ul>
+    </div>
+</div>
 ```
-
-#### # 게시글 수정페이지 : `modify.jsp`
+**`list.jsp`의 게시글 조회 링크 수정**
 ```xml
-
+<td>
+  <a href="${path}/article/paging/search/read${pageMaker.makeSearch(pageMaker.criteria.page)}&articleNo=${article.articleNo}">
+    ${article.title}
+  </a>
+</td>
 ```
+
+#### # 검색처리를 위한 목록페이지 완성 모습
 
 ## 4. MyBatis 동적 SQL
 
-## 5. `ArticleService`와 `SearchArticleController` 수정
-
-## 6. 조회, 수정, 삭제 페이지 처리
-
-## 7. 등록 페이지 처리
-
-## 8. 결과 확인
+## 5.
