@@ -16,7 +16,7 @@
 |4|[Spring MVC 구조](http://doublesprogramming.tistory.com/174)|
 |5|[Spring MVC - Controller 작성 연습, WAS없이 Controller 테스트 해보기](http://doublesprogramming.tistory.com/175)|
 |6|[Spring MVC + MyBatis](http://doublesprogramming.tistory.com/176)|
-|7|[Spring MVC - RestController, AJAX](http://doublesprogramming.tistory.com/203)|
+|7|[Spring - RestController, ResponseEntity, AJAX](http://doublesprogramming.tistory.com/204)|
 
 #### Spring-MVC 게시판 예제  이전 포스팅 링크
 |순서|포스팅 제목|
@@ -33,24 +33,38 @@
 |10|[검색처리, 동적 SQL](http://doublesprogramming.tistory.com/202)|
 ---
 
-# Spring MVC - RestController, AJAX
+# Spring MVC - 댓글처리
 
-## 1. Rest란?
+## 1. 댓글처리를 위한 준비
 
-## 2. `@RestController` 애너테이션
+#### # 전달방식과 처리방식 결정
+Rest방식을 이용할 것이라면 해당 컨트롤러를 먼저 작성하고, 그에 맞는 URI를 결정하는 것이 첫단계이다. 댓글처리는 아래와 같은 방식으로 호출하도록 한다.
 
-## 3. RestController 예제
+|URI|전송방식|설명|
+|---|---|---|
+|`/replies/all/123`|GET|123번게시글의 모든댓글 리스트|
+|`/replies/+데이터`|POST|새로운데이터추가|
+|`/replies/200 + 데이터`|PUT/PATCH|200 댓글수정|
+|`/replies/200`|DELETE|200 댓글삭제|
 
-#### # 단순 문자열로 반환할 경우
-```java
+#### # 댓글을 위한 테이블 설정
+하나의 게시글은 여러개의 댓글을 가질 수 있기 때문에 테이블의 구조는 아래와 같은 형태가 된다.
+![relation]()
+
+```sql
+-- 댓글 테이블 생성
+CREATE TABLE tbl_reply (
+  reply_no INT NOT NULL AUTO_INCREMENT,
+  article_no INT NOT NULL DEFAULT 0,
+  reply_text VARCHAR(1000) NOT NULL,
+  reply_writer VARCHAR(50) NOT NULL,
+  reg_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  update_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (reply_no)
+);
+
+-- 댓글 참조키 설정
+ALTER TABLE tbl_reply ADD CONSTRAINT FK_ARTICLE
+FOREIGN KEY (article_no) REFERENCES tbl_article (article_no);
+
 ```
-
-#### # 객체를 JSON으로 반환할 경우
-```java
-```
-
-#### # 컬렉션 타입의 객체를 반환할 경우
-```java
-```
-
-## 4. `ResponseEntity` 타입

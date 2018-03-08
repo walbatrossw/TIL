@@ -33,7 +33,7 @@
 |10|[검색처리, 동적 SQL](http://doublesprogramming.tistory.com/202)|
 ---
 
-# Spring MVC - RestController, AJAX
+# Spring Framework - RestController, ResponseEntity, AJAX
 
 ## 1. REST(Representational State Transfer)란?
 
@@ -206,7 +206,14 @@ public ResponseEntity<List<SampleVO>> sendListNot() {
 #### AJAX란?
 웹을 통해 작업할 때 REST방식이 가장 많이 쓰이는 형태는 AJAX와 같이 결합된 형태이다. 주로 브라우저에서 대화형으로 서버와 데이터를 주고받는 형태의 메시지 전송방식을 의미한다. **AJAX는 화면의 전환이나 깜빡임없이 서버에서 데이터를 받는 방법** 이라고 생각하면 된다. 페이스북이나 네이버와 같은 포털사이트의 검색창 자동완성기능들이 AJAX를 활용한 대표적인 서비스라고 할 수 있다.
 
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/ajax-fig2_small.png?raw=true)
+사진출처(http://adaptivepath.org/ideas/ajax-new-approach-web-applications/)
+
 **비동기화는 결과의 데이터를 기다리는 방식이 아닌 결과를 통보받는 형식** 이라고 할 수 있다. 대부분의 프로그래밍은 특정로직을 호출하고, 결과를 받아서 다음 로직을 실행하는 방식이라면 비동기화된 방식은 로직을 호출하고 결과를 기다리지 않는다. 대신 결과가 통보될 때 실행할 로직을 지정하는 방식이다.
+
+- 동기화방식은 순차적인 일을 실행하는데 적합
+- 비동기방식은 일을 처리한 결과를 기다리지 않고 흐름이 지속됨
+- 비동기 방식의 특징은 처리된 일의 결과를 통보받은 형태로 처리
 
 #### AJAX의 장점
 - 페이지의 이동없이 고속으로 화면을 전환할 수 있다.
