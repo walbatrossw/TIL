@@ -169,5 +169,27 @@ public Map<Integer, SampleVO> sendMap() {
 스프링에서 제공하는 `ResponseEntity`타입은 개발자가 직접 결과 데이터와 HTTP상태코드를 직접 제어할 수 있는 클래스다. `ResponseEntity`를 사용하면 404나 500같은 에러를 전송하고 싶은 데이터와 함께 전송할 수 있기 때문에 좀더 세밀한 제어가 가능해진다.
 
 #### `ResponseEntity` 예제
+
 ```java
+@RequestMapping("/sendErrorAuth")
+public ResponseEntity<Void> sendListAuth() {
+    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+}
+```
+
+```java
+@RequestMapping("/sendErrorNot")
+public ResponseEntity<List<SampleVO>> sendListNot() {
+
+    List<SampleVO> samples = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+        SampleVO sample = new SampleVO();
+        sample.setSampleNo(i);
+        sample.setFirstName("더블");
+        sample.setLastName("에스" + i);
+        samples.add(sample);
+    }
+
+    return new ResponseEntity<>(samples, HttpStatus.NOT_FOUND);
+}
 ```
