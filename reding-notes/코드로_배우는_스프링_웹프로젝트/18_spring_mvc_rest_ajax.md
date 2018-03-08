@@ -38,7 +38,7 @@
 ## 1. REST(Representational State Transfer)란?
 
 #### # 기본 개념
-하나의 URI는 하나의 고유한 리소스를 대표하도록 설계된다는 개념이다. REST방식은 특정한 URI는 반드시 그에 상응하는 데이터 자체라는 것을 의미하는 방식이다. 예를 들어 `/article/120`은 120번 게시물이라는 고유한 의미를 가지도록 설계하고, 이에 대한 처리는 GET, POST 방식과 같이 추가적인 정보를 통해 결정하게된다.
+**하나의 URI는 하나의 고유한 리소스를 대표하도록 설계된다는 개념** 이다. REST방식은 특정한 URI는 반드시 그에 상응하는 데이터 자체라는 것을 의미하는 방식이다. 예를 들어 `/article/120`은 120번 게시물이라는 고유한 의미를 가지도록 설계하고, 이에 대한 처리는 GET, POST 방식과 같이 추가적인 정보를 통해 결정하게된다.
 
 #### # REST API
 외부에서 위와 같은 방식으로 특정 URI를 통해 사용자가 원하는 정보를 제공하는 방식이다. 최근 OPEN API에서 많이 사용되면서 REST방식으로 제공되는 외부연결 URI를 REST API라고 하고, REST 방식의 서비스 제공이 가능것을 "Restful"하다고 표현한다.
@@ -67,7 +67,7 @@ public class AjaxController {
 }
 ```
 
-#### # 단순 문자열을 리턴할 경우
+#### # 단순 문자열을 리턴할 경우 메서드 작성법
 ```java
 @RequestMapping("/hello")
 public String sayHello() {
@@ -77,8 +77,9 @@ public String sayHello() {
 }
 ```
 해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다.
+![hello](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112615.png?raw=true)
 
-#### # 객체를 JSON으로 리턴할 경우
+#### # 객체를 JSON으로 리턴할 경우 메서드 작성법
 
 먼저 예제에 사용될 간단한 객체를 아래와 같이 작성해준다.
 ```java
@@ -107,9 +108,9 @@ public SampleVO sendVO() {
 ```
 
 해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다.
-![]()
+![json](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112649.png?raw=true)
 
-만약 406에러가 발생한다면 `pom.xml`에 `jackson-databind`라이브러리가 추가되어있는지 확인해본다.
+만약 406에러가 발생한다면 `pom.xml`에 `jackson-databind`라이브러리가 추가한다.
 ```xml
 <!--JSON : jackson-databind 라이브러리-->
 <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
@@ -120,7 +121,7 @@ public SampleVO sendVO() {
 </dependency>
 ```
 
-#### # 컬렉션 타입(`List`)의 객체를 리턴할 경우
+#### # 컬렉션 타입(`List`)의 객체를 리턴할 경우 메서드 작성법
 ```java
 @RequestMapping("/sendList")
 public List<SampleVO> sendList() {
@@ -137,10 +138,10 @@ public List<SampleVO> sendList() {
     return samples;
 }
 ```
-해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다.
-![]()
+해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다. JSON의 문법상 리스트는 배열로 표현되기 때문에 아래와 같이 나오게 된다.
+![list](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112724.png?raw=true)
 
-#### # 컬렉션 타입(`Map`)의 객체를 리턴할 경우
+#### # 컬렉션 타입(`Map`)의 객체를 리턴할 경우 메서드 작성법
 ```java
 @RequestMapping("/sendMap")
 public Map<Integer, SampleVO> sendMap() {
@@ -157,26 +158,30 @@ public Map<Integer, SampleVO> sendMap() {
     return sampleMap;
 }
 ```
-해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다.
-![]()
+해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다. Map의 경우 자바스크립트의 JSON형태로 보여지게 되는데 Key와 Value로 구성되서 `{}`로 표현된다.
+![map](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112759.png?raw=true)
 
 ## 4. `ResponseEntity` 타입
 
-#### `ResponseEntity`이란?
+#### # `ResponseEntity` 타입이란?
 [HTTP 상태코드 정리 포스팅 참고](http://doublesprogramming.tistory.com/203)
 `@RestController`는 별도의 뷰를 제공하지 않는 형태로 서비스를 실행하기 때문에 리턴 데이터가 예외적인 상황에서 문제가 발생할 수가 있다. 웹의 경우 HTTP 상태코드가 이러한 정보를 나타내는데 사용된다.
 
-스프링에서 제공하는 `ResponseEntity`타입은 개발자가 직접 결과 데이터와 HTTP상태코드를 직접 제어할 수 있는 클래스다. `ResponseEntity`를 사용하면 404나 500같은 에러를 전송하고 싶은 데이터와 함께 전송할 수 있기 때문에 좀더 세밀한 제어가 가능해진다.
+**스프링에서 제공하는 `ResponseEntity`타입은 개발자가 직접 결과 데이터와 HTTP상태코드를 직접 제어할 수 있는 클래스다.** `ResponseEntity`를 사용하면 404나 500같은 에러를 전송하고 싶은 데이터와 함께 전송할 수 있기 때문에 좀더 세밀한 제어가 가능해진다.
 
-#### `ResponseEntity` 예제
-
+#### # `ResponseEntity` 예제1 : HTTP상태코드만 보내기
+아래와 같이 예제를 작성하고 해당 URI를 요청해보자.
 ```java
 @RequestMapping("/sendErrorAuth")
 public ResponseEntity<Void> sendListAuth() {
     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 }
 ```
+해당 URI를 요청하면 리턴타입으로 선언된 `ResponseEntity`는 결과 데이터로 Http상태코드 중에서 400에러를 헤더메시지로 보내게 되는데 크롬 개발자도구의 네트워크 탭을 확인해보면 아래와 같이 400에러가 발생된 것을 확인해볼 수 있다.
+![400](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112916.png?raw=true)
 
+#### # `ResponseEntity` 예제2 : 결과데이터와 HTTP상태코드 같이 보내기
+아래와 같이 예제를 작성하고 해당 URI를 요청해보자.
 ```java
 @RequestMapping("/sendErrorNot")
 public ResponseEntity<List<SampleVO>> sendListNot() {
@@ -193,3 +198,28 @@ public ResponseEntity<List<SampleVO>> sendListNot() {
     return new ResponseEntity<>(samples, HttpStatus.NOT_FOUND);
 }
 ```
+해당 URI를 요청하면 리턴타입에 list 데이터와 HTTP상태코드(404)를 전송하게 된다. 앞서 본 예제와 달리 화면에는 전송한 결과를 보여주면서, 상태코드도 함께 전달되는 것을 확인해볼 수 있다.
+![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_113106.png?raw=true)
+
+## 5. AJAX(Asynchronous Javascript and XML)
+
+#### AJAX란?
+웹을 통해 작업할 때 REST방식이 가장 많이 쓰이는 형태는 AJAX와 같이 결합된 형태이다. 주로 브라우저에서 대화형으로 서버와 데이터를 주고받는 형태의 메시지 전송방식을 의미한다. **AJAX는 화면의 전환이나 깜빡임없이 서버에서 데이터를 받는 방법** 이라고 생각하면 된다. 페이스북이나 네이버와 같은 포털사이트의 검색창 자동완성기능들이 AJAX를 활용한 대표적인 서비스라고 할 수 있다.
+
+**비동기화는 결과의 데이터를 기다리는 방식이 아닌 결과를 통보받는 형식** 이라고 할 수 있다. 대부분의 프로그래밍은 특정로직을 호출하고, 결과를 받아서 다음 로직을 실행하는 방식이라면 비동기화된 방식은 로직을 호출하고 결과를 기다리지 않는다. 대신 결과가 통보될 때 실행할 로직을 지정하는 방식이다.
+
+#### AJAX의 장점
+- 페이지의 이동없이 고속으로 화면을 전환할 수 있다.
+- 서버처리를 기다리지 않고, 비동기 요청이 가능하다.
+- 수신하는 데이터의 양을 줄일 수 있고, 클라이언트에게 처리를 위임할 수도 있다.
+
+#### AJAX의 단점
+- AJAX를 쓸 수 없는 브라우저에 대한 문제가 있다.
+- HTTP 클라이언트의 기능이 한정되 있다.
+- 페이지 이동없는 통신으로 인한 보안상의 문제가 발생할 수 있다.
+- 지원하는 Charset이 한정되어 있다.
+- 스크립트로 작성되므로 디버깅이 용이하지 않다.
+- 요청을 남발하면 역으로 서버 부하가 늘 수 있음.
+- 동일-출처 정책으로 인해 다른 도메인과는 통신이 불가능하다.
+
+AJAX 장단점 출처(https://ko.wikipedia.org/wiki/Ajax)
