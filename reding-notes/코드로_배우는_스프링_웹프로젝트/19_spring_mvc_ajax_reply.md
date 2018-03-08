@@ -47,10 +47,11 @@ Rest방식을 이용할 것이라면 해당 컨트롤러를 먼저 작성하고,
 |`/replies/200 + 데이터`|PUT/PATCH|200 댓글수정|
 |`/replies/200`|DELETE|200 댓글삭제|
 
-#### # 댓글을 위한 테이블 설정
-하나의 게시글은 여러개의 댓글을 가질 수 있기 때문에 테이블의 구조는 아래와 같은 형태가 된다.
-![relation]()
+#### # 댓글을 위한 테이블 생성
+하나의 게시글은 여러개의 댓글을 가지는 1:N관계이므로 게시글 테이블과 댓글 테이블의 구조는 아래와 같은 형태가 된다.
+![relation](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_213705.png?raw=true)
 
+아래와 같이 댓글 테이블을 생성하고, 댓글 참조키를 설정해준다.
 ```sql
 -- 댓글 테이블 생성
 CREATE TABLE tbl_reply (
@@ -66,5 +67,230 @@ CREATE TABLE tbl_reply (
 -- 댓글 참조키 설정
 ALTER TABLE tbl_reply ADD CONSTRAINT FK_ARTICLE
 FOREIGN KEY (article_no) REFERENCES tbl_article (article_no);
+```
+
+#### # 댓글을 위한 도메인 객체 설계
+`src/main/java/기본패키지/reply/domain`패키지를 생성하고 아래와 같이 클래스를 작성해준다.
+```java
+public class ReplyVO {
+
+    private Integer replyNo;
+    private Integer ArticleNo;
+    private String replyText;
+    private String replyWriter;
+    private Date regDate;
+    private Date updateDate;
+
+    // getter, setter, toString() 생략...
+}
+```
+
+#### # 댓글 영속 계층 구현
+`/src/java/main/기본패키지/reply/Persistence`패키지를 생성하고, `ReplyDAO`인터페이스에 추상메서드를 정의해준다. 그리고 `ReplyDAO`인테피이스를 구현한 `ReplyDAOImpl`클래스를 만들고, 메서드 오버라이드하여 구현을 해준다. 마지막으로 `replyMapper.xml`에서 댓글 목록, 입력, 수정, 삭제 SQL을 작성해준다.
+
+**`ReplyDAO`**
+```java
+public interface ReplyDAO {
+
+    List<ReplyVO> list(Integer articleNo) throws Exception;
+
+    void create(ReplyVO replyVO) throws Exception;
+
+    void update(ReplyVO replyVO) throws Exception;
+
+    void delete(Integer replyNo) throws Exception;
+
+}
+```
+**`ReplyDAOImpl`**
+```java
+@Repository
+public class ReplyDAOImpl implements ReplyDAO {
+
+    private static String NAMESPACE = "com.doubles.mvcboard.mappers.reply.ReplyMapper";
+
+    private final SqlSession sqlSession;
+
+    @Inject
+    public ReplyDAOImpl(SqlSession sqlSession) {
+        this.sqlSession = sqlSession;
+    }
+
+    @Override
+    public List<ReplyVO> list(Integer articleNo) throws Exception {
+        return sqlSession.selectList(NAMESPACE + ".list", articleNo);
+    }
+
+    @Override
+    public void create(ReplyVO replyVO) throws Exception {
+        sqlSession.insert(NAMESPACE + ".create", replyVO);
+    }
+
+    @Override
+    public void update(ReplyVO replyVO) throws Exception {
+        sqlSession.update(NAMESPACE + ".update", replyVO);
+    }
+
+    @Override
+    public void delete(Integer replyNo) throws Exception {
+        sqlSession.delete(NAMESPACE + ".delete", replyNo);
+    }
+}
+```
+
+**`replyMapper.xml`**
+```sql
+<mapper namespace="com.doubles.mvcboard.mappers.reply.ReplyMapper">
+
+    <select id="list" resultMap="ReplyResultMap">
+        SELECT
+          reply_no
+          , article_no
+          , reply_text
+          , reply_writer
+          , reg_date
+          , update_date
+        FROM tbl_reply
+        WHERE article_no = #{articleNo}
+        ORDER BY reply_no
+    </select>
+
+    <insert id="create">
+        INSERT INTO tbl_reply (
+            article_no
+            , reply_text
+            , reply_writer
+        ) VALUES (
+            #{articleNo}
+            , #{replyText}
+            , #{replyWriter}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE tbl_reply
+        SET
+            reply_text = #{replyText}
+            , update_date = NOW()
+        WHERE reply_no = #{replyNo}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tbl_reply
+        WHERE reply_no = #{replyNo}
+    </delete>
+
+    <resultMap id="ReplyResultMap" type="ReplyVO">
+        <id property="replyNo" column="reply_no"/>
+        <result property="ArticleNo" column="article_no"/>
+        <result property="replyText" column="reply_text"/>
+        <result property="replyWriter" column="reply_writer"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <resultMap id="ArticleResultMap" type="ArticleVO">
+        <id property="articleNo" column="article_no"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="writer" column="writer"/>
+        <result property="regDate" column="regdate"/>
+        <result property="viewCnt" column="viewcnt"/>
+    </resultMap>
+
+</mapper>
+```
+
+#### # 댓글 비지니스 계층 구현
+`/src/main/java/기본패키지/reply/service`패키지에 `ReplyService`인터페이스와 `ReplyServiceImpl`클래스를 생성해 아래와 같이 작성해준다.
+**`ReplyService`**
+```java
+public interface ReplyService {
+
+    List<ReplyVO> list(Integer articleNo) throws Exception;
+
+    void create(ReplyVO replyVO) throws Exception;
+
+    void update(ReplyVO replyVO) throws Exception;
+
+    void delete(Integer replyNo) throws Exception;
+
+}
+```
+
+**`ReplyServiceImpl`**
+```java
+@Service
+public class ReplyServiceImpl implements ReplyService {
+
+    private final ReplyDAO replyDAO;
+
+    @Inject
+    public ReplyServiceImpl(ReplyDAO replyDAO) {
+        this.replyDAO = replyDAO;
+    }
+
+    @Override
+    public List<ReplyVO> list(Integer articleNo) throws Exception {
+        return replyDAO.list(articleNo);
+    }
+
+    @Override
+    public void create(ReplyVO replyVO) throws Exception {
+        replyDAO.create(replyVO);
+    }
+
+    @Override
+    public void update(ReplyVO replyVO) throws Exception {
+        replyDAO.update(replyVO);
+    }
+
+    @Override
+    public void delete(Integer replyNo) throws Exception {
+        replyDAO.delete(replyNo);
+    }
+}
+```
+
+## 2. Rest방식의 `ReplyController` 작성하기
+
+#### # REST방식에서 쓰이는 주요 애너테이션들
+- `@PathVariable` : URI의 경로에서 원하는 데이터를 추출하는 용도로 사용한다.
+- `@RequestBody` : 전송된 JSON데이터를 객체로 변환해주는 애너테이션으로 @ModelAttribute와 유사한 역할을 하지만 JSON에서 사용한다는 점이 차이점이다.
+
+#### # `ReplyController`클래스 생성 및 작성
+`/src/main/java/기본패키지/reply/controller`패키지에 클래스를 생성하고, 아래와 같이 작성해준다.
+```java
+@RestController
+@RequestMapping("/replies")
+public class ReplyController {
+
+    private final ReplyService replyService;
+
+    @Inject
+    public ReplyController(ReplyService replyService) {
+        this.replyService = replyService;
+    }
+
+}
+```
+
+#### # 댓글 등록처리 메서드 작성
+```java
+
+```
+
+#### # 댓글 목록 메서드 작성
+```java
+
+```
+
+#### # 댓글 수정 처리 메서드 작성
+```java
+
+```
+
+#### # 댓글 삭제 처리 메서드 작성
+```java
 
 ```
