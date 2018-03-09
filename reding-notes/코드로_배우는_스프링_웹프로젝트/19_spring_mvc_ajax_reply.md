@@ -201,6 +201,24 @@ public class ReplyDAOImpl implements ReplyDAO {
 </mapper>
 ```
 
+**`mybatis-config.xml`**
+`replyMapper.xml`에서 `resultMap`이나 `resultType`을 짧게 쓰기 위해 `ReplyVO`를 `alias` 설정해준다.
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <typeAliases>
+        <typeAlias type="com.doubles.mvcboard.article.domain.ArticleVO" alias="ArticleVO"/>
+        <typeAlias type="com.doubles.mvcboard.reply.domain.ReplyVO" alias="ReplyVO"/>
+    </typeAliases>
+
+</configuration>
+```
+
+
 #### # 댓글 비지니스 계층 구현
 `/src/main/java/기본패키지/reply/service`패키지에 `ReplyService`인터페이스와 `ReplyServiceImpl`클래스를 생성해 아래와 같이 작성해준다.
 **`ReplyService`**
@@ -277,20 +295,78 @@ public class ReplyController {
 
 #### # 댓글 등록처리 메서드 작성
 ```java
-
+@RequestMapping(value = "", method = RequestMethod.POST)
+public ResponseEntity<String> register(@RequestBody ReplyVO replyVO) {
+    ResponseEntity<String> entity = null;
+    try {
+        replyService.create(replyVO);
+        entity = new ResponseEntity<>("regSuccess", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    return entity;
+}
 ```
 
 #### # 댓글 목록 메서드 작성
 ```java
-
+@RequestMapping(value = "/all/{articleNo}", method = RequestMethod.GET)
+public ResponseEntity<List<ReplyVO>> list(@PathVariable("articleNo") Integer articleNo) {
+    ResponseEntity<List<ReplyVO>> entity = null;
+    try {
+        entity = new ResponseEntity<>(replyService.list(articleNo), HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    return entity;
+}
 ```
 
 #### # 댓글 수정 처리 메서드 작성
 ```java
 
+@RequestMapping(value = "/{replyNo}", method = {RequestMethod.PUT, RequestMethod.PATCH})
+public ResponseEntity<String> update(@PathVariable("replyNo") Integer replyNo, @RequestBody ReplyVO replyVO) {
+    ResponseEntity<String> entity = null;
+    try {
+        replyVO.setReplyNo(replyNo);
+        replyService.update(replyVO);
+        entity = new ResponseEntity<>("modSuccess", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    return entity;
+}
+```
+
+#### # `PUT`, `PATCH`, `DELETE`방식을 지원하기 위한 필터 추가
+**`web.xml`**
+```xml
+<filter>
+    <filter-name>hiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>hiddenHttpMethodFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
 ```
 
 #### # 댓글 삭제 처리 메서드 작성
 ```java
-
+@RequestMapping(value = "/{replyNo}", method = RequestMethod.DELETE)
+public ResponseEntity<String> delete(@PathVariable("replyNo") Integer replyNo) {
+    ResponseEntity<String> entity = null;
+    try {
+        replyService.delete(replyNo);
+        entity = new ResponseEntity<>("delSuccess", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    return entity;
+}
 ```
