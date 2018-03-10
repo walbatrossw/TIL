@@ -342,7 +342,8 @@ public ResponseEntity<String> update(@PathVariable("replyNo") Integer replyNo, @
 }
 ```
 
-#### # `PUT`, `PATCH`, `DELETE`방식을 지원하기 위한 필터 추가
+#### # `Overloaded POST` : 브라우저에서 `PUT`, `PATCH`, `DELETE`방식을 지원하기 위한 필터 추가
+브라우저에 따라 `GET`과 `POST`방식을 지원하고, `PUT`, `PATCH`, `DELETE`방식은 지원하지 않는 경우가 발생할 수 있다. 해결책은 브라우저에서 `POST`방식으로 전송하고, 추가적인 정보를 이용해 `PUT`, `PATCH`, `DELETE`와 같은 정보를 함께 전송하는 것이다. 이것을 `Overloaded POST`라고 한다.
 **`web.xml`**
 ```xml
 <filter>
