@@ -427,13 +427,144 @@ public ResponseEntity<String> delete(@PathVariable("replyNo") Integer replyNo) {
 
 #### # Postman을 이용한 컨트롤러 테스트
 **댓글 등록 테스트**
-![create]()
+![create](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-10%2022-38-32.png?raw=true)
 
 **댓글 목록 테스트**
-![list]()
+![list](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-10%2022-39-06.png?raw=true)
 
 **댓글 수정 테스트**
-![modify]()
+![modify](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-10%2022-39-41.png?raw=true)
 
 **댓글 삭제 테스트**
-![remove]()
+![remove](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-10%2022-40-35.png?raw=true)
+
+## 3. 댓글 페이징 처리하기
+게시글과 마찬가지로 댓글도 페이징 처리를 해준다. 이전에 게시글 페이징처리에 사용했던 `Criteria`클래스를 재사용하여 구현해보자.
+
+#### # `ReplyDAO` 메서드 추가 / `ReplyDAOImpl` 메서드 구현
+**`ReplyDAO`**
+```java
+List<ReplyVO> listPaging(Integer articleNo, Criteria criteria) throws Exception;
+
+int countReply(Integer articleNo) throws Exception;
+```
+
+**`ReplyDAOImpl`**
+```java
+@Override
+public List<ReplyVO> listPaging(Integer articleNo, Criteria criteria) throws Exception {
+
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("articleNo", articleNo);
+    paramMap.put("criteria", criteria);
+
+    return sqlSession.selectList(NAMESPACE + ".listPaging", paramMap);
+}
+
+@Override
+public int countReply(Integer articleNo) throws Exception {
+    return 0;
+}
+```
+
+#### # `replyMapper.xml` 페이징처리 / 댓글 갯수 SQL 작성
+```sql
+<select id="listPaging" resultMap="ReplyResultMap">
+    SELECT
+        reply_no
+        , article_no
+        , reply_text
+        , reply_writer
+        , reg_date
+        , update_date
+    FROM tbl_reply
+    WHERE article_no = #{articleNo}
+    ORDER BY reply_no
+    LIMIT #{criteria.pageStart}, #{criteria.perPageNum}
+</select>
+
+<select id="countReply" resultType="int">
+    SELECT
+        COUNT(article_no)
+    FROM tbl_reply
+    WHERE article_no = #{articleNo}
+</select>
+```
+
+#### # 댓글 페이징 처리 테스트
+영속 계층에서 댓글 페이징 처리가 제대로 구현되었는지 확인하기 위해 아래와 같이 테스트 코드를 작성하고, 테스트 실행 해보자.
+```java
+@Test
+public void testReplyPaging() throws Exception {
+
+    Criteria criteria = new Criteria();
+    criteria.setPerPageNum(20);
+    criteria.setPage(1);
+
+    List<ReplyVO> replies = replyDAO.listPaging(1000, criteria);
+
+    for (ReplyVO reply : replies) {
+        logger.info(reply.getReplyNo() + " : " + reply.getReplyText());
+    }
+
+}
+```
+
+#### # 댓글 페이징 처리 비지니스 계층 구현
+**`ReplyService`**
+```java
+List<ReplyVO> getRepliesPaging(Integer articleNo, Criteria criteria) throws Exception;
+
+int countReplies(Integer articleNo) throws Exception;
+```
+
+**`ReplyService`**
+```java
+@Override
+public List<ReplyVO> getRepliesPaging(Integer articleNo, Criteria criteria) throws Exception {
+    return replyDAO.listPaging(articleNo, criteria);
+}
+
+@Override
+public int countReplies(Integer articleNo) throws Exception {
+    return replyDAO.countReplies(articleNo);
+}
+```
+
+#### # 댓글 페이징 처리 컨트롤러 작성
+**`ReplyController`**
+```java
+@RequestMapping(value = "/{articleNo}/{page}", method = RequestMethod.GET)
+public ResponseEntity<Map<String, Object>> listPaging(@PathVariable("articleNo") Integer articleNo,
+                                                      @PathVariable("page") Integer page) {
+
+    ResponseEntity<Map<String, Object>> entity = null;
+
+    try {
+
+        Criteria criteria = new Criteria();
+        criteria.setPage(page);
+
+        List<ReplyVO> replies = replyService.getRepliesPaging(articleNo, criteria);
+        int repliesCount = replyService.countReplies(articleNo);
+
+        PageMaker pageMaker = new PageMaker();
+        pageMaker.setCriteria(criteria);
+        pageMaker.setTotalCount(repliesCount);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("replies", replies);
+        map.put("pageMake", pageMaker);
+
+        entity = new ResponseEntity<>(map, HttpStatus.OK);
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+        entity = new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    return entity;
+}
+```
