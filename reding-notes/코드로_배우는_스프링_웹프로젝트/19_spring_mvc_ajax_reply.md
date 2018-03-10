@@ -202,7 +202,7 @@ public class ReplyDAOImpl implements ReplyDAO {
 ```
 
 **`mybatis-config.xml`**
-`replyMapper.xml`에서 `resultMap`이나 `resultType`을 짧게 쓰기 위해 `ReplyVO`를 `alias` 설정해준다.
+`replyMapper.xml`에서 `resultMap`이나 `resultType`을 패키지 경로와 클래스명을 길게 쓰지 않고, 짧게 쓰기 위해 `ReplyVO`를 `alias` 설정해준다.
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE configuration
@@ -216,6 +216,57 @@ public class ReplyDAOImpl implements ReplyDAO {
     </typeAliases>
 
 </configuration>
+```
+
+**`ReplyDAO`테스트 코드 작성**
+댓글 영속 계층을 구현을 완료했으니 제대로 작동하는지 확인하기 위해 아래와 같이 테스트 코드를 작성하고, 테스트를 진행한다.
+```java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring-config/applicationContext.xml"})
+public class ReplyDAOTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReplyDAOTest.class);
+
+    @Inject
+    private ReplyDAO replyDAO;
+
+    @Test
+    public void testReplyCreate() throws Exception {
+
+        for (int i = 1; i <= 100; i++) {
+            ReplyVO replyVO = new ReplyVO();
+            replyVO.setArticleNo(1000);
+            replyVO.setReplyText(i+"번째 댓글입니다..");
+            replyVO.setReplyWriter("user0"+(i%10));
+            replyDAO.create(replyVO);
+        }
+
+    }
+
+    @Test
+    public void testReplyList() throws Exception {
+
+        logger.info(replyDAO.list(1000).toString());
+
+    }
+
+    @Test
+    public void testReplyUpdate() throws Exception {
+
+        ReplyVO replyVO = new ReplyVO();
+        replyVO.setArticleNo(2);
+        replyVO.setReplyText(2+"번째 댓글 수정...");
+        replyDAO.update(replyVO);
+
+    }
+
+    @Test
+    public void testReplyDelete() throws Exception {
+
+        replyDAO.delete(3);
+
+    }
+}
 ```
 
 
@@ -276,6 +327,23 @@ public class ReplyServiceImpl implements ReplyService {
 - `@PathVariable` : URI의 경로에서 원하는 데이터를 추출하는 용도로 사용한다.
 - `@RequestBody` : 전송된 JSON데이터를 객체로 변환해주는 애너테이션으로 @ModelAttribute와 유사한 역할을 하지만 JSON에서 사용한다는 점이 차이점이다.
 
+#### # `Overloaded POST` : 브라우저에서 `PUT`, `PATCH`, `DELETE`방식을 지원하기 위한 필터 추가
+브라우저에 따라 `GET`과 `POST`방식을 지원하고, `PUT`, `PATCH`, `DELETE`방식은 지원하지 않는 경우가 발생할 수 있다. 해결책은 브라우저에서 `POST`방식으로 전송하고, 추가적인 정보를 이용해 `PUT`, `PATCH`, `DELETE`와 같은 정보를 함께 전송하는 것이다. 이것을 `Overloaded POST`라고 한다. `<form>`태그를 이용해 데이터를 전송할 때, `POST`방식으로 전송하되 `_method`라는 추가적인 정보를 이용한다.
+
+스프링은 이를 위해 `HiddenHttpMethodFilter`라는 것을 제공한다. `<form>`태그 내에 `<input type="hidden" name="_method" value="PUT">`와 같은 형태로 사용한다. 이렇게 설정함으로써 `GET`, `POST`방식만을 지원하는 브라우저에서 REST방식을 사용할 수 있게 된다. 이렇게 사용하기 위해서는 아래와 같이 `web.xml`에 필터를 추가해주면 된다.
+
+**`web.xml`**
+```xml
+<filter>
+    <filter-name>hiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>hiddenHttpMethodFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
 #### # `ReplyController`클래스 생성 및 작성
 `/src/main/java/기본패키지/reply/controller`패키지에 클래스를 생성하고, 아래와 같이 작성해준다.
 ```java
@@ -299,7 +367,7 @@ public class ReplyController {
 public ResponseEntity<String> register(@RequestBody ReplyVO replyVO) {
     ResponseEntity<String> entity = null;
     try {
-        replyService.create(replyVO);
+        replyService.addReply(replyVO);
         entity = new ResponseEntity<>("regSuccess", HttpStatus.OK);
     } catch (Exception e) {
         e.printStackTrace();
@@ -315,7 +383,7 @@ public ResponseEntity<String> register(@RequestBody ReplyVO replyVO) {
 public ResponseEntity<List<ReplyVO>> list(@PathVariable("articleNo") Integer articleNo) {
     ResponseEntity<List<ReplyVO>> entity = null;
     try {
-        entity = new ResponseEntity<>(replyService.list(articleNo), HttpStatus.OK);
+        entity = new ResponseEntity<>(replyService.getReplies(articleNo), HttpStatus.OK);
     } catch (Exception e) {
         e.printStackTrace();
         entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -326,13 +394,12 @@ public ResponseEntity<List<ReplyVO>> list(@PathVariable("articleNo") Integer art
 
 #### # 댓글 수정 처리 메서드 작성
 ```java
-
 @RequestMapping(value = "/{replyNo}", method = {RequestMethod.PUT, RequestMethod.PATCH})
 public ResponseEntity<String> update(@PathVariable("replyNo") Integer replyNo, @RequestBody ReplyVO replyVO) {
     ResponseEntity<String> entity = null;
     try {
         replyVO.setReplyNo(replyNo);
-        replyService.update(replyVO);
+        replyService.modifyReply(replyVO);
         entity = new ResponseEntity<>("modSuccess", HttpStatus.OK);
     } catch (Exception e) {
         e.printStackTrace();
@@ -342,27 +409,13 @@ public ResponseEntity<String> update(@PathVariable("replyNo") Integer replyNo, @
 }
 ```
 
-#### # `Overloaded POST` : 브라우저에서 `PUT`, `PATCH`, `DELETE`방식을 지원하기 위한 필터 추가
-브라우저에 따라 `GET`과 `POST`방식을 지원하고, `PUT`, `PATCH`, `DELETE`방식은 지원하지 않는 경우가 발생할 수 있다. 해결책은 브라우저에서 `POST`방식으로 전송하고, 추가적인 정보를 이용해 `PUT`, `PATCH`, `DELETE`와 같은 정보를 함께 전송하는 것이다. 이것을 `Overloaded POST`라고 한다.
-**`web.xml`**
-```xml
-<filter>
-    <filter-name>hiddenHttpMethodFilter</filter-name>
-    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
-</filter>
-<filter-mapping>
-    <filter-name>hiddenHttpMethodFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-</filter-mapping>
-```
-
 #### # 댓글 삭제 처리 메서드 작성
 ```java
 @RequestMapping(value = "/{replyNo}", method = RequestMethod.DELETE)
 public ResponseEntity<String> delete(@PathVariable("replyNo") Integer replyNo) {
     ResponseEntity<String> entity = null;
     try {
-        replyService.delete(replyNo);
+        replyService.removeReply(replyNo);
         entity = new ResponseEntity<>("delSuccess", HttpStatus.OK);
     } catch (Exception e) {
         e.printStackTrace();
@@ -371,3 +424,16 @@ public ResponseEntity<String> delete(@PathVariable("replyNo") Integer replyNo) {
     return entity;
 }
 ```
+
+#### # Postman을 이용한 컨트롤러 테스트
+**댓글 등록 테스트**
+![create]()
+
+**댓글 목록 테스트**
+![list]()
+
+**댓글 수정 테스트**
+![modify]()
+
+**댓글 삭제 테스트**
+![remove]()
