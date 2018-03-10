@@ -33,7 +33,7 @@
 |10|[검색처리, 동적 SQL](http://doublesprogramming.tistory.com/202)|
 ---
 
-# Spring MVC - 댓글처리
+# Spring MVC - 댓글처리 : 영속, 비지니스, 컨트롤 계층 구현
 
 ## 1. 댓글처리를 위한 준비
 
@@ -568,3 +568,5 @@ public ResponseEntity<Map<String, Object>> listPaging(@PathVariable("articleNo")
     return entity;
 }
 ```
+**댓글 페이징 컨트롤러 테스트**
+![paging](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-11%2002-36-47.png?raw=true)
