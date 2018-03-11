@@ -128,8 +128,10 @@ public class ReplyTestController {
 </section>
 ```
 아래는 해당 페이지의 모습이다. 아직 댓글 목록과 페이징처리가 완료되지 않았기 때문에 하단의 2개의 빨간 박스는 비어있다. 추후에 댓글 목록과 페이징처리가 구현되면 차이점을 구분할 수 있게된다.
+![html](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-11%2022-47-55.png?raw=true)
+
 **JS코드를 이용한 댓글 목록 가져오기 테스트**
-jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록을 리스트형태로 가져와 보자. `@RestController`의 경우 객체를 JSON방식으로 전달하기 때문에 jQuery를 이용해서 호출할 때는 `getJSON()`를 아래와 같이 사용한다.
+jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록을 배열 형태로 가져와 보자. `@RestController`의 경우 객체를 JSON방식으로 전달하기 때문에 jQuery를 이용해서 호출할 때는 `getJSON()`를 아래와 같이 사용한다.
 ```html
 <script>
     var articleNo = 1000;
@@ -139,7 +141,7 @@ jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록�
 </script>
 ```
 아래는 해당 페이지로 이동하고, 크롬 개발자 도구 콘솔창을 통해 확인해본 결과이다.
-![]()
+![list]()
 
 #### # 댓글 목록
 ```html
