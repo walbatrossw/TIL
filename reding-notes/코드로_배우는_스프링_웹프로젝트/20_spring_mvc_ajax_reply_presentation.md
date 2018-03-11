@@ -144,6 +144,7 @@ jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록�
 ![list](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-11%2022-56-38.png?raw=true)
 
 #### # 댓글 목록
+댓글 목록을 출력하기 위한 함수 `getReplies()`를 정의하고, 위에서 댓글 목록 가져오기 테스트를 했던 것처럼 `getJSON()`함수를 통해 댓글 목록 객체를 JSON형식으로 받아온다. 받아온 댓글 객체를 `each()`함수를 통해 루프를 돌면서 `<li>`태그를 만들어낸다. `<li>`태그마다 댓글내용과 댓글작성자들이 출력되도록 한다. 아래의 코드에서 주목해서봐야할 점은 `<li>`태그 속성에 `data-replyNo`이다. `data-`로 시작되는 속성은 이름이나 갯수에 상관없이 id나 name속성을 대신해서 사용하기에 편리하다. 이 속성을 통해 앞으로 댓글 수정/삭제 처리시 댓글 번호를 세팅하는데 사용하게 된다.
 ```js
 // 1000번째 게시글
 var articleNo = 1000;
@@ -176,11 +177,59 @@ function getReplies() {
 
 }
 ```
-![]()
-#### # 댓글 등록
-```html
 
+댓글 목록이 출력된 모습은 아래와 같다.
+![list2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-11%2023-55-18.png?raw=true)
+
+#### # 댓글 등록
+댓글 저장 버튼 클릭을 클릭할 경우, 이벤트 처리는 아래와 같이 작성해준다.
+- jQuery를 이용하여 화면에서 입력된 변수를 처리하고, `$.ajax()`를 통해 서버를 호출한다.
+- 전송하는 데이터는 JSON으로 구성된 문자열을 사용하고, 전송 받은 결과는 단순 문자열인 `regSuccess`이다.
+- 이 문자열을 통해 댓글이 정상적으로 등록되었는지 확인할 수 있는 알림창을 띄워준다.
+- 마지막으로 댓글 목록 출력 함수를 호출하여 댓글 목록을 갱신시키고, 댓글내용과 작성자 입력창은 초기화를 시켜준다.
+```js
+var articleNo = 1000;
+
+// 댓글 목록 출력 함수 ...
+
+// 댓글 저장 버튼 클릭 이벤트 발생시
+$("#replyAddBtn").on("click", function () {
+
+    // 화면으로부터 입력 받은 변수값의 처리
+    var replyText = $("#newReplyText");
+    var replyWriter = $("#newReplyWriter");
+
+    var replyTextVal = replyText.val();
+    var replyWriterVal = replyWriter.val();
+
+    // AJAX 통신
+    $.ajax({
+        type : "post",
+        url : "/replies",
+        headers : {
+            "Content-type" : "application/json",
+            "X-HTTP-Method-Override" : "POST"
+        },
+        dataType : "text",
+        data : JSON.stringify({
+            articleNo : articleNo,
+            replyText : replyTextVal,
+            replyWriter : replyWriterVal
+        }),
+        success : function (result) {
+            // 성공적인 댓글 등록 처리 알림
+            if (result == "regSuccess") {
+                alert("댓글 등록 완료!");
+            }
+            getReplies(); // 댓글 목록 출력 함수 호출
+            replyText.val(""); // 댓글 내용 초기화
+            replyWriter.val(""); // 댓글 작성자 초기화
+        }
+    });
+});
 ```
+![register1]()
+![register2]()
 
 #### # 댓글 조회 및 수정/삭제
 ```html
