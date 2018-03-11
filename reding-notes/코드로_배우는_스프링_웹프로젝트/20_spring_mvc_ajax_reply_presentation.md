@@ -141,17 +141,56 @@ jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록�
 </script>
 ```
 아래는 해당 페이지로 이동하고, 크롬 개발자 도구 콘솔창을 통해 확인해본 결과이다.
-![list]()
+![list](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-11%2022-56-38.png?raw=true)
 
 #### # 댓글 목록
+```js
+// 1000번째 게시글
+var articleNo = 1000;
+
+// 댓글 목록 호출
+getReplies();
+
+// 댓글 목록 출력 함수
+function getReplies() {
+
+    $.getJSON("/replies/all/" + articleNo, function (data) {
+
+        console.log(data);
+
+        var str = "";
+
+        $(data).each(function () {
+            str += "<li data-replyNo='" + this.replyNo + "' class='replyLi'>"
+                +   "<p class='replyText'>" + this.replyText + "</p>"
+                +   "<p class='replyWriter'>" + this.replyWriter + "</p>"
+                +   "<button type='button' class='btn btn-xs btn-success' data-toggle='modal' data-target='#modifyModal'>댓글 수정</button>"
+                + "</li>"
+                + "<hr/>";
+
+        });
+
+        $("#replies").html(str);
+
+    });
+
+}
+```
+![]()
+#### # 댓글 등록
 ```html
 
 ```
-#### # 댓글 등록
 
 #### # 댓글 조회 및 수정/삭제
+```html
+
+```
 
 #### # 전체 페이징 처리
+```html
+
+```
 
 ## 2. 게시글에 댓글 적용하기
 
