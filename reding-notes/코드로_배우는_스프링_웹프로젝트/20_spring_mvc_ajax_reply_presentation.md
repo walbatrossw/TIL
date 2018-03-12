@@ -61,7 +61,7 @@ public class ReplyTestController {
 - `<div class="box-body"></div>` : 댓글 입력 영역
 - `<ul id="replies"></ul>` : 댓글 목록 영역
 - `<ul class="pagination pagination-sm no-margin"></ul>` : 댓글 페이징 영역
-- `<div class="modal fade" id="modifyModal" role="dialog"></div>` : 댓글 수정/삭제를 위한 모달창 영역
+- `<div class="modal fade" id="modifyModal" role="dialog"></div>` : 댓글 수정/삭제를 위한 Modal 영역
 
 ```html
 <section class="content container-fluid">
@@ -127,7 +127,7 @@ public class ReplyTestController {
 
 </section>
 ```
-아래는 해당 페이지의 모습이다. 아직 댓글 목록과 페이징처리가 완료되지 않았기 때문에 하단의 2개의 빨간 박스는 비어있다. 추후에 댓글 목록과 페이징처리가 구현되면 차이점을 구분할 수 있게된다.
+아래는 해당 페이지의 모습이다. 아직 댓글 목록과 페이징처리가 완료되지 않았기 때문에 하단의 2개의 빨간 박스는 비어있다. 추후에 댓글 목록과 페이징처리가 구현되면 차이점을 구분할 수 있다.
 ![html](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-11%2022-47-55.png?raw=true)
 
 **JS코드를 이용한 댓글 목록 가져오기 테스트**
@@ -228,16 +228,110 @@ $("#replyAddBtn").on("click", function () {
     });
 });
 ```
-![register1]()
-![register2]()
+
+아래는 댓글내용과 댓글 작성자를 입력하고 저장버튼을 클릭하고 난 직후의 모습이다. 댓글 등록이 제대로 처리되고 나서 댓글 등록이 완료되었다는 알림창이 뜨게 되는 것을 확인 할 수 있다.
+![register1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2000-30-41.png?raw=true)
+
+그리고 알림창 확인 버튼을 클릭하고 나면 댓글 목록이 갱신되면서 방금 등록한 댓글의 내용이 출력되고, 입력했던 댓글내용과 등록자는 초기화가 된다.
+![register2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2000-31-07.png?raw=true)
 
 #### # 댓글 조회 및 수정/삭제
+`getReplies()`함수를 통해 생성된 `<li>`태그 안의 수정버튼을 클릭하면 Modal창이 뜨고, 클릭한 댓글의 값들(댓글번호, 댓글내용, 댓글작성자)이 `<input>`태그 value값으로 세팅된다.
+
+**댓글 수정/삭제 Modal 버튼**
 ```html
+<button type='button' class='btn btn-xs btn-success' data-toggle='modal' data-target='#modifyModal'>
+  댓글 수정
+</button>
+```
+
+**댓글 수정/삭제 Modal 영역**
+```html
+<div class="modal fade" id="modifyModal" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">댓글 수정창</h4>
+          </div>
+          <div class="modal-body">
+              <div class="form-group">
+                  <label for="replyNo">댓글 번호</label>
+                  <input class="form-control" id="replyNo" name="replyNo" readonly>
+              </div>
+              <div class="form-group">
+                  <label for="replyText">댓글 내용</label>
+                  <input class="form-control" id="replyText" name="replyText" placeholder="댓글 내용을 입력해주세요">
+              </div>
+              <div class="form-group">
+                  <label for="replyWriter">댓글 작성자</label>
+                  <input class="form-control" id="replyWriter" name="replyWriter" readonly>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">닫기</button>
+              <button type="button" class="btn btn-success modalModBtn">수정</button>
+              <button type="button" class="btn btn-danger modalDelBtn">삭제</button>
+          </div>
+      </div>
+  </div>
+</div>
+```
+
+**댓글의 값들 세팅**
+jQuery코드에서 주목해서 봐야할 것은 클릭 이벤트 선택자가 `<ul>`의 id인 `replies`로 되어있다는 점이다. 단순히 클릭이 발생한 수정버튼을 선택자로 지정하면 될 것 같지만 Ajax통신 후에 생기는 요소이기 때문에 이벤트처리가 되지 않는다. 그래서 AJA통신 이전에 존재하는 `<ul>`을 이용해서 이벤트를 등록해야만 한다.
+```js
+$("#replies").on("click", ".replyLi button", function () {
+    var reply = $(this).parent();
+
+    var replyNo = reply.attr("data-replyNo");
+    var replyText = reply.find(".replyText").text();
+    var replyWriter = reply.find(".replyWriter").text();
+
+    $("#replyNo").val(replyNo);
+    $("#replyText").val(replyText);
+    $("#replyWriter").val(replyWriter);
+
+});
+```
+
+아래를 보면 댓글 수정 버튼 클릭시 모달창이 나오고, 해당 댓글의 값들이 함께 출력되는 것을 확인할 수 있다.
+![]()
+
+**댓글 삭제 호출하기**
+```js
+$(".modalDelBtn").on("click", function () {
+
+    var replyNo = $(this).parent().parent().find("#replyNo").val();
+
+    $.ajax({
+        type : "delete",
+        url : "/replies/" + replyNo,
+        headers : {
+            "Content-type" : "application/json",
+            "X-HTTP-Method-Override" : "DELETE"
+        },
+        dataType : "text",
+        success : function (result) {
+            console.log("result : " + result);
+            if (result == "delSuccess") {
+                alert("댓글 삭제 완료!");
+                $("#modifyModal").modal("hide");
+                getAllList();
+            }
+        }
+    });
+
+});
+```
+
+**댓글 수정 호출하기**
+```js
 
 ```
 
 #### # 전체 페이징 처리
-```html
+```js
 
 ```
 
