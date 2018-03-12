@@ -447,19 +447,25 @@ function printPageNumbers(pageMaker) {
 ```
 
 **댓글 목록 페이지 번호 클릭 이벤트처리**
-페이지번호가 출력되었으니 각 페이지번호에 대한 클릭 이벤트를 처리해주자. `<a>`태그에서 페이지번호를 추출해서 `getRepliesPaging()`를 호출해준다.
+페이지번호가 출력되었으니 각 페이지번호에 대한 클릭 이벤트를 처리해주자. `<a>`태그에서 페이지 번호를 추출해서 `getRepliesPaging()`를 호출해준다.
 ```js
+
+// 목록페이지 번호 변수 선언, 1로 초기화(첫번째 페이지)
+var replyPageNum = 1;
+
+// 목록페이지 번호 클릭 이벤트
 $(".pagination").on("click", "li a", function (event) {
 
     event.preventDefault();
-    replyPageNum = $(this).attr("href");
-    getRepliesPaging(replyPageNum);
+    replyPageNum = $(this).attr("href"); // 목록 페이지 번호 추출
+    getRepliesPaging(replyPageNum); // 목록 페이지 호출
 
 });
 ```
 
 **댓글 페이징처리 구현 모습**
-![]()
+![paging1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2021-22-19.png?raw=true)
+![paging2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2021-23-09.png?raw=true)
 
 ## 2. 게시글에 댓글 적용하기
 
