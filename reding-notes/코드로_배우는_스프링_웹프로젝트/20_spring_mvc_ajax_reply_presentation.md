@@ -379,21 +379,87 @@ $(".modalModBtn").on("click", function () {
 
 **댓글 삭제/수정 구현 결과 확인**
 댓글 삭제버튼 클릭하면 댓글 삭제 처리가 되고, 성공적으로 처리가 되었다는 알림창이 뜬다.
-![delete1]()
+![delete1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-55-52.png?raw=true)
 
 그리고 Modal이 닫히고, 댓글 목록이 갱신된다.
-![delete2]()
+![delete2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-56-08.png?raw=true)
 
 댓글 수정버튼 클릭하면 댓글 수정 처리가 되고, 성공적으로 처리가 되었다는 알림창이 뜬다.
-![update1]()
+![update1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-58-43.png?raw=true)
 
 그리고 Modal이 닫히고, 댓글 목록이 갱신된다.
-![update2]()
+![update2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-59-00.png?raw=true)
 
-#### # 전체 페이징 처리
+#### # 댓글 목록 페이징 처리
+
+**댓글 목록 페이지 / 댓글 목록 페이지 번호 출력**
+댓글 목록을 화면에서 페이징 처리 해보자. 페이징 처리된 댓글 목록을 출력하기 위한 함수 `getRepliesPaging()`와 댓글 목록 페이지 번호를 출력하기 위한 함수 `printPageNumbers()`를 선언하고, 아래와 같이 작성해준다. 그리고 이전에 `getReplies()`함수를 호출한 것들은 `getRepliesPaging()`로 변경해준다.
 ```js
+// 댓글 목록 페이징 함수
+function getRepliesPaging(page) {
 
+    $.getJSON("/replies/" + articleNo + "/" + page, function (data) {
+        console.log(data);
+
+        var str = "";
+
+        $(data.replies).each(function () {
+            str += "<li data-replyNo='" + this.replyNo + "' class='replyLi'>"
+                +  "<p class='replyText'>" + this.replyText + "</p>"
+                +  "<p class='replyWriter'>" + this.replyWriter + "</p>"
+                +  "<button type='button' class='btn btn-xs btn-success' data-toggle='modal' data-target='#modifyModal'>댓글 수정</button>"
+                +  "</li>"
+                +  "<hr/>";
+        });
+
+        $("#replies").html(str);
+
+        // 페이지 번호 출력 호출
+        printPageNumbers(data.pageMaker);
+
+    });
+
+}
+
+// 댓글 목록 페이지 번호 출력 함수
+function printPageNumbers(pageMaker) {
+
+    var str = "";
+
+    // 이전 버튼 활성화
+    if (pageMaker.prev) {
+        str += "<li><a href='"+(pageMaker.startPage-1)+"'>이전</a></li>";
+    }
+
+    // 페이지 번호
+    for (var i = pageMaker.startPage, len = pageMaker.endPage; i <= len; i++) {
+        var strCalss = pageMaker.criteria.page == i ? 'class=active' : '';
+        str += "<li "+strCalss+"><a href='"+i+"'>"+i+"</a></li>";
+    }
+
+    // 다음 버튼 활성화
+    if (pageMaker.next) {
+        str += "<li><a href='"+(pageMaker.endPage + 1)+"'>다음</a></li>";
+    }
+
+    $(".pagination-sm").html(str);
+}
 ```
+
+**댓글 목록 페이지 번호 클릭 이벤트처리**
+페이지번호가 출력되었으니 각 페이지번호에 대한 클릭 이벤트를 처리해주자. `<a>`태그에서 페이지번호를 추출해서 `getRepliesPaging()`를 호출해준다.
+```js
+$(".pagination").on("click", "li a", function (event) {
+
+    event.preventDefault();
+    replyPageNum = $(this).attr("href");
+    getRepliesPaging(replyPageNum);
+
+});
+```
+
+**댓글 페이징처리 구현 모습**
+![]()
 
 ## 2. 게시글에 댓글 적용하기
 
