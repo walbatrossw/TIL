@@ -467,14 +467,422 @@ $(".pagination").on("click", "li a", function (event) {
 ![paging1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2021-22-19.png?raw=true)
 ![paging2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2021-23-09.png?raw=true)
 
-## 2. 게시글에 댓글 적용하기
+## 2. 게시판에 댓글 적용하기
+지금까지 AJAX방식으로 댓글 기능을 구현하기 위한 화면 구현 연습을 했으니 실제로 게시판에 적용시켜보자.
 
-#### # 조회 화면의 수정
+#### # 조회 화면(`read.jsp`)의 수정
+게시글에 댓글을 달기 위해서는 게시글 조회 페이지로 이동해야만 한다. 그렇기 때문에 게시글 조회 페이지에서 댓글 기능을 구현하게 된다. 앞서 연습해본 것과 마찬가지로 댓글 기능을 추가하기 위한 영역은 아래와 같이 2가지 영역으로 나누어진다.
 
-#### # Handlebars를 이용한 템플릿
+- 댓글 입력 영역
+- 댓글 목록/페이징 영역
+
+이렇게 2가지의 영역을 아래와 같이 `read.jsp`에 추가시켜준다.
+
+**댓글 입력 영역**
+댓글 입력 영역은 간단하다. 댓글 내용과 댓글 작성자를 입력할 수 있게 `<textarea>`태그와 `<input>`로 이루어져있다.
+```html
+<div class="box box-warning">
+    <div class="box-header with-border">
+        <a class="link-black text-lg"><i class="fa fa-pencil"></i> 댓글작성</a>
+    </div>
+    <div class="box-body">
+        <form class="form-horizontal">
+            <div class="form-group margin">
+                <div class="col-sm-10">
+                    <textarea class="form-control" id="newReplyText" rows="3" placeholder="댓글내용..." style="resize: none"></textarea>
+                </div>
+                <div class="col-sm-2">
+                    <input class="form-control" id="newReplyWriter" type="text" placeholder="댓글작성자...">
+                </div>
+                <hr/>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary btn-block replyAddBtn"><i class="fa fa-save"></i> 저장</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+```
+
+**댓글 목록/페이징 영역**
+댓글 목록/페이징 영역의 HTML코드가 약간 복잡하다. 지금 참고하고 있는 책의 예제와 약간 다른데 AdminLTE 템플릿에서 제공하는 `box`클래스 속성 중에서 `collapsed-box`클래스를 이용하여 `box`를 접거나 펼칠 수 있게 하였다. 즉, 쉽게 말하자면 댓글 목록을 펼치거나 접을 수 있게 구현하려고 한다. 댓글의 유무에 따라 댓글 목록을 펼칠 수 있는 버튼이 활성화/비활성화 되게 처리하고, 댓글 갯수도 함께 출력해줄 예정이다.
+```html
+<div class="box box-success collapsed-box">
+    <%--댓글 유무 / 댓글 갯수 / 댓글 펼치기, 접기--%>
+    <div class="box-header with-border">
+        <a href="" class="link-black text-lg"><i class="fa fa-comments-o margin-r-5 replyCount"></i></a>
+        <div class="box-tools">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+    </div>
+    <%--댓글 목록--%>
+    <div class="box-body repliesDiv">
+
+    </div>
+    <%--댓글 페이징--%>
+    <div class="box-footer">
+        <div class="text-center">
+            <ul class="pagination pagination-sm no-margin">
+
+            </ul>
+        </div>
+    </div>
+</div>
+```
+
+**현재까지의 댓글 영역의 모습**
+아래는 아직은 구현이 되지 않은 댓글 영역의 모습이다.
+![]()
+
+#### # Handlebars를 이용한 JS템플릿 적용
+댓글 기능을 구현하는데 있어서 가장 핵심적인 부분은 댓글이 추가되거나 수정, 삭제되더라도 지속적으로 댓글 목록이 갱신되어 화면에 출력 되어야하는 것이다. 목록의 출력은 `<div>`태그가 반복적으로 구성되고, 하나의 `<div>` 안의 댓글의 정보들이 채워지는 방식으로 동작하게 된다. 이러한 작업은 문자열로 이루어지기 때문에 상당히 번거롭고, 지저분한 코드가 만들어지게 된다. 앞서 본 연습에서도 `str`변수에 html코드를 계속 붙여가면서 작성해야하는 번거로움이 있었던 것처럼 말이다. 하지만 자바스크립트 템플릿을 통해 좀더 깔끔한 코드를 작성할 수 있고 가독성 향상에도 도움이 된다. 자바스크립트 템플릿 종류에는 JS Render, Mustache, Mustache를 기반으로 한 Handlebars, Hogan 등이 있다. 이 예제에서는 Handlebars를 사용할 것이다.
+
+Handlebars의 구체적인 사용법을 알고 싶다면 아래를 통해 참조하면 된다.
+https://handlebarsjs.com/
+
+**Handlebars 라이브러리 추가**
+Handlebars를 사용하기 위해서는 jQuery와 Handlebar라이브러리를 추가해줘야하는데 이미 jQuery는 추가 되어있기 때문에
+`WEB-INF/view/include/plugin_js.jsp`에 Handlebar라이브러리만 추가해준다.
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+```
+
+Handlebars를 사용하기 위한 준비는 마쳤다. 이제 댓글 목록, 등록, 수정/삭제 조회 기능을 구현해보자.
 
 #### # 댓글 목록
+**템플릿 코드**
+댓글 목록을 출력하기 위해 템플릿 코드를 아래와 같이 작성해준다. 이 템플릿 코드는 하나의 댓글을 구성하는 부분이다.
+```html
+<script id="replyTemplate" type="text/x-handlebars-template">
+    {{#each.}}
+    <div class="post replyDiv" data-replyNo={{replyNo}}>
+        <div class="user-block">
+            <img class="img-circle img-bordered-sm" src="/dist/img/user1-128x128.jpg" alt="user image">
+            <span class="username">
+                <a href="#">{{replyWriter}}</a>
+                <a href="#" class="pull-right btn-box-tool replyDelBtn" data-toggle="modal" data-target="#delModal">
+                    <i class="fa fa-times"> 삭제</i>
+                </a>
+                <a href="#" class="pull-right btn-box-tool replyModBtn" data-toggle="modal" data-target="#modModal">
+                    <i class="fa fa-edit"> 수정</i>
+                </a>
+            </span>
+            <span class="description">{{prettifyDate regDate}}</span>
+        </div>
+        <div class="oldReplyText">{{{escape replyText}}}</div>
+        <br/>
+    </div>
+    {{/each}}
+</script>
+```
+위의 코드에서 주목해서 봐야할 점은 아래와 같다.
+- Handlebars의 `{{#each.}}{{/each}}`은 JSTL의 `<c:forEach>`처럼 배열의 루프를 처리하기 위해 사용한다.
+- 댓글 등록일자의 `prettifyDate`와 댓글 내용의 `escape`은 Handlebars의 확장기능을 사용한 것으로 아래의 JS코드에서 처리해준다.
 
-#### # 댓글 댓글 등록
+**댓글 목록 JS코드**
+```js
+$(document).ready(function () {
+
+    var articleNo = "${article.articleNo}";  // 현재 게시글 번호
+    var replyPageNum = 1; // 댓글 페이지 번호 초기화
+
+    // 댓글 내용 : 줄바꿈/공백처리
+    Handlebars.registerHelper("escape", function (replyText) {
+        var text = Handlebars.Utils.escapeExpression(replyText);
+        text = text.replace(/(\r\n|\n|\r)/gm, "<br/>");
+        text = text.replace(/( )/gm, "&nbsp;");
+        return new Handlebars.SafeString(text);
+    });
+
+    // 댓글 등록일자 : 날짜/시간 2자리로 맞추기
+    Handlebars.registerHelper("prettifyDate", function (timeValue) {
+        var dateObj = new Date(timeValue);
+        var year = dateObj.getFullYear();
+        var month = dateObj.getMonth() + 1;
+        var date = dateObj.getDate();
+        var hours = dateObj.getHours();
+        var minutes = dateObj.getMinutes();
+        // 2자리 숫자로 변환
+        month < 10 ? month = '0' + month : month;
+        date < 10 ? date = '0' + date : date;
+        hours < 10 ? hours = '0' + hours : hours;
+        minutes < 10 ? minutes = '0' + minutes : minutes;
+        return year + "-" + month + "-" + date + " " + hours + ":" + minutes;
+    });
+
+    // 댓글 목록 함수 호출
+    getReplies("/replies/" + articleNo + "/" + replyPageNum);
+
+    // 댓글 목록 함수
+    function getReplies(repliesUri) {
+        $.getJSON(repliesUri, function (data) {
+            printReplyCount(data.pageMaker.totalCount);
+            printReplies(data.replies, $(".repliesDiv"), $("#replyTemplate"));
+            printReplyPaging(data.pageMaker, $(".pagination"));
+        });
+    }
+
+    // 댓글 갯수 출력 함수
+    function printReplyCount(totalCount) {
+
+        var replyCount = $(".replyCount");
+        var collapsedBox = $(".collapsed-box");
+
+        // 댓글이 없으면
+        if (totalCount === 0) {
+            replyCount.html(" 댓글이 없습니다. 의견을 남겨주세요");
+            collapsedBox.find(".btn-box-tool").remove();
+            return;
+        }
+
+        // 댓글이 존재하면
+        replyCount.html(" 댓글목록 (" + totalCount + ")");
+        collapsedBox.find(".box-tools").html(
+            "<button type='button' class='btn btn-box-tool' data-widget='collapse'>"
+            + "<i class='fa fa-plus'></i>"
+            + "</button>"
+        );
+
+    }
+
+    // 댓글 목록 출력 함수
+    function printReplies(replyArr, targetArea, templateObj) {
+        var replyTemplate = Handlebars.compile(templateObj.html());
+        var html = replyTemplate(replyArr);
+        $(".replyDiv").remove();
+        targetArea.html(html);
+    }
+
+    // 댓글 페이징 출력 함수
+    function printReplyPaging(pageMaker, targetArea) {
+        var str = "";
+        if (pageMaker.prev) {
+            str += "<li><a href='" + (pageMaker.startPage - 1) + "'>이전</a></li>";
+        }
+        for (var i = pageMaker.startPage, len = pageMaker.endPage; i <= len; i++) {
+            var strClass = pageMaker.criteria.page == i ? "class=active" : "";
+            str += "<li " + strClass + "><a href='" + i + "'>" + i + "</a></li>";
+        }
+        if (pageMaker.next) {
+            str += "<li><a href='" + (pageMaker.endPage + 1) + "'>다음</a></li>";
+        }
+        targetArea.html(str);
+    }
+
+    // 댓글 페이지 번호 클릭 이벤트
+    $(".pagination").on("click", "li a", function (event) {
+        event.preventDefault();
+        replyPageNum = $(this).attr("href");
+        getReplies("/replies/" + articleNo + "/" + replyPageNum);
+    });
+}
+```
+
+댓글 목록에 관련된 JS코드가 상당히 많은 편인데 각각의 코드를 설명하면 아래와 같다.
+- 전역변수(`articleNo`, `replyPageNum`) 선언 : JS코드 전체에서 쓰이는 현재 게시글의 번호와 댓글 페이지 번호 변수를 선언해준다.
+- Handlebars 확장 기능 : `Handlebars.registerHelper()`를 통해 댓글 내용의 줄바꿈/공백처리와 댓글 등록일자의 날짜 시간을 변환시켜준다.
+- 댓글 목록함수(`getReplies()`) : 댓글 목록 함수를 통해 특정 게시글의 전체 댓글을 가져와 댓글갯수, 댓글목록, 댓글 페이징처리 함수를 호출해준다.
+- 댓글 갯수 출력 함수(`printReplyCount()`) : 댓글이 없으면 `collapsedBox`를 비활성화 시키고, 1개 이상이면 활성화 시킨다.
+- 댓글 페이징 출력 함수(`printReplyPaging()`) : 기존에 페이징 처리했던 것처럼 동일하게 다음, 이전, 페이지번호를 출력하는 함수이다.
+- 댓글 페이지 번호 클릭시 해당 페이지로 이동하기 위한 이벤트 처리를 해준다.
+
+#### # 댓글 등록
+```js
+// 댓글 저장 버튼 클릭 이벤트
+$(".replyAddBtn").on("click", function () {
+
+    // 입력 form 선택자
+    var replyWriterObj = $("#newReplyWriter");
+    var replyTextObj = $("#newReplyText");
+    var replyWriter = replyWriterObj.val();
+    var replyText = replyTextObj.val();
+
+    // 댓글 입력처리 수행
+    $.ajax({
+        type : "post",
+        url : "/replies/",
+        headers : {
+            "Content-Type" : "application/json",
+            "X-HTTP-Method-Override" : "POST"
+        },
+        dataType : "text",
+        data : JSON.stringify({
+            articleNo : articleNo,
+            replyWriter : replyWriter,
+            replyText : replyText
+        }),
+        success: function (result) {
+            console.log("result : " + result);
+            if (result === "regSuccess") {
+                alert("댓글이 등록되었습니다.");
+                replyPageNum = 1;  // 페이지 1로 초기화
+                getReplies("/replies/" + articleNo + "/" + replyPageNum); // 댓글 목록 호출
+                replyTextObj.val("");   // 댓글 입력창 공백처리
+                replyWriterObj.val("");   // 댓글 입력창 공백처리
+            }
+        }
+    });
+});
+```
+댓글 등록 처리는 목록처리에 비해 간단한데 코드에 설명은 아래와 같다.
+- 댓글 저장 버튼 클릭 이벤트가 발생하면 jQuery 선택자를 통해 입력된 값들을 각각 변수에 담고 JSON으로 변환시켜 AJAX POST방식으로 값을 넘겨준다.
+- 댓글 등록처리가 성공적으로 처리되면 결과값으로 받은 문자열(`regSuccess`)을 통해 알림창을 띄워준다.
+- 페이지 번호는 1로 초기화하여 댓글 목록을 다시 호출해 첫번째 목록화면으로 이동한다.
+- 마지막으로 댓글내용과 댓글 작성자 입력칸은 비워지게 처리를 해준다.
 
 #### # 댓글 수정/삭제
+**HTML 코드 : 댓글 수정/삭제를 위한 Modal 추가**
+댓글 수정/삭제는 Modal창을 띄워서 처리하도록 구현하기 위해 아래와 같이 html코드를 추가해준다.
+```html
+<%--댓글 수정 modal 영역--%>
+<div class="modal fade" id="modModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">댓글수정</h4>
+            </div>
+            <div class="modal-body" data-rno>
+                <input type="hidden" class="replyNo"/>
+                <%--<input type="text" id="replytext" class="form-control"/>--%>
+                <textarea class="form-control" id="replyText" rows="3" style="resize: none"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary modalModBtn">수정</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%--댓글 삭제 modal 영역--%>
+<div class="modal fade" id="delModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">댓글 삭제</h4>
+                <input type="hidden" class="rno"/>
+            </div>
+            <div class="modal-body" data-rno>
+                <p>댓글을 삭제하시겠습니까?</p>
+                <input type="hidden" class="rno"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">아니요.</button>
+                <button type="button" class="btn btn-primary modalDelBtn">네. 삭제합니다.</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+**JS 코드 : 댓글 수정/삭제 이벤트 처리**
+```js
+// 댓글 수정을 위해 modal창에 선택한 댓글의 값들을 세팅
+$(".repliesDiv").on("click", ".replyDiv", function (event) {
+    var reply = $(this);
+    $(".replyNo").val(reply.attr("data-replyNo"));
+    $("#replyText").val(reply.find(".oldReplyText").text());
+});
+
+// modal 창의 댓글 수정버튼 클릭 이벤트
+$(".modalModBtn").on("click", function () {
+    var replyNo = $(".replyNo").val();
+    var replyText = $("#replyText").val();
+    $.ajax({
+        type : "put",
+        url : "/replies/" + replyNo,
+        headers : {
+            "Content-Type" : "application/json",
+            "X-HTTP-Method-Override" : "PUT"
+        },
+        dataType : "text",
+        data: JSON.stringify({
+            replyText : replyText
+        }),
+        success: function (result) {
+            console.log("result : " + result);
+            if (result === "modSuccess") {
+                alert("댓글이 수정되었습니다.");
+                getReplies("/replies/" + articleNo + "/" + replyPageNum); // 댓글 목록 호출
+                $("#modModal").modal("hide"); // modal 창 닫기
+            }
+        }
+    })
+});
+
+// modal 창의 댓글 삭제버튼 클릭 이벤트
+$(".modalDelBtn").on("click", function () {
+    var replyNo = $(".replyNo").val();
+    $.ajax({
+        type: "delete",
+        url: "/replies/" + replyNo,
+        headers: {
+            "Content-Type" : "application/json",
+            "X-HTTP-Method-Override" : "DELETE"
+        },
+        dataType: "text",
+        success: function (result) {
+            console.log("result : " + result);
+            if (result === "delSuccess") {
+                alert("댓글이 삭제되었습니다.");
+                getReplies("/replies/" + articleNo + "/" + replyPageNum); // 댓글 목록 호출
+                $("#delModal").modal("hide"); // modal 창 닫기
+            }
+        }
+    });
+});
+```
+댓글 수정/삭제 이벤트 처리에 대한 코드의 설명은 아래와 같다.
+- 댓글 수정 버튼클릭 이벤트가 발생하면 수정 Modal창에 댓글번호, 댓글 내용을 입력폼에 세팅해준다.
+- 수정 Modal창의 수정버튼 클릭 이벤트가 발생하면, 댓글번호, 댓글내용을 jQuery선택자를 통해 변수(`replyNo`, `replyText`)에 담고, AJAX PUT방식으로 값을 넘겨준다.
+- 댓글 삭제버튼 클릭 이벤트가 발생하면 삭제 Modal창에 댓글번호를 변수(`replyNo`)에 담고, AJAX DELETE방식으로 값을 넘겨준다.
+- 댓글 수정/삭제 처리가 성공적으로 처리되고 결과값으로 받은 문자열(`modSuccess`, `delSuccess`)을 통해 알림창을 띄워주고, 댓글의 목록을 갱신해준다.
+- 마지막으로 Modal창을 닫아주면 댓글 수정/삭제처리가 종료된다.
+
+#### # 댓글 기능 구현 모습
+**댓글 목록**
+댓글이 없을 경우
+![box1]()
+
+댓글이 있을 경우(댓글 목록 접기)
+![box2-1]()
+
+댓글이 있을 경우(댓글 목록 펼치기)
+![box2-2]()
+
+**댓글 입력**
+댓글 저장 버튼 클릭 시
+![add1]()
+
+댓글 저장 후 댓글 목록 갱신, 댓글 입력창 초기화
+![add2]()
+
+**댓글 수정**
+댓글 수정 버튼 클릭시 Modal창의 모습
+![mod1]()
+
+Modal창의 댓글 수정버튼 클릭
+![mod2]()
+
+댓글 수정 처리 후 모습
+![mod3]()
+
+**댓글 삭제**
+댓글 삭제 버튼 클릭시 Modal창의 모습
+![del1]()
+
+Modal창의 댓글 삭제버튼 클릭
+![del2]()
+
+댓글 삭제 처리 후 모습
+![del3]()
+
+## 3. 정리
+Rest방식으로 AJAX를 통해 댓글 기능 구현을 완료하였다. 일반적으로 `@Controller`를 사용하여 작성하는 방식보다 `@RestController`를 통해 작성하는 방식의 경우 클라이언트에 작성해야할 코드가 많아졌다. 물론 JS템플릿을 통해 코드의 양이 줄어들긴했지만 여전히 많은 양의 코드를 작성해줘야만 했다. 덕분에 설명해야할 포스팅의 양도 많아져서 보기가 힘든 부분도 있는데 지금까지 구현한 내용 중에서 알아두어야할 내용들을 간단하게 정리해보자.
+
+-
