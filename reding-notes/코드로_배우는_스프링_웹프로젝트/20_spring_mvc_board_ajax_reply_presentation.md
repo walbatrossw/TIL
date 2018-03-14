@@ -34,7 +34,7 @@
 |11|[AJAX 댓글처리 : Persistence, Business, Control 계층](http://doublesprogramming.tistory.com/205)|
 ---
 
-# Spring MVC - 댓글처리 : 프레젠테이션 계층 구현
+# Spring MVC 게시판 예제12  - 댓글처리 : 프레젠테이션 계층 구현
 
 ## 1. 화면에서 AJAX 호출 테스트
 
@@ -534,7 +534,7 @@ $(".pagination").on("click", "li a", function (event) {
 
 **현재까지의 댓글 영역의 모습**
 아래는 아직은 구현이 되지 않은 댓글 영역의 모습이다.
-![]()
+![before](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2023-32-09.png?raw=true)
 
 #### # Handlebars를 이용한 JS템플릿 적용
 댓글 기능을 구현하는데 있어서 가장 핵심적인 부분은 댓글이 추가되거나 수정, 삭제되더라도 지속적으로 댓글 목록이 갱신되어 화면에 출력 되어야하는 것이다. 목록의 출력은 `<div>`태그가 반복적으로 구성되고, 하나의 `<div>` 안의 댓글의 정보들이 채워지는 방식으로 동작하게 된다. 이러한 작업은 문자열로 이루어지기 때문에 상당히 번거롭고, 지저분한 코드가 만들어지게 된다. 앞서 본 연습에서도 `str`변수에 html코드를 계속 붙여가면서 작성해야하는 번거로움이 있었던 것처럼 말이다. 하지만 자바스크립트 템플릿을 통해 좀더 깔끔한 코드를 작성할 수 있고 가독성 향상에도 도움이 된다. 자바스크립트 템플릿 종류에는 JS Render, Mustache, Mustache를 기반으로 한 Handlebars, Hogan 등이 있다. 이 예제에서는 Handlebars를 사용할 것이다.
@@ -847,42 +847,47 @@ $(".modalDelBtn").on("click", function () {
 #### # 댓글 기능 구현 모습
 **댓글 목록**
 댓글이 없을 경우
-![box1]()
+![box1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-40-59.png?raw=true)
 
 댓글이 있을 경우(댓글 목록 접기)
-![box2-1]()
+![box2-1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-42-29.png?raw=true)
 
 댓글이 있을 경우(댓글 목록 펼치기)
-![box2-2]()
+![box2-2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-44-34.png?raw=true)
 
 **댓글 입력**
-댓글 저장 버튼 클릭 시
-![add1]()
+댓글 저장 버튼 클릭하고, 댓글 저장 처리 후 알림창을 띄운 모습
+![add1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-47-53.png?raw=true)
 
-댓글 저장 후 댓글 목록 갱신, 댓글 입력창 초기화
-![add2]()
+댓글 목록 갱신, 댓글 입력창 초기화
+![add2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-48-08.png?raw=true)
 
 **댓글 수정**
-댓글 수정 버튼 클릭시 Modal창의 모습
-![mod1]()
+댓글 수정 버튼 클릭시 Modal창이 뜨고, 기존의 댓글을 수정
+![mod1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-00-30.png?raw=true)
 
-Modal창의 댓글 수정버튼 클릭
-![mod2]()
+Modal창의 댓글 수정버튼 클릭하고, 댓글 수정 처리 후 알림창을 띄운 모습
+![mod2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-01-21.png?raw=true)
 
-댓글 수정 처리 후 모습
-![mod3]()
+댓글 수정 처리 후 댓글 목록 갱신
+![mod3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-01-38.png?raw=true)
 
 **댓글 삭제**
 댓글 삭제 버튼 클릭시 Modal창의 모습
-![del1]()
+![del1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-03-07.png?raw=true)
 
-Modal창의 댓글 삭제버튼 클릭
-![del2]()
+Modal창의 댓글 삭제버튼을 클릭하고, 댓글 삭제 처리 후 알림창을 띄운 모습
+![del2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-03-53.png?raw=true)
 
-댓글 삭제 처리 후 모습
-![del3]()
+댓글 삭제 처리 후 댓글 목록 갱신
+![del3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-04-38.png?raw=true)
 
 ## 3. 정리
-Rest방식으로 AJAX를 통해 댓글 기능 구현을 완료하였다. 일반적으로 `@Controller`를 사용하여 작성하는 방식보다 `@RestController`를 통해 작성하는 방식의 경우 클라이언트에 작성해야할 코드가 많아졌다. 물론 JS템플릿을 통해 코드의 양이 줄어들긴했지만 여전히 많은 양의 코드를 작성해줘야만 했다. 덕분에 설명해야할 포스팅의 양도 많아져서 보기가 힘든 부분도 있는데 지금까지 구현한 내용 중에서 알아두어야할 내용들을 간단하게 정리해보자.
+Rest방식으로 AJAX를 통해 댓글 기능 구현을 완료하였다. 일반적으로 `@Controller`를 사용하여 작성하는 방식보다 `@RestController`를 통해 작성하는 방식의 경우 클라이언트에 작성해야할 코드가 많아졌다. 물론 JS템플릿을 통해 코드의 양이 줄어들긴했지만 여전히 많은 양의 코드를 작성해줘야만 했다. 덕분에 설명해야할 포스팅의 양도 많아졌다. 그래서 지금까지 댓글 화면을 구현한 내용 중에서 설명을 빼먹은 부분이나 기억해두어야할 내용들을 간단하게 정리해보자.
 
--
+- `$.getJSON(uri, 익명함수(결과데이터))` : 서버로부터 원하는 URI를 호출하고, 결과 데이터인 배열객체를 가져와 익명함수의 매개변수에 넣어준다. 익명함수의 내부에는 결과 데이터인 배열객체를 목록형태의 html코드로 출력하는 변환하는 로직을 작성해준다.
+- `$.ajax()` : 각각의 기능에 해당하는 적절한 데이터를 JSON으로 변환해 POST, PUT, DELETE 방식으로 서버에 값을 넘겨준다.
+- `JSON.stringify()` : 자바스크립트 데이터를 JSON문자열로 변환시켜준다.
+- `success : 익명함수(결과데이터){}` : AJAX처리가 성공적으로 처리된 이후 처리할 로직을 작성해준다.
+- Handlebars : JS템플릿으로 보다 깔끔하고, 가독성있는 코드를 작성하게 도와준다.
+- `Handlebars.registerHelper()` : Handlebars의 확장기능으로 사용자가 데이터를 원하는 방식으로 처리하거나, 변환할 수 있도록 도와준다.
