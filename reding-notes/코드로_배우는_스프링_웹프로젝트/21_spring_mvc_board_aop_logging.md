@@ -35,7 +35,7 @@
 |12|[AJAX 댓글처리 : Presentation 계층](http://doublesprogramming.tistory.com/206)|
 ---
 
-# Spring MVC 게시판 예제13  - AOP를 이용한 로깅 설정
+# Spring MVC 게시판 예제13  - AOP를 이용한 LogAdvice 작성
 
 AOP 정리 포스팅 (http://doublesprogramming.tistory.com/115)
 이전에도 AOP를 정리한 글을 포스팅한 적이 있지만 다시 복습하는 차원에서 다시 작성하려고한다.

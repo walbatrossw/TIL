@@ -33,10 +33,10 @@
 |10|[검색처리, 동적 SQL](http://doublesprogramming.tistory.com/202)|
 |11|[AJAX 댓글처리 : Persistence, Business, Control 계층](http://doublesprogramming.tistory.com/205)|
 |12|[AJAX 댓글처리 : Presentation 계층](http://doublesprogramming.tistory.com/206)|
-|13|[AOP를 이용한 로깅 설정]()|
+|13|[AOP를 이용한 LogAdvice 작성](http://doublesprogramming.tistory.com/207)|
 ---
 
-# Spring MVC 게시판 예제14  - 게시글 조회수, 댓글 갯수의 구현과 트랜잭션 처리
+# Spring MVC 게시판 예제14  - 게시글 조회수, 댓글 갯수의 출력 구현과 트랜잭션 처리
 
 ## 1. 트랜잭션(Transaction)
 
@@ -284,9 +284,9 @@ public ArticleVO read(Integer articleNo) throws Exception {
 }
 ```
 
-## 4. 기능 구현 모습 확인
+## 4. 최종 기능 구현 모습 확인
 댓글 추가/삭제에 따른 댓글 갯수 변화와 게시글 조회에 따른 조회수 증가 모습은 아래와 같다.
-
+![check](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-14%2023-52-31.png?raw=true)
 
 ## 5. 정리
 게시글의 조회수 변화와 댓글 갯수의 갱신작업을 트랜잭션을 통해 처리했는데 앞서 포스팅한 내용에 비해 간단한 내용들이어서 따로 정리할 것은 없다. 다만 불만족스러운 부분은 게시글의 조회수 중복증가 방지처리를 하지 않았다는 점이다. 이 부분은 앞으로 로그인처리를 구현하면서 Session을 통해 조회수 중복증가를 막아보도록 할 예정이다.
