@@ -96,16 +96,16 @@
 
 #### # 파일 업로드 페이지
 가장 먼저 파일 업로드 페이지를 작성해보자.
-일반적인 파일 업로드 테스트 페이지는 `WEB-INF/view/tutorial` 디렉토리에 `upload_form.jsp`를 생성해서 사용한다. 기존의 프로젝트에서 쓰이는 양식의 내용을 쓰도록한다.
+일반적인 파일 업로드 테스트 페이지는 `WEB-INF/view/tutorial` 디렉토리에 `upload_form.jsp`를 생성해서 사용한다. 기존의 프로젝트에서 쓰이는 템플릿의 양식의 내용을 그대로 사용한다.
 
 **Jasny Bootstrap Template 적용**
-AdminLTE에서는 파일 업로드 입력폼 양식이 따로 없기 때문에 파일 업로드를 지원하는 부트스트랩 템플릿을 찾아서 적용했다. 그리고 이후에 회원 프로필 사진 업로드 기능 구현에도 쓰이게 된다.
+AdminLTE에서는 파일 업로드 템플릿이 없기 때문에 파일 업로드 부트스트랩 템플릿을 찾아서 적용했다. 그리고 이후에 회원 프로필 사진 업로드 기능 구현에도 쓰이게 된다.
 
 http://www.jasny.net/bootstrap/getting-started/#download
-템플릿 적용은 간단하다. 위의 링크에 들어가 템플릿의 js파일과 css파일을 다운받아 템플릿파일(js, css)을 넣어주고 적용시켜주기만 하면 된다.
+템플릿 적용은 간단하다. 위의 링크에 들어가 템플릿파일을 다운받아 js, css파일을 프로젝트에 넣어주고, include파일(`head.jsp`, `plugin_js.jsp`)에 적용시켜주기만 하면된다.
 
 http://www.jasny.net/bootstrap/javascript/#fileinput
-그리고나서 파일 업로드 폼 예제가 여러 개가 있는데 그중에 파일을 업로드할 수 있는 예제를 붙여 넣고 아래와 같이 수정해주면 된다.
+그리고 나서 위의 페이지에서 파일 업로드 예제 중에서 하나를 참고해 아래와 같이 코드를 작성해주면 된다.
 
 ```html
 <div class="col-lg-12">
@@ -143,12 +143,10 @@ http://www.jasny.net/bootstrap/javascript/#fileinput
     </form>
 </div>
 ```
-
-아래는 파일 입력 폼을 적용한 모습이다.
-![fileInputForm]()
-
 위 코드에서 가장 중요한 부분은 `<form>`태그의 속성 중에 `enctype`을 `multipart/form-data`으로 설정한 것이다. 이 설정이 없을 경우 파일 데이터가 전달되지 않으니 반드시 써줘야한다. 그리고 업로드 처리 결과 알림에 `<iframe>`을 사용하기 위해서 `<form>`태그의 `target`속성을 `<iframe>`의 `name`속성에 맞춰준다.
 
+아래는 파일 입력 폼을 적용한 모습이다.
+![fileInputForm](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-17%2016-41-34.png?raw=true)
 
 #### # 일반적인 파일 업로드 컨트롤러
 입력페이지가 준비되었으니 파일 업로드 컨트롤러를 작성해보자. 일반적인 파일 업로드에서는 파일을 파일을 다운하거나 삭제/수정처리 작업은 제외하고 단순히 파일을 업로드하는 것만 구현해준다. 이어서 나오는 AJAX방식의 파일업로드 처리에서 파일 다운, 삭제/수정처리를 정리한다.
@@ -217,7 +215,7 @@ public class UploadFormController {
 
 위의 코드에서 중요한 부분을 정리해보면 다음과 같다.
 - `uploadFile()`메서드 : 파라미터에 `MultipartFile`타입이 선언되어 있는데 `MultipartFile`은 POST방식으로 들어온 파일 데이터를 의미한다.
-- `MultipartFile` : 객체를 이용하면 파일의 이름, 크기, 타입등과 같은 정보를 얻을 수 있다.
+- `MultipartFile` : 객체를 이용하면 파일의 이름(`getOriginalFilename()`), 크기(`getSize()`), 타입(`getContentType()`)등과 같은 정보를 얻을 수 있다.
 - `getRealUploadPath()`메서드 : 파일이 업로드 되는 상대경로를 추출해준다.
 - `uploadFile()`메서드 : 파일을 업로드 처리하고, 최종적으로 저장된 파일명을 리턴해준다.
 
@@ -226,8 +224,8 @@ public class UploadFormController {
 
 `<ifrmae>`을 이용한 파일 업로드는 아래와 같은 과정을 거치게 된다.
 
-1. `<form>`태그 전송은 화면에 포함된 `<iframe>`으로 전송한다.
-2. 결과 페이지(`upload_result.jsp`)는 `upload_form.jsp`의 `<iframe>`내에 포함되므로 실제로 화면 변화가 없다.
+1. `<form>`태그 전송은 입력페이지(`upload_form.jsp`)에 포함된 `<iframe>`으로 전송한다.
+2. 결과 페이지(`upload_result.jsp`)는 입력페이지(`upload_form.jsp`)의 `<iframe>`내에 포함되므로 실제로 화면 변화가 없다.
 3. 결과 페이지에서 다시 바깥 페이지(`upload_form.jsp`)의 JS함수를 호출하고, alert창을 띄운다.
 
 **결과 페이지 : `<iframe>`페이지(`upload_result.jsp`) 작성**
@@ -245,7 +243,7 @@ public class UploadFormController {
 ```
 
 **입력페이지 : `upload_form.jsp`수정**
-아래와 같이 `iframe`에 대한 스타일 속성 모두를 0px로 설정해준다. 이렇게 하면 iframe은 화면에 보이지 않게되어 AJAX처리와 같은 효과를 얻을 수 있다.
+아래와 같이 `iframe`에 대한 스타일 속성 모두를 0px로 설정해준다. 이렇게 하면 iframe은 입력화면에 보이지 않게 되어  AJAX처리와 같은 효과를 얻을 수 있다.
 ```css
 iframe {
     width: 0px;
@@ -270,13 +268,16 @@ function addFilePath(msg) {
 
 #### # 파일 업로드 처리 확인
 파일을 선택하고 난 후 모습이다.
-![fileSelect]()
+![fileSelect](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-17%2017-49-06.png?raw=true)
 
 파일 업로드 처리 후 파일명을 alert창을 통해 알려준다.
 ![afterFileUpload]()
 
 alert창이 닫히고 나면 파일 입력폼을 초기화시켜준다.
 ![removeFileSelect]()
+
+실제로 파일이 파일저장 디렉토리에 업로드되었는지 확인해보자.
+![saveDirectory]()
 
 ## 3. AJAX 방식의 파일 업로드 처리
 #### # 파일 업로드 페이지
