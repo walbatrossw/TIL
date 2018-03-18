@@ -270,16 +270,21 @@ function addFilePath(msg) {
 파일을 선택하고 난 후 모습이다.
 ![fileSelect](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-17%2017-49-06.png?raw=true)
 
-파일 업로드 처리 후 파일명을 alert창을 통해 알려준다.
-![afterFileUpload]()
+파일 업로드 처리 후 파일명을 alert창을 통해 알려준다. `<iframe>`을 사용했기 때문에 페이지전환은 이루어지지 않는다.
+![afterFileUpload](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-17%2020-38-15.png?raw=true)
 
 alert창이 닫히고 나면 파일 입력폼을 초기화시켜준다.
-![removeFileSelect]()
+![removeFileSelect](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-17%2020-38-35.png?raw=true)
 
-실제로 파일이 파일저장 디렉토리에 업로드되었는지 확인해보자.
-![saveDirectory]()
+실제로 파일이 해당 디렉토리에 업로드 되었는지 확인해보면 다음과 같이 정상적으로 업로드 된 것을 알 수 있다.
+![saveDirectory](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-17%2020-41-55.png?raw=true)
 
 ## 3. AJAX 방식의 파일 업로드 처리
+
+이번 예제에서는 AJAX를 이용해 파일을 드래그 앤 드랍 방식으로 업로드를 구현을 해보자.
+
+#### # 파일 업로드 컨트롤러 :
+
 #### # 파일 업로드 페이지
 ```html
 
