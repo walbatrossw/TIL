@@ -283,9 +283,77 @@ alert창이 닫히고 나면 파일 입력폼을 초기화시켜준다.
 
 이번 예제에서는 AJAX를 이용해 파일을 드래그 앤 드랍 방식으로 업로드를 구현을 해보자.
 
-#### # 파일 업로드 컨트롤러 :
+#### # 파일 업로드 컨트롤러 : `UploadAjaxController`
 
-#### # 파일 업로드 페이지
+##### AJAX 파일업로드 페이지 매핑
+일반 Controller와 다르게 RestController의 경우 `String`값을 리턴 하게 되면 뷰페이지로 이동하지 않고, `String`값을 반환하게 된다. 그래서 뷰페이지 이동을 위해서 `ModelAndView`객체를 리턴값으로 선언하고 아래와 같이 코드를 작성해준다.
+
+```java
+@RestController
+@RequestMapping("/file/ajax")
+public class UploadAjaxController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UploadAjaxController.class);
+
+    // AJAX 파일업로드 페이지 매핑
+    @RequestMapping(value = "/uploadPage", method = RequestMethod.GET)
+    public ModelAndView uploadPage() {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("tutorial/upload_ajax");
+
+        return modelAndView;
+
+    }
+}
+```
+
+#####
+
+#### # 파일 업로드 페이지 : `upload_ajax.jsp`
+**HTML코드**
 ```html
+<section class="content container-fluid">
+    <div class="col-lg-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">파일 업로드 (Ajax) 입력폼</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
 
+                <div class="fileDrop">
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <p class="text-center">파일을 드래그해주세요.</p>
+                </div>
+                <hr/>
+                <div class="uploadedList"></div>
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer">
+                <div class="form-group pull-right">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> 저장</button>
+                </div>
+            </div>
+            <!-- /.box-footer -->
+        </div>
+    </div>
+</section>
+```
+**CSS코드**
+```css
+.fileDrop {
+    width: 100%;
+    height: 200px;
+    border: 2px dotted #0b58a2;
+}
+
+small {
+    margin-left: 3px;
+    font-weight: bold;
+    color: #0b58a2;
+}
 ```
