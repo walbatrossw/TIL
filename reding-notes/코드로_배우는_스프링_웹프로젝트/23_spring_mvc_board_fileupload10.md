@@ -37,24 +37,17 @@
 |14|[댓글 갯수, 게시글 조회수 구현, 트랜잭션처리](http://doublesprogramming.tistory.com/208)|
 ---
 
-# Spring MVC 게시판 예제15 - AJAX방식의 게시판 첨부파일 기능 구현
+# Spring MVC 게시판 예제15 - 게시판 파일 첨부 기능 구현, AJAX방식의 업로드처리
 
-이번에는 게시판에 AJAX방식으로 파일첨부기능 구현을 정리해보자.
+게시판에 파일 업로드 기능을 추가해보자. 파일 업로드 방식에는 여러가지 방식이 있지만 크게 두 가지로 나누어 본다면 아래와 같다.
 
-## 1. 파일 업로드 방식 정리
-파일 업로드를 처리하는 방식을 아래와 같이 2가지 방식으로 나눌 수 있다.
+- **`<form>`태그와 같이 전송하는 방식** : `<input type="file">`태그를 통해 파일을 선택하고, `<form>`태그의 데이터를 전송할 때 파일 데이터도 함께 전송한다.
+- **`<form>`태그의 데이터와 파일 데이터를 구분해서 전송하는 방식** : 파일 데이터를 완전히 별도로 전송하고, `<form>`태그의 데이터는 나중에 전송한다.
 
-- **파일데이터와 `<form>`태그의 데이터를 함께 전송하는 방식** : `<input type="file">`태그를 사용하여 파일은 선택하고, `<form>`데이터와 함께 전송
-- **파일데이터와 `<form>`태그의 데이터를 구분해서 전송하는 방식** : AJAX통신을 통해 파일 데이터를 미리 서버에 저장한 뒤 `<form>`데이터를 전송
+위의 두 가지 방식의 차이점은 한번에 `<form>`태그 데이터와 파일 데이터를 함께 전송하는지 아니면 파일 데이터를 따로 전송하는가이다. 보통 따로 전송할 경우에는 AJAX방식을 통해 파일 데이터를 전송하게된다.
 
-본 예제에서는 첨부파일 기능 구현을 AJAX방식으로 파일데이터와 `<form>`데이터를 구분해서 전송하는 방식으로 처리하는데 아래와 같은 과정을 거치게 된다.
-1. 게시글 제목, 내용, 작성자를 입력
-2. 첨부파일이 필요할 경우 탐색기에서 drag & drop방식으로 파일을 끌어다 놓으면 서버에 업로드 처리가 미리 됨
-3. 게시글 등록 버튼을 클릭하면 게시글의 정보와 첨부파일의 정보가 함께 DB에 저장됨
-
-
-## 2. Spring 파일 업로드 설정 추가
-스프링에서 파일 업로드를 처리하기 위해서는 몇 가지 설정이 필요하다. 아래와 같이 파일 업로드 관련 라이브러리를 추가해주고, 파일 업로드 `MultipartResolver`설정을 해준다. 그리고 한글파일명이 깨지는 것을 방지하기 위해 필터설정이 되있는지 확인해준다.
+## 1. 파일 업로드를 위한 준비
+우선 파일 업로드를 처리하기 위해서는 몇 가지 설정이 필요하다. 가장 먼저 아래와 같이 파일 업로드 관련 라이브러리를 추가해주고, 파일 업로드 `MultipartResolver`설정을 해준다.
 
 #### # 파일 업로드 관련 라이브러리 추가 : `pom.xml`
 ```xml
@@ -67,7 +60,7 @@
 ```
 `imgscalr`라이브러리는 큰 이미지 파일을 고정된 크기로 변환할 때 사용한다.
 ```xml
-<!--이미지 크기 변환 라이브러리-->
+<!--이미지 축소 라이브러리-->
 <dependency>
     <groupId>org.imgscalr</groupId>
     <artifactId>imgscalr-lib</artifactId>
@@ -86,7 +79,7 @@
 `property`중에서 `maxUploadSize`를 통해 파일의 최대 크기를 10MB정도로 제한해준다.
 
 #### # 한글파일명 필터 설정 : `web.xml`
-업로드했을 때 한글 파일명이 깨져서 나오는 것을 방지하기 위해 아래와 같이 필터 설정이 되어 있는지 확인한다.
+한글 이름으로 된 파일을 업로드했을 때 파일명이 깨져서 나오는 것을 방지하기 위해 아래와 같이 필터 설정이 되어 있는지 확인한다.
 ```xml
 <!--한글 인코딩 설정-->
 <filter>
@@ -103,70 +96,34 @@
 </filter-mapping>
 ```
 
-## 3. 첨부파일 테이블 추가 및 도메인 클래스 변경
-#### # 게시글 첨부파일 테이블 생성
-게시글의 첨부파일명을 저장하기 위한 `tbl_article_file`테이블을 생성해준다. 첨부파일의 이름(`file_name`)은 고유한 속성을 가지도록 처리할 예정이기 때문에 기본키로 설정하였고, 참조키는 게시글 번호(`article_no`)로 설정해주었다. 그리고 게시글 테이블(`tbl_article`)에는 게시글 목록페이지에서 첨부파일의 갯수를 출력해주기 위해 칼럼을 아래와 같이 추가해주었다.
-```sql
--- 게시글 첨부파일 테이블 생성
-CREATE TABLE tbl_article_file (
-  file_name VARCHAR(150) NOT NULL ,
-  article_no INT NOT NULL ,
-  reg_date TIMESTAMP DEFAULT NOW(),
-  PRIMARY KEY (file_name)
-);
-
--- 게시글 첨부파일 테이블 참조키 설정
-ALTER TABLE tbl_article_file ADD CONSTRAINT fk_article_file
-FOREIGN KEY (article_no) REFERENCES tbl_article (article_no);
-
--- 게시글 테이블 첨부파일 갯수 칼럼 추가
-ALTER TABLE tbl_article ADD COLUMN file_cnt INT DEFAULT 0;
-```
-
-#### # 게시글 도메인 클래스의 수정 : `ArticleVO`
-데이터베이스의 테이블이 변경되었기 때문에 도메인 클래스에도 추가적인 데이터가 필요하게 되었다. 그래서 `ArticleVO`클래스에 파일들의 이름을 의미하는 String배열 타입 변수 `files`와 파일 개수를 의미하는 변수 `fileCnt`를 선언해준다. 그리고 게시글이 입력/수정될 때 생성되는 `ArticleVO`의 인스턴스가 스스로 게시글의 첨부파일 갯수를 상태를 가질 수 있게 `setFiles()`메서드를 아래와 같이 작성해준다. 이렇게 되면 외부에서 `setFiles()`를 호출하여 게시글의 첨부파일 갯수를 넣어주지 않아도 된다.
+## 2. 파일 업로드 컨트롤러 작성 : `ArticleFileController`
+AJAX 방식으로 파일을 업로드 처리하기 위해 `@RestController`애너테이션을 사용한 컨트롤러를 `/src/main/java/기본클래스/upload`패키지에 아래와 같이 컨트롤러 클래스를 생성하고, 코드를 작성해준다. 이 컨트롤러에는 앞으로 파일을 업로드, 파일출력, 파일목록, 파일삭제 메서드등이 추가될 것이다.
 ```java
-public class ArticleVO {
-
-    private Integer articleNo;
-    private String title;
-    private String content;
-    private String writer;
-    private Date regDate;
-    private int viewCnt;
-    private int replyCnt;
-
-    private String[] files;
-    private int fileCnt;
-
-    // ... getter, setter
-
-    public void setFiles(String[] files) {
-        this.files = files;
-        setFileCnt(files.length);
-    }
-
-    private void setFileCnt(int fileCnt) {
-        this.fileCnt = fileCnt;
-    }
-
-    // ... toString()
+@RestController
+@RequestMapping("/article/file")
+public class ArticleFileController {
+    // 파일 업로드 처리 : /article/file/upload
+    // 파일 출력 : /article/file/display
+    // 파일 목록 : /article/file/list
+    // 파일 삭제1(게시글 입력페이지) : /article/file/delete
+    // 파일 삭제2(게시글 수정페이지) : /article/file/delete/{articleNo}
+    // 파일 삭제3(게시글 삭제처리) : /article/file/deleteAll
 }
 ```
 
-## 4. 파일 업로드 유틸 클래스 작성
+## 3. 파일 업로드를 위한 유틸 클래스 작성 : `UploadFileUtils`, `MediaUtils`
 
-#### # 서버에 파일 업로드할 때 고려사항
-서버에 파일을 저장할 때 발생할 수 있는 문제점과 그 해결방안을 정리하면 아래와 같다.
+서버에 파일을 업로드 처리할 때 발생할 수 있는 문제점과 그에 대한 해결 방법은 다음과 같다.
 
-- **동일한 파일명이 저장되는 경우** : UUID를 이용하여 고유 값을 생성하고, 파일명 앞에 붙여 중복 문제를 해결한다.
-- **파일의 단일 저장 경로** : 단일 경로에 계속 파일을 저장하게 되면 나중에 파일을 검색하고 찾는데 속도 문제가 발생할 수 있기 때문에 파일을 날짜별 폴더를 생성해 관리한다.
+- **파일명의 중복저장** : UUID를 이용하여 고유 값을 생성하고, 파일명 앞에 붙여 중복 문제를 해결한다.
+- **파일의 단일 저장경로** : 단일 경로에 계속 파일을 저장하게 되면 나중에 파일을 검색하고 찾는데 속도 문제가 발생할 수 있기 때문에 파일을 날짜별 폴더를 생성해 관리한다.
 - **이미지 파일인 경우 브라우저에 출력할 크기** : 업로드한 이미지 파일이 크기가 클 경우 서버에서 브라우저에 많은 양의 데이터를 전송하게 되므로 이미지 파일의 축소본, 즉 썸네일을 생성해서 최소한의 데이터를 전송하도록 한다.
 
-위에서 살펴본 문제점과 해결 방안을 고려하여 파일 업로드를 처리하기 위한 유틸 클래스 2개를 작성할 것인데 그 클래스들의 역할은 다음과 같다.
+위에서 살펴본 문제점과 해결 방안을 고려하여 파일 업로드를 위한 유틸 클래스 2개를 작성할 것인데 그 클래스들의 역할은 다음과 같다.
 
 - `UploadFileUtils` : 파일 업로드/삭제/전송, 폴더생성, 파일명 중복방지 등의 기능을 처리할 메서드들을 가진 유틸 클래스
 - `MediaUtils` : 파일의 타입이 이미지인지를 판별하는 메서드를 가진 유틸 클래스
+
 #### # `UploadFileUtils` 클래스 작성
 `/src/main/java/기본패키지/commons/util`패키지에 파일 업로드와 관련된 기능을 처리할 `UploadFileUtils`클래스를 아래와 같이 작성해준다.
 유틸 클래스로 사용하기 때문에 기본적으로 클래스 내부의 모든 메서드는 `static`메서드로 선언하여 인스턴스 생성 없이 바로 사용이 가능하도록 하였다. 그리고 파일 업로드 처리, 삭제, 출력을 위한 httpHeader설정, 기본경로 추출 메서드는 `public`메서드로 선언하고 파일 업로드 컨트롤러에서 바로 접근하여 사용이 가능하게 했다.
@@ -308,7 +265,8 @@ public class UploadFileUtils {
 }
 ```
 
-#### # `MediaUtils` 클래스 작성
+
+#### # `MediaUtils`
 `UploadFileUtils`클래스와 마찬가지로 `/src/main/java/기본패키지/commons/util`패키지에 파일 타입이 이미지인지를 판별해주는 `MediaUtils`클래스를 아래와 같이 작성했다.
 ```java
 public class MediaUtils {
@@ -331,116 +289,31 @@ public class MediaUtils {
 }
 ```
 
-## 5. 게시글 입력 페이지에서 첨부파일 기능 구현
+## 4. AJAX 파일 업로드 컨트롤러 메서드 작성
 
-#### # 게시글 첨부파일 영속계층 작성 : `ArticleFileDAO` / `ArticleFileDAOImpl`
-`/src/main/기본패키지/upload/Persistence`패키지에 업로드한 파일정보를 첨부파일 테이블에 저장하기 위해 `ArticleFileDAO`인터페이스와 `ArticleFileDAOImpl`클래스를 생성하고 코드를 아래와 같이 작성해준다.
+#### # 파일 업로드 처리 : 게시글 입력페이지, 수정페이지에서 사용
+
 ```java
-public interface ArticleFileDAO {
-
-    // 파일 추가
-    void addFile(String fullName) throws Exception;
-
-}
-```
-```java
-@Repository
-public class ArticleFileDAOImpl implements ArticleFileDAO {
-
-    private static final String NAMESPACE = "com.doubles.mvcboard.mappers.upload.ArticleFileMapper";
-
-    private final SqlSession sqlSession;
-
-    @Inject
-    public ArticleFileDAOImpl(SqlSession sqlSession) {
-        this.sqlSession = sqlSession;
+// 게시글 파일 업로드
+@RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
+public ResponseEntity<String> uploadFile(MultipartFile file, HttpServletRequest request) {
+    ResponseEntity<String> entity = null;
+    try {
+        String savedFilePath = UploadFileUtils.uploadFile(file.getOriginalFilename(), file.getBytes(), request);
+        entity = new ResponseEntity<>(savedFilePath, HttpStatus.CREATED);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
-    @Override
-    public void addFile(String fileName) throws Exception {
-        sqlSession.insert(NAMESPACE + ".addFile", fileName);
-    }
+    return entity;
 }
 ```
 
-#### # 게시글 첨부파일 SQL Mapper : `articleFileMapper.xml`
-`articleFileMapper.xml`을 생성하고 아래와 같이 SQL을 작성해준다. 게시글 테이블에 게시글 내용이 추가되는 동시에 첨부파일 테이블에도 게시글 번호가 같이 저장될 수 있도록 처리하기 위해 게시글 번호는 `LAST_INSERT_ID()`를 이용하여 처리해준다.
-```sql
-<mapper namespace="com.doubles.mvcboard.mappers.upload.ArticleFileMapper">
+파일업로드 처리 메서드는 `UploadFileUtils`클래스의 `uploadFile()`메서드에서 파일을 업로드 처리하고 난 뒤 리턴 받은 값, 즉 첨부파일명("/년/월/일/파일명")을 호출한 곳으로 리턴해준다. 이 과정에서 주목할 점은 `@RequestMapping`애너테이션의 `produces`속성인데 `"text/plain;charset=UTF-8"`으로 지정한 것인데 이것은 한국어를 정상적으로 전송하기 위한 설정으로 리턴값이 한글일 경우 정상적으로 한글을 전달해주기 위한 것이다.
 
-    <insert id="addFile">
-        INSERT INTO tbl_article_file (
-            file_name
-            , article_no
-        ) VALUES (
-            #{fileName}
-            , LAST_INSERT_ID()
-        )
-    </insert>
-
-</mapper>
-```
-
-#### # 게시글 서비스 계층 수정 : `ArticleServiceImpl`
-게시글이 입력 처리가 되면 함께 게시글 첨부파일명이 게시글 첨부파일 테이블에 함께 입력되도록 `ArticleServiceImpl`클래스의 `create()`를 아래와 같이 수정해준다. 그리고 게시글 입력처리와 게시글 첨부파일 입력처리가 동시에 이루어지기 때문에 트랜잭션 처리를 반드시 해주어야한다.
+#### # 파일 출력 : 게시글 입력페이지, 조회페이지, 수정페이지에서 사용
 ```java
-@Transactional
-@Override
-public void create(ArticleVO articleVO) throws Exception {
-
-    // 게시글 입력처리
-    articleDAO.create(articleVO);
-    String[] files = articleVO.getFiles();
-
-    if (files == null)
-        return;
-
-    // 게시글 첨부파일 입력처리
-    for (String fileName : files)
-        articleFileDAO.addFile(fileName);
-
-}
-```
-
-#### # 게시글 첨부파일 컨트롤러 작성 : `ArticleFileController`
-게시글 첨부파일 컨트롤러는 앞서 말한 것처럼 게시글 입력처리가 되기 전에 클라이언트로부터 AJAX 통신을 통해 미리 파일 데이터를 받아 서버에 저장하는 역할을 수행하게 된다.
-
-파일 업로드 처리 메서드는 다음과 같은 과정을 거치게 된다.
-
-1. 클라이언트로부터 전달 받은 `file`의 정보 파일명, 파일데이터, `request`를 `UploadFileUtils.uploadFile()`의 매개변수로 전달한다.
-2. `UploadFileUtils`클래스 내부의 메서드들을 통해 파일 업로드 처리가 완료되고, "/년/월/일/파일명"의 문자열을 리턴 받는다.
-3. 리턴 받은 문자열을 호출한 클라이언트 화면으로 리턴한다.
-
-아래의 컨트롤러 코드에서 주의할 점은 `@RequestMapping`애너테이션의 `produces`속성을 `"text/plain;charset=UTF-8"`로 지정한 것인데 클라이언트로 한글을 정상적으로 전송하기 위한 설정이므로 반드시 작성해야 한다.
-```java
-@RestController
-@RequestMapping("/article/file")
-public class ArticleFileController {
-
-    // 게시글 파일 업로드 처리
-    @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
-    public ResponseEntity<String> uploadFile(MultipartFile file, HttpServletRequest request) {
-        ResponseEntity<String> entity = null;
-        try {
-            String savedFilePath = UploadFileUtils.uploadFile(file.getOriginalFilename(), file.getBytes(), request);
-            entity = new ResponseEntity<>(savedFilePath, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return entity;
-    }
-}
-```
-
-그리고 서버에 파일이 업로드가 완료되고 나면, 바로 화면에서 업로드한 파일을 확인할 수 있도록 컨트롤러에 아래와 같이 파일 출력메서드를 작성해준다. 업로드 파일 출력 처리 메서드는 다음과 같은 과정을 거치게 된다.
-
-1. 클라이언트로부터 전달 받은 업로드 파일명(`fileName`)을 매개변수로 `UploadFileUtils`클래스의 `getHttpHeaders()`메서드를 호출한다.
-2. `getHttpHeaders()`메서드는 파일명(`fileName`)을 통해 파일타입을 판별하여 적절한 MINE타입을 지정하고, 클라이언트에게 전송할 `HttpHeaders`객체를 리턴한다.
-3. 리턴받은 `HttpHeaders`객체와 파일 데이터를 호출한 클라이언트 화면으로 리턴한다.
-
-```java
-// 업로드 파일 출력 처리
+// 게시글 파일 출력
 @RequestMapping(value = "/display", method = RequestMethod.GET)
 public ResponseEntity<byte[]> displayFile(String fileName, HttpServletRequest request) throws Exception {
 
@@ -459,68 +332,38 @@ public ResponseEntity<byte[]> displayFile(String fileName, HttpServletRequest re
     return entity;
 }
 ```
+AJAX를 통해 파일 업로드 처리가 완료되면 업로드한 파일을 바로 화면에 출력하기 위해 파일 출력 메서드를 위와 같이 작성해준다.
 
-#### # 게시글 입력 페이지 수정 : `write.jsp`
-##### 첨부파일 Drag & Drop 영역 추가
-게시글 입력페이지에 아래와 같이 CSS와 HTML코드를 추가해준다.
-```css
-.fileDrop {
-    width: 100%;
-    height: 200px;
-    border: 2px dotted #0b58a2;
+요청을 받은 **파일 출력 메서드는 파일 데이터와 HttpHeader를 리턴** 해주게 되는데 파일데이터와 HttpHeaders를 처리하기 위한 과정은 아래와 같다.
+1. 원하는 파일을 파라미터(`fileName`)로 받는다.
+2. `httpHeaders`를 얻기 위해 `UploadFileUtils.getHttpHeaders(fileName)`메서드를 호출한다.
+3. `getHttpHeaders(fileName)`메서드는 파일타입을 체크하여 설정에 맞는 MINE타입을 지정해 리턴해준다.
+4. 원하는 파일을 `InputStream`객체를 통해 읽어온다.
+5. 최종적으로 읽어온 파일 데이터와 HttpHeader를 호출한 화면으로 리턴해준다.
+
+
+#### # 파일 목록 : 게시글 조회페이지에서 사용
+```java
+
+```
+#### # 파일 삭제 처리1 : 게시글 입력페이지에서 사용
+```java
+// 게시글 파일 삭제 : 게시글 작성
+@RequestMapping(value = "/delete", method = RequestMethod.POST)
+public ResponseEntity<String> deleteFile(String fileName, HttpServletRequest request) {
+    ResponseEntity<String> entity = null;
+
+    try {
+        UploadFileUtils.deleteFile(fileName, request);
+        entity = new ResponseEntity<>("DELETED", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    return entity;
 }
 ```
-```xml
-<div class="box-body">
-    <div class="form-group">
-        <label for="title">제목</label>
-        <input class="form-control" id="title" name="title" placeholder="제목을 입력해주세요">
-    </div>
-    <div class="form-group">
-        <label for="content">내용</label>
-        <textarea class="form-control" id="content" name="content" rows="30"
-                  placeholder="내용을 입력해주세요" style="resize: none;"></textarea>
-    </div>
-    <div class="form-group">
-        <label for="writer">작성자</label>
-        <input class="form-control" id="writer" name="writer">
-    </div>
-    <%-- Drag & Drop 영역 --%>
-    <div class="form-group">
-        <div class="fileDrop">
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <p class="text-center"><i class="fa fa-paperclip"></i> 첨부파일을 드래그해주세요.</p>
-        </div>
-    </div>
-    <%-- Drag & Drop 영역 --%>
-</div>
-```
+#### # 파일 삭제 처리2 : 게시글 수정페이지에서 사용
 
-##### 첨부파일용 Handlebars템플릿 작성
-댓글기능을 구현했을 때와 마찬가지로 Handlebars를 이용하여 HTML코드를 동적으로 생성하도록 아래와 같이 코드를 작성해준다.
-```xml
-<script id="fileTemplate" type="text/x-handlebars-template">
-    <li>
-        <span class="mailbox-attachment-icon has-img">
-            <img src="{{imgSrc}}" alt="Attachment">
-        </span>
-        <div class="mailbox-attachment-info">
-            <a href="{{getLink}}" class="mailbox-attachment-name">
-                <i class="fa fa-paperclip"></i> {{fileName}}
-            </a>
-            <a href="{{fullName}}" class="btn btn-default btn-xs pull-right delBtn">
-                <i class="fa fa-fw fa-remove"></i>
-            </a>
-        </div>
-    </li>
-</script>
-```
-```js
-```
-
-## 6. 게시글 조회 페이지의 첨부파일 목록 기능 구현
-
-## 7. 게시글 수정 페이지의 첨부파일 기능 구현
+#### # 파일 전체 삭제 처리 : 게시글 삭제처리시
