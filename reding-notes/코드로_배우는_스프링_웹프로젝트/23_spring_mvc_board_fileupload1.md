@@ -805,20 +805,26 @@ $(document).on("click", ".delBtn", function (event) {
 ```
 #### # 구현 확인
 ##### 게시글 입력페이지의 첨부파일 업로드 영역
-![file]()
+![file](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-05%2000-02-19.png?raw=true)
 
 ##### 게시글 입력페이지의 첨부파일 업로드 처리 확인
-![file2]()
+![file2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-05%2000-11-56.png?raw=true)
 - 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장 확인, 이미지 파일인 경우 썸네일도 함께 저장되었는지 확인
 - 한글 파일명 정상 출력 확인
 - 이미지 파일인 경우 썸네일 이미지 생성/출력 처리 확인
 - 일반 파일인 경우 파일 아이콘 이미지 출력 확인
 
 ##### 게시글 입력페이지의 첨부파일 삭제 처리 확인
-![file3]()
+![file3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-05%2000-29-51.png?raw=true)
 - 첨부파일 삭제 처리 후 파일이 정상적으로 서버에서 삭제되었는지 확인
 - 삭제 처리 후 파일 출력 영역에서 삭제한 파일 사라짐 확인
 
+##### 게시글 입력페이지의 lightbox 라이브러리 적용 확인
+![file4]()
+- 첨부파일의 이미지인 경우 파일명 클릭시 원본 이미지가 팝업창으로 뜨는지 확인
+
+##### 게시글 입력페이지에서 일반파일인 경우 파일명 클릭시 다운로드 창 팝업 확인
+![file5]()
 
 ## 6. 게시글 조회 페이지의 첨부파일 목록 구현
 
