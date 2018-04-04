@@ -594,8 +594,8 @@ public ResponseEntity<String> deleteFile(String fileName, HttpServletRequest req
             <img src="{{imgSrc}}" alt="Attachment">
         </span>
         <div class="mailbox-attachment-info">
-            <a href="{{fileLink}}" class="mailbox-attachment-name">
-                <i class="fa fa-paperclip"></i> {{fileName}}
+            <a href="{{originalFileUrl}}" class="mailbox-attachment-name">
+                <i class="fa fa-paperclip"></i> {{originalFileName}}
             </a>
             <a href="{{fullName}}" class="btn btn-default btn-xs pull-right delBtn">
                 <i class="fa fa-fw fa-remove"></i>
@@ -606,27 +606,186 @@ public ResponseEntity<String> deleteFile(String fileName, HttpServletRequest req
 ```
 
 ##### 첨부파일 업로드/출력/삭제를 위한 JS파일 작성
-첨부파일 업로드/출력/삭제처리를 위한 JS코드는 `/resources/dist/js`에 `article_file_upload.js`파일을 생성해서 따로 작성해주고, 아래와 같이 게시글 작성페이지에 포함시켜준다. 첨부파일 기능을 처리하는 JS코드의 내용이 많고, 게시글 입력/조회/수정 페이지에 공통으로 들어가는 코드의 중복을 방지하기 위해서이다.
+첨부파일 업로드/출력/삭제처리를 위한 JS코드는 `/resources/dist/js`에 `article_file_upload.js`파일을 생성해서 따로 작성해주고, 아래와 같이 게시글 작성페이지에 포함시켜준다. 첨부파일 기능을 처리하는 JS코드의 내용이 많고, 게시글 입력/조회/수정 페이지에 공통으로 들어가는 코드의 중복을 방지하기 위해서이다. 그리고 일반 파일의 경우 썸네일 이미지가 없기 때문에 파일 아이콘 이미지를 출력해야 한다. 그래서 `/resources/dist/upload/files/`경로에 `file-icon.png`파일을 넣어준다.
 ```xml
 <script type="text/javascript" src="/resources/dist/js/article_file_upload.js"></script>
 ```
 ```js
+// Handlebars 파일템플릿 컴파일
+var fileTemplate = Handlebars.compile($("#fileTemplate").html());
+
+// 첨부파일 drag & drop 영역 선택자
+var fileDropDiv = $(".fileDrop");
+
+// 전체 페이지 첨부파일 drag & drop 기본 이벤트 방지
+$(".content-wrapper").on("dragenter dragover drop", function (event) {
+    event.preventDefault();
+});
+
+// 첨부파일 영역 drag & drop 기본 이벤트 방지
+fileDropDiv.on("dragenter dragover", function (event) {
+    event.preventDefault();
+});
+
+// 첨부파일 drag & drop 이벤트 처리 : 파일업로드 처리 -> 파일 출력
+fileDropDiv.on("drop", function (event) {
+    event.preventDefault();
+    // drop 이벤트 발생시 전달된 파일 데이터
+    var files = event.originalEvent.dataTransfer.files;
+    // 단일 파일 데이터만을 처리하기 때문 첫번째 파일만 저장
+    var file = files[0];
+    // formData 객체 생성, 파일데이터 저장
+    var formData = new FormData();
+    formData.append("file", file);
+    // 파일 업로드 AJAX 통신 메서드 호출
+    uploadFile(formData);
+});
+
+// 파일 업로드 AJAX 통신
+function uploadFile(formData) {
+    $.ajax({
+        url: "/article/file/upload",
+        data: formData,
+        dataType: "text",
+        // processData : 데이터를 일반적인 query string으로 변환처리할 것인지 결정
+        // 기본값은 true, application/x-www-form-urlencoded 타입
+        // 자동변환 처리하지 않기 위해 false
+        processData: false,
+        // contentType : 기본값은 true, application/x-www-form-urlencoded 타입
+        // multipart/form-data 방식으로 전송하기 위해 false
+        contentType: false,
+        type: "POST",
+        success: function (data) {
+            printFiles(data); // 첨부파일 출력 메서드 호출
+            $(".noAttach").remove();
+        }
+    });
+}
+
+// 첨부파일 출력
+function printFiles(data) {
+    // 파일 정보 처리
+    var fileInfo = getFileInfo(data);
+    // Handlebars 파일 템플릿에 파일 정보들을 바인딩하고 HTML 생성
+    var html = fileTemplate(fileInfo);
+    // Handlebars 파일 템플릿 컴파일을 통해 생성된 HTML을 DOM에 주입
+    $(".uploadedFileList").append(html);
+    // 이미지 파일인 경우 파일 템플릿에 lightbox 속성 추가
+    if (fileInfo.fullName.substr(12, 2) === "s_") {
+        // 마지막에 추가된 첨부파일 템플릿 선택자
+        var that = $(".uploadedFileList li").last();
+        // lightbox 속성 추가
+        that.find(".mailbox-attachment-name").attr("data-lightbox", "uploadImages");
+        // 파일 아이콘에서 이미지 아이콘으로 변경
+        that.find(".fa-paperclip").attr("class", "fa fa-camera");
+    }
+}
+
+// 게시글 입력/수정 submit 처리시에 첨부파일 정보도 함께 처리
+function filesSubmit(that) {
+    var str = "";
+    $(".uploadedFileList .delBtn").each(function (index) {
+        str += "<input type='hidden' name='files[" + index + "]' value='" + $(this).attr("href") + "'>"
+    });
+    that.append(str);
+    that.get(0).submit();
+}
+
+// 파일 삭제(입력페이지) : 첨부파일만 삭제처리
+function deleteFileWrtPage(that) {
+    var url = "/article/file/delete";
+    deleteFile(url, that);
+}
+
+// 파일 삭제 AJAX 통신
+function deleteFile(url, that) {
+    $.ajax({
+        url: url,
+        type: "post",
+        data: {fileName: that.attr("href")},
+        dataType: "text",
+        success: function (result) {
+            if (result === "DELETED") {
+                alert("삭제되었습니다.");
+                that.parents("li").remove();
+            }
+        }
+    });
+}
+
+// 파일 정보 처리
+function getFileInfo(fullName) {
+
+    var originalFileName;   // 화면에 출력할 파일명
+    var imgSrc;             // 썸네일 or 파일아이콘 이미지 파일 출력 요청 URL
+    var originalFileUrl;    // 원본파일 요청 URL
+    var uuidFileName;       // 날짜경로를 제외한 나머지 파일명 (UUID_파일명.확장자)
+
+    // 이미지 파일이면
+    if (checkImageType(fullName)) {
+        imgSrc = "/article/file/display?fileName=" + fullName; // 썸네일 이미지 링크
+        uuidFileName = fullName.substr(14);
+        var originalImg = fullName.substr(0, 12) + fullName.substr(14);
+        // 원본 이미지 요청 링크
+        originalFileUrl = "/article/file/display?fileName=" + originalImg;
+    } else {
+        imgSrc = "/resources/upload/files/file-icon.png"; // 파일 아이콘 이미지 링크
+        uuidFileName = fullName.substr(12);
+        // 파일 다운로드 요청 링크
+        originalFileUrl = "/article/file/display?fileName=" + fullName;
+    }
+    originalFileName = uuidFileName.substr(uuidFileName.indexOf("_") + 1);
+
+    return {originalFileName: originalFileName, imgSrc: imgSrc, originalFileUrl: originalFileUrl, fullName: fullName};
+}
+
+// 이미지 파일 유무 확인
+function checkImageType(fullName) {
+    var pattern = /jpg$|gif$|png$|jpge$/i;
+    return fullName.match(pattern);
+}
 
 ```
 
-##### 원본 이미지 파일 출력을 위한 설정
+##### 원본 이미지 파일 출력을 위한 ligthbox 라이브러리 적용
 첨부파일이 이미지 타입인 경우 화면에 출력할 때 썸네일을 출력하고, 해당 썸네일을 클릭하면 원본 이미지 파일을 출력해주기 위해서 `head.jsp`와 `plugin_js.jsp`에 `lightbox`플러그인 css와 js파일을 아래와 같이 추가해준다.
-lightbox플러그인의 사용법은 이 곳(http://lokeshdhakar.com/projects/lightbox2/)을 참조하면 된다.
+
+> lightbox플러그인의 사용법은 이 곳(http://lokeshdhakar.com/projects/lightbox2/)을 참조하면 된다.
+
+**`head.jsp`**
 ```xml
 <%--lightbox css--%>
 <link rel="stylesheet" href="/bower_components/lightbox/css/lightbox.css">
 ```
+**`plugin_js.jsp`**
 ```xml
 <%--lightbox js--%>
 <script src="/bower_components/lightbox/js/lightbox.js"></script>
 ```
+그리고 `article_file_upload.js`의 첨부파일 출력 메서드 코드를 보면 Handlebars 파일 템플릿을 통해 출력처리가 완료되고 나서 파일명이 썸네일인 경우에는 lightbox속성이 추가되도록 처리한 것을 확인 할 수 있다.
+```js
+// 첨부파일 출력
+function printFiles(data) {
+    // 파일 정보 처리
+    var fileInfo = getFileInfo(data);
+    // Handlebars 파일 템플릿에 파일 정보들을 바인딩하고 HTML 생성
+    var html = fileTemplate(fileInfo);
+    // Handlebars 파일 템플릿 컴파일을 통해 생성된 HTML을 DOM에 주입
+    $(".uploadedFileList").append(html);
+    // 이미지 파일인 경우 파일 템플릿에 lightbox 속성 추가
+    if (fileInfo.fullName.substr(12, 2) === "s_") {
+        // 마지막에 추가된 첨부파일 템플릿 선택자
+        var that = $(".uploadedFileList li").last();
+        // lightbox 속성 추가
+        that.find(".mailbox-attachment-name").attr("data-lightbox", "uploadImages");
+        // 파일 아이콘에서 이미지 아이콘으로 변경
+        that.find(".fa-paperclip").attr("class", "fa fa-camera");
+    }
+}
+```
 
 ##### 게시글 입력 페이지(`write.jsp`)의 첨부파일 이벤트 처리 JS 코드
+게시글 저장 버튼을 클릭하면 `article_file_upload.js`의 `filesSubmit()`메서드를 호출하여 `<input type="hidden"/>`태그를 생성하고 `value`에 업로드 처리한 첨부 파일명을 추가 시켜 최종적으로 `<form>`태그를 `submit`처리하게 된다.
 ```js
 // 게시글 저장 버튼 클릭 이벤트 처리
 $("#writeForm").submit(function (event) {
@@ -634,7 +793,9 @@ $("#writeForm").submit(function (event) {
     var that = $(this);
     filesSubmit(that);
 });
-
+```
+첨부 파일의 삭제 버튼을 클릭하면 `article_file_upload.js`의 `deleteFileWrtPage()`메서드를 호출하여 파일 삭제처리를 수행하게 된다.
+```js
 // 파일 삭제 버튼 클릭 이벤트
 $(document).on("click", ".delBtn", function (event) {
     event.preventDefault();
@@ -646,8 +807,18 @@ $(document).on("click", ".delBtn", function (event) {
 ##### 게시글 입력페이지의 첨부파일 업로드 영역
 ![file]()
 
-##### 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장, 한글 파일명 정상 출력, 이미지 파일의 경우 썸네일 이미지 생성/출력 처리
+##### 게시글 입력페이지의 첨부파일 업로드 처리 확인
 ![file2]()
+- 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장 확인, 이미지 파일인 경우 썸네일도 함께 저장되었는지 확인
+- 한글 파일명 정상 출력 확인
+- 이미지 파일인 경우 썸네일 이미지 생성/출력 처리 확인
+- 일반 파일인 경우 파일 아이콘 이미지 출력 확인
+
+##### 게시글 입력페이지의 첨부파일 삭제 처리 확인
+![file3]()
+- 첨부파일 삭제 처리 후 파일이 정상적으로 서버에서 삭제되었는지 확인
+- 삭제 처리 후 파일 출력 영역에서 삭제한 파일 사라짐 확인
+
 
 ## 6. 게시글 조회 페이지의 첨부파일 목록 구현
 
