@@ -805,19 +805,20 @@ $(document).on("click", ".delBtn", function (event) {
 ```
 #### # 구현 확인
 ##### 게시글 입력페이지의 첨부파일 업로드 영역
-![file](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-05%2000-02-19.png?raw=true)
+![file]()
 
-##### 게시글 입력페이지의 첨부파일 업로드 처리 확인
-![file2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-05%2000-11-56.png?raw=true)
-- 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장 확인, 이미지 파일인 경우 썸네일도 함께 저장되었는지 확인
+##### 게시글 입력페이지의 첨부파일 업로드 처리 및 출력처리 확인
+![file2]()
+- 파일 탐색기에서 첨부파일을 선택해 업로드 영역에 드래그
+- 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장 확인, 이미지 파일인 경우 썸네일이 생성되었는지 확
 - 한글 파일명 정상 출력 확인
 - 이미지 파일인 경우 썸네일 이미지 생성/출력 처리 확인
 - 일반 파일인 경우 파일 아이콘 이미지 출력 확인
 
 ##### 게시글 입력페이지의 첨부파일 삭제 처리 확인
-![file3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-05%2000-29-51.png?raw=true)
-- 첨부파일 삭제 처리 후 파일이 정상적으로 서버에서 삭제되었는지 확인
-- 삭제 처리 후 파일 출력 영역에서 삭제한 파일 사라짐 확인
+![file3]()
+- 첨부파일 삭제버튼을 클릭하면 파일이 정상적으로 서버에서 삭제되었는지 확인
+- 첨부파일이 삭제처리가 되고 화면에서 해당파일이 사라졌는지 확인
 
 ##### 게시글 입력페이지의 lightbox 라이브러리 적용 확인
 ![file4]()
@@ -826,14 +827,517 @@ $(document).on("click", ".delBtn", function (event) {
 ##### 게시글 입력페이지에서 일반파일인 경우 파일명 클릭시 다운로드 창 팝업 확인
 ![file5]()
 
-## 6. 게시글 조회 페이지의 첨부파일 목록 구현
+##### 게시글 입력처리 완료 후에 게시글 목록 페이지 이동, 파일 개수 확인, 테이블에 파일정보가 등록되었는지 확인
+![file6]()
 
-#### # 게시글 첨부파일 컨트롤러 작성
+## 6. 게시글 조회 페이지의 첨부파일 목록 구현/ 게시글 삭제 처리시 첨부파일삭제 처리 구현
+게시글 조회페이지에서는 첨부파일 기능이 추가됨에 따라 추가적으로 구현해야할 것들은 다음과 같다.
+- 첨부파일 목록 출력
+- 게시글 삭제 처리시 서버에 저장된 첨부파일 삭제, 테이블에 저장된 첨부파일 정보 삭제
 
-#### # 게시글 목록 페이지 수정
+**첨부파일 목록 출력**은 아래와 같은 과정을 거치게 된다.
+1. AJAX 방식으로 현재 조회하고 있는 게시글의 첨부파일 목록을 가져온다.
+2. 테이블로부터 가져온 첨부파일 목록에서 첨부파일명을 통해 AJAX 방식으로 파일을 출력처리 한다.
+
+**게시글 삭제시 첨부파일의 삭제처리**는 아래와 같은 과정을 거치게 된다.
+1. AJAX 방식으로 해당 게시글의 첨부파일을 서버에서 삭제처리를 먼저 수행한다.
+2. 해당 게시글의 첨부파일 정보를 테이블에서 먼저 삭제 처리를 수행하고 난 뒤, 게시글을 삭제 처리한다.
+
+#### # 게시글 첨부파일 영속 계층 : `ArticleFileDAO` / `ArticleFileDAOImpl`
+아래와 같이 `ArticleFileDAO`인터페이스에 첨부파일 목록을 가져오는 추상 메서드를 추가하고, `ArticleFileDAOImpl`클래스에 메서드를 구현해준다.
+```java
+// 첨부 파일 목록
+List<String> getArticleFiles(Integer articleNo) throws Exception;
+
+// 게시글의 첨부 파일 전체 삭제
+void deleteFiles(Integer articleNo) throws Exception;
+```
+```java
+// 첨부 파일 목록
+@Override
+public List<String> getArticleFiles(Integer articleNo) throws Exception {
+    return sqlSession.selectList(NAMESPACE + ".getArticleFiles", articleNo);
+}
+
+// 게시글의 첨부 파일 전체 삭제
+@Override
+public void deleteFiles(Integer articleNo) throws Exception {
+    sqlSession.delete(NAMESPACE + ".deleteFiles", articleNo);
+}
+```
+
+#### # 게시글 첨부파일 SQL Mapper : `articleFileMapper.xml`
+특정 게시글의 첨부파일 목록을 가져오는 SQL과 해당 게시글의 첨부파일들을 삭제처리하는 SQL을 아래와 같이 작성한다.
+```sql
+<select id="getArticleFiles" resultType="string">
+    SELECT file_name
+    FROM tbl_article_file
+    WHERE article_no = #{articleNo}
+    ORDER BY reg_date
+</select>
+
+<delete id="deleteFiles">
+    DELETE FROM tbl_article_file
+    WHERE article_no = #{articleNo}
+</delete>
+```
+
+#### # 게시글 첨부파일 비지니스 계층 : `ArticleFileService` / `ArticleServiceImpl`
+아래와 같이 `ArticleFileService`인터페이스를 생성하고, 첨부파일 목록을 가져오는 추상메서드를 작성해준다. 그리고 `ArticleFileServiceImpl`클래스에 첨부파일 목록 메서드를 구현해준다.
+```java
+public interface ArticleFileService {
+
+    // 첨부파일 목록
+    List<String> getArticleFiles(Integer articleNo) throws Exception;
+
+}
+```
+
+```java
+@Service
+public class ArticleFileServiceImpl implements ArticleFileService {
+
+    private final ArticleFileDAO articleFileDAO;
+
+    @Inject
+    public ArticleFileServiceImpl(ArticleFileDAO articleFileDAO) {
+        this.articleFileDAO = articleFileDAO;
+    }
+
+    // 첨부파일 목록
+    @Override
+    public List<String> getArticleFiles(Integer articleNo) throws Exception {
+        return articleFileDAO.getArticleFiles(articleNo);
+    }
+
+}
+```
+
+#### # 게시글 비지니스 계층 수정 : `ArticleServiceImpl`
+게시글이 삭제 처리되기 전에 해당 게시글의 첨부파일들을 테이블에서 먼저 삭제처리 하도록 아래와 같이 코드를 작성하고, 트랜잭션처리를 위해 `@Transactional`애너테이션을 붙여준다.
+```java
+private final ArticleDAO articleDAO;
+
+private final ArticleFileDAO articleFileDAO;
+
+@Inject
+public ArticleServiceImpl(ArticleDAO articleDAO, ArticleFileDAO articleFileDAO) {
+    this.articleDAO = articleDAO;
+    this.articleFileDAO = articleFileDAO;
+}
+
+// 다른 메서드 생략 ...
+
+// 게시글 삭제 처리
+@Transactional
+@Override
+public void delete(Integer articleNo) throws Exception {
+    articleFileDAO.deleteFiles(articleNo);
+    articleDAO.delete(articleNo);
+}
+```
+
+#### # 게시글 첨부파일 컨트롤러 : `ArticleFileController`
+아래와 같이 컨트롤러에 첨부파일 목록 매핑 메서드를 아래와 같이 작성해준다.
+```java
+// 게시글 첨부 파일 목록
+@RequestMapping(value = "/list/{articleNo}", method = RequestMethod.GET)
+public ResponseEntity<List<String>> getFiles(@PathVariable("articleNo") Integer articleNo) {
+    ResponseEntity<List<String>> entity = null;
+    try {
+        List<String> fileList = articleFileService.getArticleFiles(articleNo);
+        entity = new ResponseEntity<>(fileList, HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    return entity;
+}
+```
+그리고 해당 게시글의 첨부파일 전체를 삭제하는 매핑 메서드를 아래와 같이 작성해준다.
+```java
+// 게시글 파일 전체 삭제
+@RequestMapping(value = "/deleteAll", method = RequestMethod.POST)
+public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] files, HttpServletRequest request) {
+
+    if (files == null || files.length == 0)
+        return new ResponseEntity<>("DELETED", HttpStatus.OK);
+
+    ResponseEntity<String> entity = null;
+
+    try {
+        for (String fileName : files)
+            UploadFileUtils.deleteFile(fileName, request);
+        entity = new ResponseEntity<>("DELETED", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    return entity;
+}
+```
+
+#### # 게시글 목록 페이지 수정 : `read.jsp`
+
+##### 게시글 첨부파일 출력 영역 HTML코드
+게시글의 첨부파일 목록이 출력될 영역을 아래와 같이 추가해준다.
+```xml
+<%--업로드 파일 정보 영역--%>
+<div class="box-footer uploadFiles">
+    <ul class="mailbox-attachments clearfix uploadedFileList"></ul>
+</div>
+<%--업로드 파일 정보 영역--%>
+```
+##### 게시글 첨부파일 Handlebars 파일 템플릿
+게시글 첨부파일을 출력하기 위해 Handlebars 파일 템플릿 코드를 아래와 추가적으로 작성해준다. 기존의 첨부파일 Handlebars와 다른점은 `<li>`태그에 `data-src`속성을 추가하였는데 이 속성을 통해 게시글 삭제할 때 함께 수행할 첨부파일 삭제처리를 위한 정보로 쓰이기 위해서이다.
+```xml
+<script id="fileTemplate" type="text/x-handlebars-template">
+    <li data-src="{{fullName}}">
+        <span class="mailbox-attachment-icon has-img">
+            <img src="{{imgSrc}}" alt="Attachment">
+        </span>
+        <div class="mailbox-attachment-info">
+            <a href="{{originalFileUrl}}" class="mailbox-attachment-name">
+                <i class="fa fa-paperclip"></i> {{originalFileName}}
+            </a>
+        </div>
+    </li>
+</script>
+```
+
+##### 게시글 첨부파일 JS파일 수정 : `article_file_upload.js`
+`article_file_upload.js`파일에 아래와 같이 파일 목록을 가져오는 코드를 작성해준다. 만약 첨부파일이 없을 경우 첨부파일이 없다는 메시지를 출력하게 해주었다.
+```js
+// 파일 목록 : 게시글 조회, 수정페이지
+function getFiles(articleNo) {
+    $.getJSON("/article/file/list/" + articleNo, function (list) {
+        if (list.length === 0) {
+            $(".uploadedFileList").html("<span class='noAttach'>첨부파일이 없습니다.</span>");
+        }
+        $(list).each(function () {
+            printFiles(this);
+        })
+    });
+}
+```
+
+##### 게시글 목록 페이지 JS 영역
+게시글 조회페이지가 로드되면 첨부파일 목록을 출력하기 위해 `getFiles()`메서드를 호출해준다.
+```js
+// 현재 게시글 번호
+var articleNo = "${article.articleNo}";  
+// 첨부파일 목록
+getFiles(articleNo);
+```
+게시글 삭제 버튼 클릭시 서버에 저장된 첨부파일 삭제처리하는 메서드를 아래와 같이 작성해준다. 그리고 기존의 코드에서 추가적으로 변경된 내용은 다음과 같다.
+- 댓글이 달린 게시글은 삭제처리 되지 않도록 조건문을 추가
+- 해당 게시글의 첨부파일들을 삭제처리하기 위해서 배열에 각각의 첨부파일명을 담아 AJAX 삭제 요청
+
+```js
+// 게시글 삭제 클릭 이벤트
+$(".delBtn").on("click", function () {
+
+    // 댓글이 달린 게시글 삭제처리 방지
+    var replyCnt = $(".replyDiv").length;
+    if (replyCnt > 0) {
+        alert("댓글이 달린 게시글은 삭제할수 없습니다.");
+        return;
+    }
+
+    // 첨부파일명들을 배열에 저장
+    var arr = [];
+    $(".uploadedFileList li").each(function () {
+        arr.push($(this).attr("data-src"));
+    });
+
+    // 첨부파일 삭제요청
+    if (arr.length > 0) {
+        $.post("/article/file/deleteAll", {files: arr}, function () {
+
+        });
+    }
+
+    // 삭제처리
+    formObj.attr("action", "/article/paging/search/remove");
+    formObj.submit();
+});
+```
+
+
+#### # 구현확인
+##### 게시글 조회 화면에서 정상적으로 게시글 첨부파일 목록이 나오는 것을 확인
+![file6]()
+
+##### 게시글 처리완료 후에 서버에 저장된 첨부파일 삭제 및 첨부파일 테이블에 파일정보 삭제 확인
+삭제처리 전
+![file7]()
+
+삭제처리 후
+![file8]()
 
 ## 7. 게시글 수정 페이지의 첨부파일 수정 구현
+첨부파일을 정상적으로 수정하기 위해서는 다음과 같은 조건이 필요하다.
 
-#### # 게시글 첨부파일 컨트롤러 작성
+- 첨부파일 삭제버튼을 클릭하면 서버에 저장된 첨부파일이 삭제되고, 테이블의 파일정보도 함께 삭제되야한다.
+- 수정 버튼을 클릭하면 첨부파일의 기존의 파일정보는 테이블에서 삭제되고, 새로 테이블에 입력된다.
+- 첨부파일의 개수가 이전과 다를때는 갱신을 해야한다.
 
-#### # 게시글 수정 페이지 수정
+위의 조건을 고려하여 게시글 수정페이지에서 첨부파일 수정을 구현해보자.
+
+#### # 게시글 첨부파일 영속계층 : `ArticleFileDAO` / `ArticleFileDAOImpl`
+`ArticleFileDAO`인터페이스에 첨부파일 삭제/수정/개수 갱신 추상 메서드를 선언하고, `ArticleFileDAOImpl`클래스에서 구현해준다.
+```java
+// 첨부파일 삭제
+void deleteFile(String fileName) throws Exception;
+
+// 첨부파일 수정
+void replaceFile(String fileName, Integer articleNo) throws Exception;
+
+// 첨부파일 개수 갱신
+void updateFileCnt(Integer articleNo) throws Exception;
+```
+
+```java
+@Override
+public void deleteFile(String fileName) throws Exception {
+    sqlSession.delete(NAMESPACE + ".deleteFile", fileName);
+}
+
+@Override
+public void replaceFile(String fileName, Integer articleNo) throws Exception {
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("fileName", fileName);
+    paramMap.put("articleNo", articleNo);
+    sqlSession.insert(NAMESPACE + ".replaceFile", paramMap);
+}
+
+@Override
+public void updateFileCnt(Integer articleNo) throws Exception {
+    sqlSession.update(NAMESPACE + ".updateFileCnt", articleNo);
+}
+```
+
+#### # 게시글 첨부파일 SQL Mapper : `articleFileMapper.xml`
+```sql
+<delete id="deleteFile">
+    DELETE FROM tbl_article_file
+    WHERE file_name = #{fileName}
+</delete>
+
+<delete id="deleteFiles">
+    DELETE FROM tbl_article_file
+    WHERE article_no = #{articleNo}
+</delete>
+
+<insert id="replaceFile">
+    INSERT INTO tbl_article_file (
+        file_name
+        , article_no
+    ) VALUES (
+        #{fileName}
+        , #{articleNo}
+    )
+</insert>
+
+<update id="updateFileCnt">
+    UPDATE tbl_article
+    SET file_cnt = (
+        SELECT COUNT(article_no)
+        FROM tbl_article_file
+        WHERE article_no = #{articleNo}
+    )
+    WHERE article_no = #{articleNo}
+</update>
+```
+
+#### # 게시글 서비스 계층 수정 : `ArticleServiceImpl`
+첨부파일 기능이 추가되면서 게시글 서비스 계층의 수정처리는 아래와 같이 3가지 과정을 거치게 된다.
+
+1. 게시글 수정처리
+2. 기존의 첨부파일 정보는 전체 삭제처리
+3. 첨부파일 정보를 새로 테이블에 입력 처리
+
+위와 같이 3가지 작업이 순차적으로 동시에 이루어지기 때문에 트랜잭션처리를 위해 `@Transactional`애너테이션을 붙여준다.
+
+```java
+@Transactional
+@Override
+public void update(ArticleVO articleVO) throws Exception {
+    Integer articleNo = articleVO.getArticleNo();
+    String[] files = articleVO.getFiles();
+
+    articleDAO.update(articleVO);
+    articleFileDAO.deleteFiles(articleNo);
+
+    if (files == null)
+        return;
+    for (String fileName : files)
+        articleFileDAO.replaceFile(fileName, articleNo);
+}
+```
+
+#### # 게시글 첨부파일 컨트롤러 : `ArticleFileController`
+게시글 수정화면에서 첨부파일을 삭제할 경우, 게시글 입력페이지의 첨부파일 삭제와 다르게 서버에 저장된 파일뿐만 아니라 테이블의 파일정보도 함께 삭제처리해야하기 때문에 첨부파일 삭제처리 매핑 메서드를 추가적으로 작성해야한다. 특정 게시글의 첨부파일들을 조회할 수 있도록 `@PathVariable`애너테이션을 통해 게시글 번호를 가져오게 된다.
+```java
+// 게시글 첨부파일 삭제 : 게시글 수정
+@RequestMapping(value = "/delete/{articleNo}", method = RequestMethod.POST)
+public ResponseEntity<String> deleteFile(@PathVariable("articleNo") Integer articleNo,
+                                         String fileName,
+                                         HttpServletRequest request) {
+    ResponseEntity<String> entity = null;
+
+    try {
+        UploadFileUtils.deleteFile(fileName, request);
+        articleFileService.deleteFile(fileName, articleNo);
+        entity = new ResponseEntity<>("DELETED", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    return entity;
+}
+```
+
+게시글을 수정처리 시에 서버에 저장된 게시글의 기존 첨부파일들을 삭제처리하기 위한 매핑 메서드를 아래와 같이 작성해준다.
+```java
+// 게시글 첨부파일 전체 삭제
+@RequestMapping(value = "/deleteAll", method = RequestMethod.POST)
+public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] files, HttpServletRequest request) {
+
+    if (files == null || files.length == 0)
+        return new ResponseEntity<>("DELETED", HttpStatus.OK);
+
+    ResponseEntity<String> entity = null;
+
+    try {
+        for (String fileName : files)
+            UploadFileUtils.deleteFile(fileName, request);
+        entity = new ResponseEntity<>("DELETED", HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    return entity;
+}
+```
+
+#### # 게시글 수정 페이지 수정 : `modify.jsp`
+##### 파일 업로드 영역 추가, Handlebars 파일 템플릿 작성
+게시글 작성페이지와 마찬가지로 CSS, HTML코드, Handlebars 파일 템플릿 코드를 `modify.jsp`에 아래와 같이 작성해준다.
+```css
+.fileDrop {
+    width: 100%;
+    height: 200px;
+    border: 2px dotted #0b58a2;
+}
+```
+```html
+<div class="form-group">
+    <div class="fileDrop">
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <p class="text-center"><i class="fa fa-paperclip"></i> 첨부파일을 드래그해주세요.</p>
+    </div>
+</div>
+```
+```xml
+<script id="fileTemplate" type="text/x-handlebars-template">
+    <li>
+        <span class="mailbox-attachment-icon has-img">
+            <img src="{{imgSrc}}" alt="Attachment">
+        </span>
+        <div class="mailbox-attachment-info">
+            <a href="{{originalFileUrl}}" class="mailbox-attachment-name">
+                <i class="fa fa-paperclip"></i> {{originalFileName}}
+            </a>
+            <a href="{{fullName}}" class="btn btn-default btn-xs pull-right delBtn">
+                <i class="fa fa-fw fa-remove"></i>
+            </a>
+        </div>
+    </li>
+</script>
+```
+
+##### 파일 업로드 JS파일 첨부파일 삭제 함수 추가 : `article_file_upload.js`
+위에서 언급했던 것 처럼 게시글 입력페이지의 첨부파일 삭제와 다르게 수정페이지의 첨부파일 삭제는 게시글 번호가 필요하기 때문에 아래와 같이 요청 URL에 `articleNo`를 붙여서 파일 삭제 요청을 처리하도록 하였다.
+
+```java
+// 파일 삭제(입력페이지) : 첨부파일만 삭제처리
+function deleteFileWrtPage(that) {
+    var url = "/article/file/delete";
+    deleteFile(url, that);
+}
+
+// 추가된 함수
+// 파일 삭제(수정페이지) : 서버에 저장된 첨부파일과 DB에 저장된 첨부파일 정보 삭제처리
+function deleteFileModPage(that, articleNo) {
+    var url = "/article/file/delete/" + articleNo;
+    deleteFile(url, that);
+}
+
+// 파일 삭제 AJAX 통신
+function deleteFile(url, that) {
+    $.ajax({
+        url: url,
+        type: "post",
+        data: {fileName: that.attr("href")},
+        dataType: "text",
+        success: function (result) {
+            if (result === "DELETED") {
+                alert("삭제되었습니다.");
+                that.parents("li").remove();
+            }
+        }
+    });
+}
+```
+
+##### 수정페이지의 JS코드
+수정페이지에서의 첨부파일 삭제처리와 수정처리 코드는 아래처럼 수정해준다.
+```js
+// 전역 변수 선언
+var articleNo = "${article.articleNo}"; // 현재 게시글 번호
+
+// 첨부파일 삭제 버튼 클릭 이벤트
+$(document).on("click", ".delBtn", function (event) {
+    event.preventDefault();
+    if (confirm("삭제하시겠습니까? 삭제된 파일은 복구할 수 없습니다.")) {
+        var that = $(this);
+        deleteFileModPage(that, articleNo);
+    }
+});
+
+// 첨부파일 목록 호출
+getFiles(articleNo);
+
+// 수정 처리시 첨부파일 정보도 함께 처리
+$("#modifyForm").submit(function (event) {
+    event.preventDefault();
+    var that = $(this);
+    filesSubmit(that);
+});
+```
+
+#### # 구현 확인
+
+##### 게시글 수정페이지에서 파일 업로드 영역, 파일목록 출력확인
+![file8]()
+
+##### 게시글 수정페이지의 파일 삭제처리 확인
+파일 삭제버튼 클릭, 파일 삭제 확인 메시지 alert창 팝업 확인
+![file9]()
+
+파일 삭제 처리 확인(서버 첨부파일 삭제, 테이블 첨부파일 정보 삭제)
+![file10]()
+
+##### 게시글 수정페이지의 첨부파일 수정처리 확인
+새로운 첨부파일 추가 업로드
+![file11]()
+
+게시글 수정처리완료 후 게시글 조회페이지, 테이블에 수정된 파일정보 입력확인
+![file12]()
