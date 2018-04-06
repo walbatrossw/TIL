@@ -805,10 +805,10 @@ $(document).on("click", ".delBtn", function (event) {
 ```
 #### # 구현 확인
 ##### 게시글 입력페이지의 첨부파일 업로드 영역
-![file]()
+![file](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2013-48-29.png?raw=true)
 
 ##### 게시글 입력페이지의 첨부파일 업로드 처리 및 출력처리 확인
-![file2]()
+![file2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-02-33.png?raw=true)
 - 파일 탐색기에서 첨부파일을 선택해 업로드 영역에 드래그
 - 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장 확인, 이미지 파일인 경우 썸네일이 생성되었는지 확
 - 한글 파일명 정상 출력 확인
@@ -816,19 +816,19 @@ $(document).on("click", ".delBtn", function (event) {
 - 일반 파일인 경우 파일 아이콘 이미지 출력 확인
 
 ##### 게시글 입력페이지의 첨부파일 삭제 처리 확인
-![file3]()
+![file3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-10-48.png?raw=true)
 - 첨부파일 삭제버튼을 클릭하면 파일이 정상적으로 서버에서 삭제되었는지 확인
 - 첨부파일이 삭제처리가 되고 화면에서 해당파일이 사라졌는지 확인
 
 ##### 게시글 입력페이지의 lightbox 라이브러리 적용 확인
-![file4]()
+![file4](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-13-12.png?raw=true)
 - 첨부파일의 이미지인 경우 파일명 클릭시 원본 이미지가 팝업창으로 뜨는지 확인
 
 ##### 게시글 입력페이지에서 일반파일인 경우 파일명 클릭시 다운로드 창 팝업 확인
-![file5]()
+![file5](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-14-35.png?raw=true)
 
 ##### 게시글 입력처리 완료 후에 게시글 목록 페이지 이동, 파일 개수 확인, 테이블에 파일정보가 등록되었는지 확인
-![file6]()
+![file6](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-19-13.png?raw=true)
 
 ## 6. 게시글 조회 페이지의 첨부파일 목록 구현/ 게시글 삭제 처리시 첨부파일삭제 처리 구현
 게시글 조회페이지에서는 첨부파일 기능이 추가됨에 따라 추가적으로 구현해야할 것들은 다음과 같다.
@@ -1067,14 +1067,14 @@ $(".delBtn").on("click", function () {
 
 #### # 구현확인
 ##### 게시글 조회 화면에서 정상적으로 게시글 첨부파일 목록이 나오는 것을 확인
-![file6]()
+![file6](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-23-07.png?raw=true)
 
 ##### 게시글 처리완료 후에 서버에 저장된 첨부파일 삭제 및 첨부파일 테이블에 파일정보 삭제 확인
 삭제처리 전
-![file7]()
+![file7](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-25-16.png?raw=true)
 
 삭제처리 후
-![file8]()
+![file8](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-27-23.png?raw=true)
 
 ## 7. 게시글 수정 페이지의 첨부파일 수정 구현
 첨부파일을 정상적으로 수정하기 위해서는 다음과 같은 조건이 필요하다.
@@ -1326,18 +1326,23 @@ $("#modifyForm").submit(function (event) {
 #### # 구현 확인
 
 ##### 게시글 수정페이지에서 파일 업로드 영역, 파일목록 출력확인
-![file8]()
+![file8](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2015-42-56.png?raw=true)
 
 ##### 게시글 수정페이지의 파일 삭제처리 확인
 파일 삭제버튼 클릭, 파일 삭제 확인 메시지 alert창 팝업 확인
-![file9]()
+![file9](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2015-56-45.png?raw=true)
 
 파일 삭제 처리 확인(서버 첨부파일 삭제, 테이블 첨부파일 정보 삭제)
-![file10]()
+![file10](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2016-00-26.png?raw=true)
 
 ##### 게시글 수정페이지의 첨부파일 수정처리 확인
 새로운 첨부파일 추가 업로드
-![file11]()
+![file11](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2016-05-19.png?raw=true)
 
 게시글 수정처리완료 후 게시글 조회페이지, 테이블에 수정된 파일정보 입력확인
-![file12]()
+![file12](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2016-07-58.png?raw=true)
+
+## 8. 게시글 첨부파일 기능 구현 정리
+
+게시글의 첨부파일 기능을 구현하는데 책의 내용을 그대로 작성하지 않고, 나름 열심히 고민해서 구현했다. 변수명과 메서드명을 보다 이해하기 쉽게 변경하였고, 파일업로드 유틸 클래스의 메서드와 자바스크립트 코드는 최대한 재사용이 가능하게 잘게 쪼개서 작성하였다. 그리고 필요하다고 생각되는 기능이나 로직을 추가도 해보았다. 전에는 무작정 책의 코드를 따라치고, 기능을 구현하는 것에만 집중해서 정작 시간이 지나고 다시 코드를 보면 왜 이렇게 코드를 작성했는지 이해가 안되는 경우가 많았는데 이번에는 일일이 코드를 분석하고, 나에 맞게 변경해보면서 코드의 내용이 머리 속에 남게 되었다. 덕분에 기능을 구현하면서 오류를 찾고, 정리하는데 시간이 오래 걸렸지만 나름 스스로 만족스러웠다.
+하지만 그럼에도 불구하고 여전히 불만족스러운 부분이 존재하는데 그 부분은 입력페이지와 수정페이지에서 파일업로드를 하고, 게시글을 저장하지 않고 다른페이지로 이동하게 되면 업로드한 파일은 여전히 서버에 저장되는 것인데 이 부분을 어떻게 처리할지 고민을 더해봐야겠다.
