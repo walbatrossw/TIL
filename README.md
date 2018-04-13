@@ -1,6 +1,4 @@
-# TIL
-Today I Learned : 개발공부 기록(독서, 강의, 강연)
-
+# TIL(Today I Learned) : 개발공부 기록(독서, 강의, 강연)
 
 ## 1. 컴퓨터 공학 기초(cs-basic)
 
