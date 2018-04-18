@@ -34,7 +34,7 @@
 
 ### 리눅스
 
-- 리눅스 설치(윈도우 듀얼부팅) 및 개발 환경 설정
+- [리눅스 설치(윈도우 듀얼부팅) 및 개발 환경 설정](https://github.com/walbatrossw/TIL/tree/master/01_cs-basic/linux/ubuntu-install-setting)
 - 기본 명령어
 - VIM 사용법
 
@@ -54,7 +54,7 @@
 
 ### Java
 
-- 자바의 정석
+- [자바의 정석](https://github.com/walbatrossw/TIL/tree/master/03_pl/java/stadard-of-java)
   - 상속
   - 오버라이딩
   - 접근제어자
@@ -99,7 +99,8 @@
 
 ### Spring MVC
 
-- 게시판 만들기 예제
+- [게시판 만들기 예제 정리](https://github.com/walbatrossw/TIL/tree/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8)
+  - [소스코드](https://github.com/walbatrossw/spring-mvc-ex)
 
 ### Spring Boot
 
@@ -107,7 +108,7 @@
 
 ### JPA
 
-- 자바 ORM 표준 JPA 프로그래밍 정리
+- [자바 ORM 표준 JPA 프로그래밍 정리](https://github.com/walbatrossw/TIL/tree/master/04_spring-framework_orm/jpa/java-orm-standard-jpa-programming)
 
 ---
 
