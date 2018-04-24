@@ -35,8 +35,22 @@
 ### 리눅스
 
 - [리눅스 설치(윈도우 듀얼부팅) 및 개발 환경 설정](https://github.com/walbatrossw/TIL/tree/master/01_cs-basic/linux/ubuntu-install-setting)
-- 기본 명령어
-- VIM 사용법
+- [기본 명령어](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/02_basic_command.md)
+- [리눅스 우분투 Editor 사용법(gedit, vim)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/03_gedit_vi_tutorial.md)
+- [DVD/USE 마운트](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/04_cd_dvd_usb_mount.md)
+- [사용자와 그룹관리](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/05_user_group.md)
+- [파일과 디렉토리의 소유와 허가권](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/06_file_ownership_permission.md)
+- [프로그램 설치](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/07_dpkg_apt-get.md)
+- [파일의 압축과 묶기](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/08_file_compression_cron_at.md)
+- [네트워크](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/09_network.md)
+- [파이프, 필터, 리디렉션](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/10.pipe_filter_redirection_rescue.md)
+- [GRUB 부트로더](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/11_GRUB_Boot_Loader_Kernel_compile.md)
+- [SATA 장치와 SCSI장치의 구성](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/13_SATA_SCSI_HDD_ADD.md)
+- [RAID](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/14_RAID.md)
+- [RAID6, RAID1+0](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/15_RAID6_0%2B1.md)
+- [LVM(Logical Volume Manage)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/16_LVM.md)
+- [RAID에 우분투 설치하기](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/17_RAID_Ubuntu_Setup.md)
+- [사용자별 공간 할당 - 쿼터(Quota)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/18_Quota.md)
 
 
 ---
@@ -54,23 +68,39 @@
 
 ### Java
 
-- [자바의 정석](https://github.com/walbatrossw/TIL/tree/master/03_pl/java/stadard-of-java)
-  - 상속
-  - 오버라이딩
-  - 접근제어자
-  - 다형성
-  - 추상클래스
-  - 인터페이스
-  - 내부클래스
-  - 예외
-  - 컬렉션
-  - 제네릭
-  - Enums
+- [자바의 정석 요약 정리](https://github.com/walbatrossw/TIL/tree/master/03_pl/java/stadard-of-java)
+  - [생성자](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/06_oop1/5_constructor.md)
+  - [초기화](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/06_oop1/6_variable_initialize.md)
+  - [오버로딩](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/06_oop1/4_overloading.md)
+  - [오버라이딩](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/2_overriding.md)
+  - [상속](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/1_inheritance.md)
+  - [접근제어자](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/4_modifier.md)
+  - [다형성](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/5_polymorphism.md)
+  - [추상클래스](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/6_abstract_class.md)
+  - [인터페이스](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/7_interface.md)
+  - [내부클래스](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/07_oop2/8_inner_class.md)
+  - [예외](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/08_exception/1_exception.md)
+  - [컬렉션 프레임워크](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/1_collection_framework.md)
+    - [ArrayList](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/2_array_list.md)
+    - [LinkedList](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/3_linked_list.md)
+    - [Stack, Queue](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/4_stack_queue.md)
+    - [Iterator, ListIterator, Enumeration](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/5_iterator_listiterator_enumeration.md)
+    - [Arrays](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/6_arrays.md)
+    - [Comparator Comparable](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/7_comparator_comparable.md)
+    - [HashSet](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/8_hashset.md)
+    - [TreeSet](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/9_treeset.md)
+    - [HashMap, HashTable](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/10_hashmap_hashtable.md)
+    - [TreeMap](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/11_treemap.md)
+    - [Properties](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/12_properties.md)
+    - [Collections](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/13_collections.md)
+    - [요약](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/14_collection_summury.md)
+  - [제네릭](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/12_generics_eums_annotion/1_generics.md)
+  - [Enums](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/12_generics_eums_annotion/2_enums.md)
   - 쓰레드
-  - Lambda
+  - [Lambda](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/14_lambda_stream/1_lambda1.md)
   - 스트림
 
-- 이펙티브 자바
+- 이펙티브 자바 요약 정리
   - 객체의 생성과 삭제
   - 모든 객체의 공통 메서드
   - 클래스와 인터페이스
