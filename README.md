@@ -2,7 +2,7 @@
 
 ## 1. 컴퓨터 공학 기초(cs-basic)
 
-### 자료구조
+### [자료구조](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/00_basic.md)
 
 - 순차 자료 구조
 - 연결 자료 구조
