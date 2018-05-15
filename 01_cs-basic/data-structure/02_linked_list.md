@@ -4,7 +4,7 @@
 
 #### # 연결리스트의 구성
 
-![](http://cfile22.uf.tistory.com/image/9978E4355AFA8BE20CAE73)
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/LinkedList.png?raw=true)
 
 연결리스트는 노드들과 참조값들로 구성되는데 참조 값은 한 노드에서 다른 노드를 가리키는 포인터 역할을 한다. 그리고 마지막 참조값은 `null`을 가리키게 된다.
 
@@ -37,7 +37,7 @@ class Node<T> {
 ## 2. 연결리스트의 삽입, 삭제 작업
 
 #### # 삽입 : 맨 앞에
-![](http://cfile24.uf.tistory.com/image/99B284375AFA9CC71C5789)
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/LinkedList_insert_front.gif?raw=true)
 ```java
 linkedList.insertAtStart(10); // 10 첫노드에 삽입
 linkedList.insertAtStart(4);  // 4 첫노드에 삽입
@@ -46,21 +46,21 @@ linkedList.insertAtStart(-5); // -5 첫노드에 삽입
 연결리스트에 새로운 노드를 맨 앞에 삽입하는 것은 매우 간단하다. 첫번째 노드의 참조값을 수정해주기만 하면된다.
 
 #### # 삽입 : 맨 뒤에
-![](http://cfile23.uf.tistory.com/image/99C07C4D5AFA9D9331F805)
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/LinkedList_insert_last.gif?raw=true)
 ```java
-linkedList.insertAtStart(25); // 25 마지막 노드에 삽입
+linkedList.insertAtEnd(25); // 25 마지막 노드에 삽입
 ```
 연결리스트에 새로운 노드를 맨 마지막에 삽입하는 것은 비교적 간단하지는 않다. 연결리스트의 첫번째 노드부터 마지막 노드(참조값이 `null`인 노드)까지 탐색을 한 뒤 새로운 노드를 마지막 노드에 참조값으로 변경하고, 새로운 노드의 참조값을 `null`을 가리키게 하면된다.
 
 #### # 삭제 : 맨 앞의 노드
-![](http://cfile3.uf.tistory.com/image/9920FB435AFAA3481947BA)
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/LinkedList_remove_first.gif?raw=true)
 ```java
 linkedList.removeStart()
 ```
 리스트의 첫 노드는 매우 빠르게 제거할 수 있다. 노드를 탐색할 필요가 없으므로 참조값만 변경하면 된다.
 
 #### # 삭제 : 특정 데이터를 가진 노드
-![](http://cfile10.uf.tistory.com/image/9923044A5AFAA69730C130)
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/LinkedList_remove.gif?raw=true)
 ```java
 linkedList.remove(10)
 ```
@@ -69,11 +69,11 @@ linkedList.remove(10)
 
 
 ## 3. 단순 연결리스트의 문제점
-![](http://cfile8.uf.tistory.com/image/99F2863A5AFAA94A220F62)
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/LinkedList_problem.png?raw=true)
 위의 그림에서 보면 4에서 25까지 탐색을 수행할 수 있지만 역으로 25에서 4로 탐색을 수행할 수 없다. 그 이유는 참조 값의 반대방향이기 때문이다.
 
-![](http://cfile23.uf.tistory.com/image/998A5E385AFAAA3611C8A6)
-이중 연결리스트 구현을 통해 역방향으로도 탐색이 가능하게 할 수 있다. 이중 연결리스트는 노드에 두개의 참조값을 가지는데 하나는 다음노드, 또다른 하나는 이전 노드를 가진다. 하지만 이중 연결리스트는 참조값이 2개이기 때문에 단순 연결리스트에 비해 메모리의 공간을 더 많이 차지하게 된다.
+![](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/linked_list/DoublyLinkedList_problem.png?raw=true)
+이중 연결리스트 구현을 통해 역방향으로도 탐색이 가능하게 할 수 있다. 이중 연결리스트는 노드에 두개의 참조값을 가지는데 하나는 다음노드, 또다른 하나는 이전 노드를 가진다. 하지만 이중 연결리스트는 참조값이 2개이기 때문에 단순 연결리스트에 비해 메모리의 공간을 더 많이 차지하게 되는 단점이 존재한다.
 
 ## 4. 연결리스트와 배열 차이비교
 
