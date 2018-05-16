@@ -2,22 +2,28 @@
 
 ## 1. 컴퓨터 공학 기초(cs-basic)
 
-### [자료구조](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/00_basic.md)
+### 자료구조, 알고리즘
 
-- 순차 자료 구조
-- 연결 자료 구조
-- 스택
-- 큐
-- 트리
-- 그래프
-- 정렬
-- 검색
+- 배열(Arrays)
+- [연결리스트(Linked List)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/02_linked_list.md)
+- 스택(Stack)
+- 큐(Queue)
+- 트리(Tree)
+  - Binary Search Trees
+  - Balanced Trees : AVL Trees
+  - Balanced Trees : Red-Black Trees
+  - Splay Trees
+  - B-Tree
 
-### 알고리즘
-
-- 기본 알고리즘
-
-- 알고리즘 문제 풀이
+- 힙(Heaps)
+- 해쉬테이블(HashTables)
+- 최저사용빈도(LRU)
+- 트라이(Tries)
+- Ternary Tree
+- Substring Search
+- String
+- Sorting
+- Data Comprssion
 
 ### 데이터베이스
 
