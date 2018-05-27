@@ -118,6 +118,20 @@
   - 병행성
   - 직렬화
 
+- 자바 디자인 패턴
+  - Strategy Pattern
+  - Singleton Pattern
+  - State Pattern
+  - Command Pattern
+  - Observer Pattern
+  - Decorator Pattern
+  - Template Method Pattern
+  - Factory Method Pattern
+  - Abstract Factory Pattern
+  - Composite Pattern
+
+- 도메인 주도 설계
+
 ### Javascript
 
 - Javascript 정리
