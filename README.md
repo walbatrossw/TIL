@@ -132,7 +132,7 @@
   - 행위 패턴
     - Observer Pattern
     - State Pattern
-    - Strategy Pattern
+    - [Strategy Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch05-strategy-pattern/ch05-strategy-pattern.md)
     - Command Pattern
     - Template Method Pattern
 
