@@ -118,17 +118,23 @@
   - 병행성
   - 직렬화
 
-- 자바 디자인 패턴
-  - Strategy Pattern
-  - Singleton Pattern
-  - State Pattern
-  - Command Pattern
-  - Observer Pattern
-  - Decorator Pattern
-  - Template Method Pattern
-  - Factory Method Pattern
-  - Abstract Factory Pattern
-  - Composite Pattern
+- [자바 디자인 패턴](https://github.com/walbatrossw/java-design-patterns)
+
+  - 생성 패턴
+    - Factory Method Pattern
+    - Abstract Factory Pattern
+    - Singleton Pattern
+
+  - 구조 패턴
+    - Composite Pattern
+    - Decorator Pattern
+
+  - 행위 패턴
+    - Observer Pattern
+    - State Pattern
+    - Strategy Pattern
+    - Command Pattern
+    - Template Method Pattern
 
 - 도메인 주도 설계
 
