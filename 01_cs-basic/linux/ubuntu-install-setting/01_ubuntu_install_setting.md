@@ -1,4 +1,4 @@
-# 우분투 설치 및 설정
+# Ubuntu 18.04 설치 및 설정
 
 ## 1. 설치 준비
 
@@ -23,76 +23,66 @@
 
 ## 3. 설치 완료 후 우분투 설정 및 개발 환경 세팅
 
+#### # 업데이트 확인
+
 #### # 터미널 설정하기
 - 터미널 크기 조정
 - 색 : 투명도 조정
 - 스크롤 막대 표시 제거
-
-#### # Unity Tweak 설치 및 설정
-##### 설치
-```bash
-$ sudo apt-get install unity-tweak-tool
-```
-
-##### 설정
-- search 옵션 설정 해제
-- panel 옵션 설정 : 날짜 시간, 사용자 이름
-
-##### 테마, 아이콘 추가 설치
-```bash
-$ sudo add-apt-repository ppa:numix/ppa
-$ sudo apt-get update
-$ sudo apt-get install numix-*
-```
-
-```bash
-$ sudo add-apt-repository ppa:moka/daily
-$ sudo apt-get update
-$ sudo apt-get install moka-icon-theme
-```
-#### # Plank 설치 및 설정
-```
-$ sudo add-apt-repository ppa:ritcotz/docky
-$ sudo apt-get update
-$ sudo apt-get install plank
-$ sudo plank --preference
-```
-- Plank 설치 설정
-```
-$ sudo apt-get install gnome-tweak-tool
-```
-- 시작프로그램에 plank 등록하기 위해 gnome-tweak-tool 설치
-- 시작프로그램에 등록
-
-#### # 우분투 소프트웨어를 통해 유틸리티 및 개발도구 설치
-- 클래식메뉴 인디케이터 설치 : 설치프로그램 메뉴
-- Bluefish 설치 : 텍스트 에디터
-- GIMP 설치 : 이미지 편집기
-- Pinta 설치 : 윈도우 그림판과 유사한 기능
-- FileZilla 설치
-- Putty 설치
-- IntelliJ 설치
-
-#### # IntelliJ 설정
-- ignore 플러그인 설치
-- lombok 플러그인 설치
-- material theme ui 플러그인 설치
 
 #### # GDebi 설치 : deb설치 파일 인스톨을 위해
 ```bash
 $ sudo apt-get install gdebi
 ```
 
-#### # Chrome, Atom, GitKraken 설치
-- Chrome(브라우저) : https://www.google.co.kr/chrome/index.html
-- Atom(에디터) : https://atom.io/
-- GitKraken(Git GUI) : https://www.gitkraken.com/
+#### # Chrome 설치
+https://www.google.co.kr/chrome/index.html
+
+#### # Gnome Tweak Tool, Gnome Extensions 설치 : 테마 및 유틸 설치를 위해
+
+- Unity Tweak은 18.04부터 없어짐
+
+```
+$ sudo apt-get install gnome-tweak-tool
+```
+
+```
+$ sudo apt install chrome-gnome-shell
+```
+
+- Extensions(https://extensions.gnome.org/) 설치
+  - Arc Menu : 윈도우 버튼같은 역할
+  - Coverflow Alt-tab : Alt-tab 3D 화면전환
+  - Dash to Dock : Dock 설정
+  - OpenWeather : 날씨
+  - User Themes : 우분투 테마
+
+#### # 한글 입력기 uim 설치
+
+http://progtrend.blogspot.com/2018/06/ubuntu-1804-uim.html
+
+- 키보드 한글 키 설정 방법 : 설정 > 기능개선 > 키보드와 마우스 > 추가 배치 옵션 이동하여 수정
+
+#### # 우분투 테마 및 아이콘 설치
+
+https://www.omgubuntu.co.uk/2017/11/best-gtk-themes-for-ubuntu
+
+#### # 우분투 소프트웨어를 통해 유틸리티 및 개발도구 설치
+- VLC : 동영상 플레이어
+- GIMP : 이미지 편집기
+- Pinta : 윈도우 그림판과 유사한 기능
+- FileZilla
+- Putty
+- IntelliJ : IDE
+- Atom : Script Editor
+- GitKraken : Git Gui
 
 #### # Tomcat 설치
 Tomcat을 다운받아 workspace에 버전별로 세팅
 http://tomcat.apache.org/
 
 #### # Java 설치 및 환경변수 설정
+
 ##### Java 설치
 ```bash
 $ sudo apt-add-repository ppa:webupd8team/java
@@ -124,10 +114,20 @@ $ sudo apt-get install mysql-server-5.7
 $ sudo apt-get install mysql-workbench
 ```
 
+##### Root 비밀번호 설정
+```bash
+$ sudo mysql
+```
+```
+> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_new_password';
+```
+[출처 : stackoverflow](https://stackoverflow.com/questions/25777943/failed-to-connect-to-mysql-at-127-0-0-13306-with-user-root-access-denied-for-us)
+
 ##### 한글 인코딩 설정
 ```bash
 $ sudo gedit /etc/mysql/my.cnf
 ```
+
 ```
 [client]
 default-character-set = utf8
@@ -151,8 +151,9 @@ $ sudo service mysql restart
 
 
 #### # 개발용 폰트 설치
-- Menlo, Monaco : https://github.com/ueaner/fonts
-- Hack : https://fonts2u.com/hack-bold.font
+- D2 : https://github.com/naver/d2codingfont
+- Nanum Gothic Coding : https://github.com/naver/nanumfont/blob/master/README.md
+- Hack : https://sourcefoundry.org/hack/
 
 
 ## 참조 블로그
