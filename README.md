@@ -197,6 +197,6 @@
 
 ## 8. 개발툴 정리
 
-- IntelliJ
+- [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/08_tools/intellij.md)
 
-- Atom
+- [Atom](https://github.com/walbatrossw/TIL/blob/master/08_tools/atom.md)

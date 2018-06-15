@@ -81,6 +81,11 @@ https://www.omgubuntu.co.uk/2017/11/best-gtk-themes-for-ubuntu
 Tomcat을 다운받아 workspace에 버전별로 세팅
 http://tomcat.apache.org/
 
+#### # Git 설치
+```
+$ sudo apt-get install git
+```
+
 #### # Java 설치 및 환경변수 설정
 
 ##### Java 설치
