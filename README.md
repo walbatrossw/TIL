@@ -119,7 +119,9 @@
   - 직렬화
 
 - [자바 디자인 패턴](https://github.com/walbatrossw/java-design-patterns)
-
+  - [객체지향 모델링](https://github.com/walbatrossw/java-design-patterns/blob/master/ch01-oop-modeling/ch01-oop-modeling.md)
+  - [객체지향 원리](https://github.com/walbatrossw/java-design-patterns/blob/master/ch02-oop-principles/ch02-oop-principles.md)
+  - [SOLID](https://github.com/walbatrossw/java-design-patterns/blob/master/ch03-solid/ch03-solid.md)
   - 생성 패턴
     - Factory Method Pattern
     - Abstract Factory Pattern
