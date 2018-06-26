@@ -125,7 +125,7 @@
   - 생성 패턴
     - Factory Method Pattern
     - Abstract Factory Pattern
-    - Singleton Pattern
+    - [Singleton Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch06-singleton-patterns/ch06-singleton-patterns.md)
 
   - 구조 패턴
     - Composite Pattern
@@ -133,7 +133,7 @@
 
   - 행위 패턴
     - Observer Pattern
-    - State Pattern
+    - [State Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch07-state-patterns/ch07-state-patterns.md)
     - [Strategy Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch05-strategy-pattern/ch05-strategy-pattern.md)
     - Command Pattern
     - Template Method Pattern
