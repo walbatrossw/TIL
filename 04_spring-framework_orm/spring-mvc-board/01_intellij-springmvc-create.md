@@ -349,7 +349,7 @@ pom.xml
 
 #### # `home.jsp`
 
-  ```xml
+  ```html
   <%@ page contentType="text/html;charset=UTF-8" language="java" %>
   <html>
   <head>
@@ -368,7 +368,8 @@ pom.xml
 #### 7. 서버 구동후 확인
 
 위와 같이 모든설정을 마무리하고 톰캣서버를 구동하면 브라우저에 화면에 아래와 같이 hello world가 출력되면 성공적으로 프로젝트가 생성된 것이다.
-![서버 구동 확인](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180222_230648.png?raw=true)
+
+![서버 구동 확인](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/01_intellij-springmvc-create/server-running-check.png?raw=true)
 
 ### # 참고 출처
 * http://javaengine.tistory.com/313
