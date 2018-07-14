@@ -1,58 +1,60 @@
-# IntelliJ에서 Spring MVC 프로젝트 만들기
+# IntelliJ에서 Spring MVC Project 생성하기
 
-IntelliJ에서는 STS(Spring Tool Suite)처럼 Spring MVC Project를 생성하는 방법이
-따로 존재하는 것 같지 않다. 구글링을 통해 참고한 내용들을 바탕으로 직접 IntelliJ에서
-Spring Mvc Project를 생성하는 과정을 정리해보았다. STS에서 처럼 기본적인 Spring MVC
-Project를 생성하고, 웹페이지에 hello world를 출력하기까지는 아래와 같이 크게 5가지의
-단계를 거친다.
+IntelliJ에서는 STS(Spring Tool Suite)처럼 Spring MVC Project를 생성하는 방법이 따로
+존재하는 것 같지 않다. 구글링을 통해 참고한 내용들을 바탕으로 직접 IntelliJ에서 Spring Mvc
+Project를 생성하는 과정을 정리해보았다. STS에서 처럼 기본적인 Spring MVC Project를 생성하고,
+웹페이지에 hello world를 출력하기까지는 아래와 같이 크게 5가지의 단계를 거친다.
 
-1. Maven module을 생성한다.
+1. IntelliJ에서 Maven module을 생성한다.
 2. Maven module에 Spring Framework 중에서 Spring MVC를 추가한다.
 3. 스프링 관련 설정, 디렉토리 생성 및 설정을 한다.
 4. Tomcat 서버 설정을 한다.
-5. 베이/테스트 package와 views 디렉토리를 생성한다.
+5. 베이스/테스트 package와 views 디렉토리를 생성한다.
 
-위와 같은 과정을 거치고 나면 아래와 같은 구조가 된다. 이제 마지막으로 `HomeController`,
-`home.jsp`를 작성하고 나서 tomcat server를 구동하게 되면 root 웹페이지에서 "hello world"
-라는 문구를 출력하게 된다.
+이렇게 설정을 하고나면 아래와 같은 구조가 된다. 이제 마지막으로 `HomeController`, `home.jsp`를
+작성하고 나서 tomcat server를 구동하게 되면 루트 웹페이지에서 hello world라는 문구를 출력하게 된다.
 
 ```
 src
  ├── main
- │      ├── java : java code
- │      ├── resources : mapper, log 관련 설정 xml (log4j.xml)
- │      └── webapp : web 디렉토리
- │              ├── resources : js, css 등의 정적 자원들
- │              └── WEB-INF : web information 디렉토리
- │                     ├── spring-config : spring관련 설정 xml (dispatcher-servlet.xml, applicationContext.xml)
- │                     └── views : jsp
- ├── test : test 관련 디렉토리
- │      ├── java : java test code
- │      └── resources : test 관련 resources
+ │    ├── java : java code
+ │    ├── resourecs : mapper, log 관련 설정 xml (log4j.xml)
+ │    └── webapp : web 디렉토리
+ │           ├── resources : js, css 등의 정적 자원들
+ │           └── WEB-INF : web information 디렉토리
+ │                 ├── spring-config : spring관련 설정 xml (dispatcher-servlet.xml, applicationContext.xml)
+ │                 └── views : jsp
+ └── test : test 관련 디렉토리
+      ├── java : java test code
+      └── resources : test 관련 resources
 pom.xml
 ```
 
-`STS`에서 간단하고 편하게 프로젝트를 생성하고 쓰면되지 않을까? 라는 생각이 들 수 있다.
-하지만 나의 경우 여러가지 편의기능을 제공하는 `IntelliJ`에 익숙해져 있기 때문이기도 하고,
-세세한 설정을 직접 해보면서 공부를 해봐야겠는 생각에 이렇게 번거로운 작업을 하게 되었다.
+
+STS에서 간단하고 편하게 프로젝트를 생성하고 쓰면되지 않을까? 라는 생각이 들 수 있다. 하지만
+나의 경우 여러가지 편의기능을 제공하는 IntelliJ에 익숙해져 있기 때문이기도 하고, 세세한
+설정을 직접 해보면서 공부를 해봐야겠는 생각에 이렇게 번거로운 작업을 하게 되었다.
 
 그렇다면 이제 각각의 단계를 좀더 자세하게 정리해보자.
 
 ## 1. Maven module 생성하기
 1. `File` > `New` > `Module` > `create from archetype` : `maven-archetype-webapp` 선택한다.
-2. 모듈의 `groupId`, `artifact`를 작성한다.
-3. module이 생성되고 나면 maven빌드가 진행되고 최종적으로 콘솔창에 `maven BUILD SUCCESS`라는 메시지가 뜨면 성공적으로 생성된 것이다.
+2. module의 `groupId`, `artifact`를 작성한다.
+3. module이 생성되고 나면 maven빌드가 진행되고, 최종적으로 콘솔창에 `maven BUILD SUCCESS`라는 메시지가 뜨면 성공적으로 생성된 것이다.
 
 ## 2. Spring MVC 추가
 1. 생성된 module 우클릭 후 `add framework support...` 선택한다.
 2. `spring mvc` 선택한다. 이때 기존의 라이브러리를 사용하는 것보다는 다운로드를 선택해서 진행하는 것이 좋다. 그렇지 않으면 `dispatcher-servlet.xml`, `applicationContext.xml`이 추가되지 않아 직접 생성하고 작성해줘야되서 번거롭다.
 3. `dispatcher-servlet.xml`, `applicationContext.xml`을 `WEB-INF`디렉토리 하위에 `spring-config`디렉토리를 생성하여 이동시켜준다.
 
+
 ## 3. Spring 관련 설정 수정 및 추가, 디렉토리 생성 및 Role 설정
 
-#### # `pom.xml` : 프로젝트의 정보 및 dependency를 기술
+### 3.1 `pom.xml`
+가장 먼저 설정해야하는 것은 `pom.xml`파일로 maven 
 
-**properties** : java, spring, aspectj, slf4j 버전을 명시해준다.
+
+java, spring, aspectj, slf4j 버전을 `<properties>` 태그 안에 작성해준다.
 ```xml
 <properties>
     <java-version>1.8</java-version>
@@ -62,7 +64,7 @@ pom.xml
 </properties>
 ```
 
-**dependencies** : maven 라이브러리 추가를 추가해준다.
+필요한 maven 라이브러리들을 `<dependencies>` 태그 안에 아래와 같이 추가해준다.
 ```xml
 <dependencies>
     <!--Spring-->
@@ -170,7 +172,7 @@ pom.xml
 </dependencies>
 ```
 
-**plugins** : `<bulid></bulid>`태그 안에 플러그인을 추가한다.
+`<bulid>` 태그 안에 플러그인을 아래와 같이 추가한다.
 ```xml
 <plugins>
     <plugin>
@@ -196,7 +198,7 @@ pom.xml
 </plugins>
 ```
 
-#### # `web.xml` : 스프링과 관련된 설정`xml`파일의 경로 설정, dispatcher url 패턴 설정
+### 3.2 `web.xml`에 스프링과 관련된 설정 `xml` 파일의 경로를 설정, dispatcher url 패턴 설정
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE web-app PUBLIC
@@ -317,7 +319,7 @@ pom.xml
 - `src/test/resourecs` : `test resources Root`
 
 ## 4. Tomcat Server 설정
-1. `Run` > `edit configurations` > `tomcat server` > `local` 선택
+1. `Run`>`edit configurations`>`tomcat server`>`local` 선택
 2. `Name` : 사용자가 정의한 tomcat server 이름을 지정해준다.
 3. `Server`탭에서 설정해야 할 것
     * `configure...` : tomcat 디렉토리 설정
@@ -330,7 +332,6 @@ pom.xml
 2. `webapp/resources` : 정적자원(js, css, 이미지파일 등)이 위치할 디렉토리 생성한다.
 
 ## 6. `HomeController`, `home.jsp` 작성
-
 #### # `HomeController`
   ```java
   @Controller
@@ -348,8 +349,7 @@ pom.xml
   ```
 
 #### # `home.jsp`
-
-  ```html
+  ```xml
   <%@ page contentType="text/html;charset=UTF-8" language="java" %>
   <html>
   <head>
@@ -365,11 +365,10 @@ pom.xml
   </html>
   ```
 
-## 7. 서버 구동후 확인
+#### 7. 서버 구동후 확인
 
 위와 같이 모든설정을 마무리하고 톰캣서버를 구동하면 브라우저에 화면에 아래와 같이 hello world가 출력되면 성공적으로 프로젝트가 생성된 것이다.
-
-![서버 구동 확인](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/01_intellij-springmvc-create/server-running-check.png?raw=true)
+![helloworld](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180222_230648.png?raw=true)
 
 ### # 참고 출처
 * http://javaengine.tistory.com/313
