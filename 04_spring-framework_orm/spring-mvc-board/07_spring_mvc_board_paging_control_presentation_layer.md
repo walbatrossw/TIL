@@ -257,7 +257,9 @@ public String listPaging(Model model, Criteria criteria) throws Exception {
 - 아직 영속계층에서 전체 게시글의 갯수를 구하는 로직을 구현하지 않았기 때문에 `setTotalCount()`의 매개변수는 1000을 임의로 넣어주었다.
 
 #### # `list_paging.jsp`
+
 `/WEB-INF/views/article/`디렉토리에 `list_paging.jsp`파일을 생성하고, `list.jsp`의 내용을 전체 복사한 뒤 붙여 넣는다. 그리고 `<div class="box-body"></div>`태그 바로 밑에 추가적으로 아래의 코드를 작성해준다.
+
 ```html
 <div class="box-footer">
     <div class="text-center">
@@ -277,6 +279,7 @@ public String listPaging(Model model, Criteria criteria) throws Exception {
     </div>
 </div>
 ```
+
 위의 코드에서 살펴볼 점을 정리한 내용은 아래와 같다.
 - `JSTL`의 `<c:if>` 조건문을 통해 이전 링크와 다음 링크의 활성/비활성 처리를 하였다.
 - `<c:forEach>` 반복문을 통해 `pageMaker`클래스에서 계산된 페이지 번호를 출력해준다.
