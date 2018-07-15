@@ -476,7 +476,8 @@ main
 ```
 
 #### # 완성된 기본 프로젝트 형태
-![end](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180224_210006.png?raw=true)
+
+![setting_complete](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/02_spring_mvc_board_setting/setting_complete.png?raw=true)
 
 ## 6. 마무리
 
