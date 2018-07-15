@@ -270,6 +270,7 @@ WEB-INF/views/article : 게시글관련 JSP디렉토리
 
 ![menu](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/09_spring_mvc_board_project_structure_modification/menu.png?raw=true)
 
+
 ```html
 <ul class="sidebar-menu" data-widget="tree">
     <li class="header">메뉴</li>
