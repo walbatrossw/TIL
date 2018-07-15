@@ -32,9 +32,9 @@ public class VoidController {
 ```
 `/doA`, `/doB`요청시 브라우저와 콘솔화면 화면
 
-![doA](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_controller_test_without_was/doA.png?raw=true)
+![doA](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_controller_test_without_was/doA.png?raw=true)
 
-![doB](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_controller_test_without_was/doB.png?raw=true)
+![doB](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_controller_test_without_was/doB.png?raw=true)
 
 ## 2. `String`리턴 타입인 경우
 `StringController`을 아래와 같이 작성해준다.
@@ -67,7 +67,7 @@ public class StringController {
 ```
 `/doC` 요청시 브라우저와 콘솔화면 확인
 
-![doC](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_controller_test_without_was/doC.png?raw=true)
+![doC](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_controller_test_without_was/doC.png?raw=true)
 
 ## 3. 만들어진 결과 데이터를 view에 전달할 경우
 `DomainController`을 아래와 같이 작성해준다.
@@ -135,7 +135,7 @@ public class ProductVO {
 ```
 `/doD` 요청시 브라우저와 콘솔화면 확인
 
-![doD](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_controller_test_without_was/doD.png?raw=true)
+![doD](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_controller_test_without_was/doD.png?raw=true)
 
 ## 4. `redirect`를 해야할 경우
 `RedirectController`을 아래와 같이 작성해준다.
@@ -165,7 +165,7 @@ public class RedirectController {
 ```
 `/doE` 요청시 브라우저와 콘솔화면 확인
 
-![doE](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_controller_test_without_was/doE.png?raw=true)
+![doE](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_controller_test_without_was/doE.png?raw=true)
 
 ## 5. `JSON`데이터를 생성하는 경우
 `JsonController`을 아래와 같이 작성해준다.
@@ -187,7 +187,7 @@ public class JasonController {
 
 `/doJson` 요청시 브라우저와 콘솔화면 확인
 
-![doJson](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_controller_test_without_was/doJson.png?raw=true)
+![doJson](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_controller_test_without_was/doJson.png?raw=true)
 
 ## 6. WAS없이 Controller 테스트
 
