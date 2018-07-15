@@ -197,7 +197,7 @@ public String remove(@RequestParam("articleNo") int articleNo,
 
 #### # `JSP`파일 생성, `include`경로 변경
 `WEB-INF/views/article`디렉토리에 등록(`write.jsp`), 조회(`read.jsp`), 수정(`modify.jsp`), 목록(`list.jsp`) `jsp`파일을 생성해준다. 그리고 `home.jsp`의 전체 코드를 복사해 붙여넣고, 각각의 `JSP`파일의 `include`의 모든 경로를 아래와 같이 수정해준다.
-```xml
+```html
 <%@ include file="../include/head.jsp"%>
 <%@ include file="../include/main_header.jsp"%>
 <%@ include file="../include/left_column.jsp"%>
@@ -209,7 +209,7 @@ public String remove(@RequestParam("articleNo") int articleNo,
 각각의 페이지의 내용은 `<section class="content container-fluid">`태그 안에 작성하면 된다.
 
 #### # 게시글 등록 페이지 : `write.jsp`
-```xml
+```html
 <div class="col-lg-12">
     <form role="form" id="writeForm" method="post" action="${path}/article/write">
         <div class="box box-primary">
@@ -244,7 +244,7 @@ public String remove(@RequestParam("articleNo") int articleNo,
 ```
 
 #### # 게시글 목록 페이지 : `list.jsp`
-```xml
+```html
 <div class="col-lg-12">
     <div class="box box-primary">
         <div class="box-header with-border">
@@ -294,7 +294,7 @@ if (result == "regSuccess") {
 }
 ```
 #### # 게시글 조회 페이지 : `read.jsp`
-```xml
+```html
 <div class="col-lg-12">
     <div class="box box-primary">
         <div class="box-header with-border">
@@ -351,7 +351,7 @@ $(document).ready(function () {
 ```
 
 #### # 게시글 수정 페이지 : `modify.jsp`
-```xml
+```html
 <div class="col-lg-12">
     <form role="form" id="writeForm" method="post" action="${path}/article/modify">
         <div class="box box-primary">
@@ -409,30 +409,44 @@ $(document).ready(function () {
 
 ## 5. 기본적인 CRUD 구현 모습 확인
 #### # 메인페이지
-![main](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-20-02.png?raw=true)
+![main](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/main.png?raw=true)
+
 #### # 게시글 등록처리
+
 게시글 등록 페이지
-![write](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-21-10.png?raw=true)
+![write](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/write.png?raw=true)
+
 게시글 등록처리 성공알림
-![regSuccess](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-21-30.png?raw=true)
+![regSuccess](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/regSuccess.png?raw=true)
+
 #### # 게시글 목록
+
 게시글 목록 페이지
-![list](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-21-56.png?raw=true)
+![list](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/list.png?raw=true)
+
 #### # 게시글 조회
+
 게시글 조회 페이지
-![read](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-22-19.png?raw=true)
+![read](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/read.png?raw=true)
+
 #### # 게시글 수정
+
 게시글 수정 페이지
-![modify](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-23-58.png?raw=true)
+![modify](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/modify.png?raw=true)
+
 게시글 수정처리 성공알림
-![modSuccess](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-24-14.png?raw=true)
+![modSuccess](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/modSuccess.png?raw=true)
+
 게시글 수정 처리 완료후
-![after_mod](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-24-40.png?raw=true)
+![after_mod](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/after_mod.png?raw=true)
+
 #### # 게시글 삭제처리
+
 게시글 삭제처리 성공알림
-![delSuccess](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-25-12.png?raw=true)
+![delSuccess](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/delSuccess.png?raw=true)
+
 게시글 삭제처리 완료 후
-![after_del](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2014-25-34.png?raw=true)
+![after_del](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/after_del.png?raw=true)
 
 ## 6. 간단 요약 정리
 게시판 예제의 기본적인 CRUD기능 control, presentation 계층 구현을 완료했다. 지금까지 구현한 내용을 간단히 요약정리 해보자.
