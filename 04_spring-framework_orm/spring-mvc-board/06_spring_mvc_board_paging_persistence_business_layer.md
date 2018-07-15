@@ -63,8 +63,10 @@ public void testCreate() throws Exception {
 ```sql
 SELECT COUNT(*) FROM tbl_article;
 ```
+
 쿼리 수행 결과
-![COUNT](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-02-28%2018-27-23.png?raw=true)
+
+![count_query_result](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/06_spring_mvc_board_paging_persistence_business_layer/count_query_result.png?raw=true)
 
 ## 4. 페이징 처리를 위한 SQL : `LIMIT`
 DB에 따라 페이징 처리를 위한 방법은 각기 다른데 MySQL의 경우 `LIMIT`를 ORACLE의 경우는 `ROWNUM`을 이용한다. 본 예제의 경우 MySQL을 사용하기 때문에 `LIMIT`을 이용할 것이다.
