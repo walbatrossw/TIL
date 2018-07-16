@@ -17,7 +17,7 @@ class InitTest {
 }
 ```
 
-##### 각 타입의 기본값(default value)
+#### 각 타입의 기본값(default value)
 
 |자료형|기본값|
 |---|---|
@@ -111,7 +111,7 @@ Car(String color, String gearType) {
 }
 ```
 
-##### 초기화 블럭 예제 1 : 초기화 순서
+#### 초기화 블럭 예제 1 : 초기화 순서
 
 예제를 통해 초기화 순서가 어떻게 진행되는지 보자.
 
@@ -159,7 +159,7 @@ BlockTest() : constructor
 콘솔화면에서와 같이 클래스 초기화 블럭, 인스턴스 블럭, 생성자 순으로 초기화가 진행된다. 초기화 블럭의 경우 메모리에 로딩될 때 한번만 초기화가 이루어지고, 인스턴스 블럭과 생성자는 인스턴스가 생성될 때마다 초기화가 수행된다.
 
 
-##### 초기화 블럭 예제 2 : `static` 초기화 블럭(클래스 초기화 블럭)
+#### 초기화 블럭 예제 2 : `static` 초기화 블럭(클래스 초기화 블럭)
 
 ```java
 public class StaticBlockTest {
@@ -232,7 +232,7 @@ class InitTest {
 }
 ```
 
-##### 인스턴스 블럭을 이용한 초기화 예제 1
+#### 인스턴스 블럭을 이용한 초기화 예제 1
 ```java
 public class ProductTest {
   public static void main(String[] args) {
@@ -269,7 +269,7 @@ p3 serialNo : 3
 generated product's count : 3
 ```
 
-##### 생성자를 이용한 초기화 예제 2
+#### 생성자를 이용한 초기화 예제 2
 ```java
 public class DocumentTest {
   public static void main(String[] args) {

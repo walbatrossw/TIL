@@ -7,7 +7,7 @@
 
 컬렉션 프레임워크에서는 컬렉션을 크게 3가지 타입(`List`, `Set`, `Map`)이 존재한다고 인식하고, 각 컬렉션을 다루는데 필요한 기능을 가진 3개지 인터페이스를 정의했다. 그리고 **`List`와 `Set`의 공통된 부분을 뽑아서 새로운 인터페이스인 `Collection`을 추가로 정의** 하였다.
 
-![collection](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/11_collection_framework/img/collection.png?raw=true)
+![collection](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/11_collection_framework/img/collection_layer.png)
 
 인터페이스 `List`와 `Set`을 구현한 컬렉션 클래스들은 서로 많은 공통부분이 있어서, 공통된 부분을 다시 뽑아 `Collection`인터페이스를 정의할 수 있었지만, **`Map`인터페이스는 이들과 전혀 다른 형태로 컬렉션을 다루기 때문에 같은 계층 상속도에 포함되지 못했다.**
 

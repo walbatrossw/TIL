@@ -288,7 +288,7 @@ K : ###### 6
 ##### 해싱(Hashing)?
 해싱이란 **해시함수(hash function)를 이용해서 데이터를 해시테이블(hash table)에 저장하고 검색하는 기법** 을 말한다. 해시함수는 데이터가 저장되어 있는 곳을 알려주기 때문에 다량의 데이터 중에서도 원하는 데이터를 빠르게 찾을 수 있다. 해싱을 구현한 컬렉션 클래스로는 `HashSet`, `HashMap`, `HashTable` 등이 있다.
 
-![hashing](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/11_collection_framework/img/hashing.png?raw=true)
+![hashing](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/11_collection_framework/img/hashing.png)
 
 해싱에 사용하는 자료구조는 위의 그림과 같이 배열과 `Linked List`의 조합으로 이루어져 있다. 저장할 데이터의 키를 해시함수에 넣으면 배열의 한 요소를 얻게되고, 다시 그 곳에 연결되어 있는 `Linked List`에 저장하게 된다.
 

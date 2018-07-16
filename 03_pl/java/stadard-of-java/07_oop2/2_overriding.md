@@ -75,7 +75,7 @@ class Child extends Parent {
 
 **`super`는 자손클래스에서 조상클래스로부터 상속받은 멤버를 참조하는데 사용되는 참조변수이다.** 상속받은 멤버와 자신의 클래스의 멤버의 이름이 같을 때 `super`를 사용해서 구별할 수 있다.
 
-##### `super` 예제 1
+#### `super` 예제 1
 ```java
 public class SuperTest {
   public static void main(String[] args) {
@@ -103,7 +103,7 @@ super.x = 10
 ```
 `x`, `this.x`, `super.x` 모두가 같은 변수를 의미하기 때문에 모두 같은 값이 출력
 
-##### `super` 예제 2
+#### `super` 예제 2
 ```java
 public class SuperTest2 {
   public static void main(String[] args) {
@@ -145,7 +145,7 @@ super.x = 10
 4. 조상클래스의 생성자 호출은 클래스 상속관계에서 최상위에 위치한 `Object`클래스의 `Object()`까지 거슬러 올라가서야 끝이 난다.
 5. 만약 생성자를 따로 추가하지 않았다면 컴파일되는 시점에서 컴파일러가 자동적으로 추가시켜주게 된다.
 
-##### `super()` 예제 1
+#### `super()` 예제 1
 ```java
 public class PointTest {
   public static void main(String[] args) {
@@ -190,7 +190,7 @@ Error:(26, 34) java: constructor Point in class com.doubles.standardofjava.ch07_
 ```
 위 코드를 실행시키면 컴파일러가 자동적으로 `Point3D()`의 첫 줄에 `super()`를 추가시키고 작업을 수행한다. 하지만 `super()`인 `Point()`가 `Point`클래스에 정의되있지 않기 때문에 컴파일 오류가 발생한다. 컴파일 오류를 수정하기 위해서는 `Point3D()`의 첫줄에 `super(x, y)`를 추가하거나, `Ponit`클래스에 `Point()`를 추가해주어야한다.
 
-##### `super()` 예제 2
+#### `super()` 예제 2
 ```java
 public class PointTest2 {
   public static void main(String[] args) {

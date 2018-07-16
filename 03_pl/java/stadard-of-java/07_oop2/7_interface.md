@@ -353,7 +353,8 @@ void repair(Repairable repairable) {
 }
 ```
 아래의 그림은 지금까지 구현한 예제의 클래스와 인터페이스의 상속도인데 이것을 보면 지금까지 설명한 내용을 보다 쉽게 이해할 수 있다.
-![예제1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/07_oop2/img/interface.png?raw=true)
+
+![예제1](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/07_oop2/img/interface.png)
 
 
 ## 8. 인터페이스의 이해

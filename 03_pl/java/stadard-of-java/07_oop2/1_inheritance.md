@@ -26,7 +26,7 @@ class Parent {
 - **생성자와 초기화 블럭은 상속되지 않으며 멤버만 상속된다.**
 - **자손 클래스의 멤버 갯수는 조상 클래스보다 많거나 같다.**
 
-##### 상속 예제 1 : `Tv`클래스, `Tv`클래스를 상속 받은 `CaptionTv`클래스
+#### 상속 예제 1 : `Tv`클래스, `Tv`클래스를 상속 받은 `CaptionTv`클래스
 
 ```java
 class Tv {
@@ -109,7 +109,7 @@ class Point {
 - 상속관계 : A는 B이다. 예) 노트북은 컴퓨터이다.
 - 포함관계 : A는 B를 가지고 있다. 예) 컴퓨터는 CPU를 가지고 있다.
 
-###### 클래스간의 포함관계 예제 : 카드뽑기
+#### 클래스간의 포함관계 예제 : 카드뽑기
 ```java
 public class DeckTest {
     public static void main(String[] args) {

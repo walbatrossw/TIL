@@ -5,7 +5,7 @@
 
 ## 2. 이진트리(binary-tree)
 
-![이진트리](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/11_collection_framework/img/tree_set_1.png?raw=true)
+![이진트리](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/11_collection_framework/img/tree_set_1.png)
 
 `LinkedList`처럼 여러 개의 노드(node)가 서로 연결된 구조로 각 노드에 최대 2개의 노드를 연결할 수 있으며 루트(root)라고 불리는 하나의 노드에서부터 시작해서 계속 확장해나갈 수 있다. 위아래로 연결된 두 노드를 부모-자식관계에 있다고 하며 위의 노드를 부모노드, 아래의 노드를 자식노드라고 한다. 부모-자식관계는 상대적인 것이며 하나의 부모노드는 두 개의 자식노드와 연결될 수 있다.
 
@@ -20,7 +20,7 @@ class TreeNode {
 
 **이진트리의 저장 순서**
 
-![이진트리2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/11_collection_framework/img/tree_set_2.png?raw=true)
+![이진트리2](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/11_collection_framework/img/tree_set_2.png)
 
 - 첫번째로 저장되는 값은 루트가 됨
 - 두번째 값은 트리의 루트부터 시작해서 값의 크기를 비교하면서 트리를 따라 내려감

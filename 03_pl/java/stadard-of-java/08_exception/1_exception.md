@@ -2,34 +2,37 @@
 
 ## 1. 예외처리(Exception Handling)
 
-##### 에러의 종류
+#### 에러의 종류
 - 컴파일 에러 : 컴파일 시 발생하는 에러
 - 런타임 에러 : 실행시 발생하는 에러
 - 논리적 에러 : 실행은 되지만, 의도와 다르게 동작하는 것
 
-##### Error와 Exception 차이점
+#### Error와 Exception 차이점
 - Error : 프로그램 코드에 의해서 수습될 수 없는 심각한 오류
 - Exception : 프로그램 코드에 의해서 수습될 수 있는 다소 미약한 오류
 
 
 ## 2. 예외 클래스의 계층구조
 
-##### 예외 클래스의 계층도
-![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/08_exception/pic/exception/exception_layer_diagram_1.png?raw=true)
+#### 예외 클래스의 계층도
 
-##### `Exception`클래스와 `RuntimeException`클래스 중심의 상속 계층도
-![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%9E%90%EB%B0%94%EC%9D%98_%EC%A0%95%EC%84%9D/08_exception/pic/exception/exception_layer_diagram_2.png?raw=true)
+![](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/08_exception/pic/exception/exception_layer_diagram_1.png)
+
+#### `Exception`클래스와 `RuntimeException`클래스 중심의 상속 계층도
+
+![](https://raw.githubusercontent.com/walbatrossw/TIL/master/03_pl/java/stadard-of-java/08_exception/pic/exception/exception_layer_diagram_2.png)
+
 - `RuntimeException`클래스와 그 자손클래스 : 프로그래머의 실수로 발생하는 예외
 - `Exception`클래스와 그 자손클래스 : 사용자의 실수와 같은 외적인 요인에 의해 발생하는 예외
 
 
 ## 3. 예외처리하기 : `try-catch`문
 
-##### 예외처리(Exception Handling)이란?
+#### 예외처리(Exception Handling)이란?
 - 프로그램 실행시 발생할 수 있는 예외의 발생에 대비한 코드를 작성하는 것
 - 프로그램의 비정상적인 종료를 막고, 정상적인 실행상태를 유지하는 것
 
-##### `try-catch`구조
+#### `try-catch`구조
 ```java
 try {
   // 예외가 발생할 가능성이 있는 코드
@@ -53,7 +56,7 @@ pubilc static void main(String[] agrs) {
 }
 ```
 
-##### 예외처리 예제 : 100을 0~9사이의 임의의 정수로 나눈 값을 출력을 10번 반복수행
+#### 예외처리 예제 : 100을 0~9사이의 임의의 정수로 나눈 값을 출력을 10번 반복수행
 ```java
 pulic static void main(String[] args) {
   int number = 100;
@@ -105,7 +108,7 @@ public static void main(String[] args) {
 
 ## 4. `try-catch`문에서의 흐름
 
-##### `try`블럭 내에서 예외가 발생한 경우
+#### `try`블럭 내에서 예외가 발생한 경우
 ```java
 public static void main(String[] args) {
   System.out.println(1);
@@ -131,7 +134,7 @@ public static void main(String[] args) {
 - 일치하는 `catch`블럭 내의 문장들을 수행하고, `try-catch`문을 빠져나와 그 다음 문장을 수행된다.
 - 만약 일치하는 `catch`블럭을 찾지 못한 경우 예외처리는 되지 않는다.
 
-##### `try`블럭 내에서 예외가 발생하지 않은 경우
+#### `try`블럭 내에서 예외가 발생하지 않은 경우
 ```java
 public static void main(String[] args) {
     System.out.println(1);
@@ -156,7 +159,7 @@ public static void main(String[] args) {
 
 ## 5. 예외 발생과 catch블럭
 
-##### catch블럭의 참조변수
+#### catch블럭의 참조변수
 - `catch`블럭에서 `()`괄호내에 처리하려는 예외와 같은 타입의 참조변수를 선언해야함.
 - 예외가 발생하면 해당 예외에 해당하는 클래스의 인스턴스 생성
 - 여러 개의 `catch`블럭이 있을 경우 각 `catch`블럭의 `()`에 선언된 참조변수와 생성된 인스턴스의 `instanceof`연산자를 이용하여 검사
@@ -211,7 +214,7 @@ ArithmeticException
 6
 ```
 
-##### `printStackTrace()`, `getMessage()` 메서드
+#### `printStackTrace()`, `getMessage()` 메서드
 
 예외가 발생했을 때 생성되는 예외 클래스의 인스턴스에는 발생한 **예외에 대한 정보** 가 담겨져있다.
 
@@ -232,7 +235,7 @@ java.lang.ArithmeticException: / by zero
 6
 ```
 
-##### 멀티 `catch`블럭
+#### 멀티 `catch`블럭
 
 jdk1.7부터 여러 `catch`블럭을 `|`기호를 통해 하나의 `catch`블럭으로 합칠 수 있게 되었다.
 
@@ -260,7 +263,7 @@ try {
 
 ## 6. 예외 발생시키기
 
-##### 예외를 발생시키는 법
+#### 예외를 발생시키는 법
 ```java
 Exception e = new Exception("예외발생"); // 예외 객체 생성
 throw e;  // 예외발생
@@ -284,7 +287,7 @@ java.lang.Exception: 예외 발생!
 정상종료...
 ```
 
-##### `checked`예외 VS `unchecked`예외
+#### `checked`예외 VS `unchecked`예외
 **`checked` : 예외처리를 확인하는 `Exception`클래스(`RuntimeException`클래스들을 제외한 클래스들)**
 ```java
 public static void main(String[] args) {
@@ -312,7 +315,7 @@ Exception in thread "main" java.lang.RuntimeException
 
 ## 7 메서드에 예외 선언하기
 
-##### 메서드 예외 선언하는 법
+#### 메서드 예외 선언하는 법
 
 메서드에 예외를 선언하려면, 메서드 선언부에 `throws`키워드를 사용해 메서드 내에 발생할 수 있는 예외를 작성, 예외가 여러개일 경우 `,`로 구분한다.
 ```java
@@ -330,7 +333,7 @@ void method() throws Exception {
 - 이렇게 예외를 선언하면, 이 예외 뿐만아니라 그 자손타입의 예외까지도 발생할 수 있음
 - 오버라이딩 할 때는 단순히 선언된 예외의 개수가 아니라 상속관계까지도 고려해야함
 
-##### 메서드 예외 선언하기 예제 1 : 예외만 전달
+#### 메서드 예외 선언하기 예제 1 : 예외만 전달
 
 예외를 메서드의 `throws`에 명시하는 것은 예외를 처리하는 것이 아니라 자신을 호출한 메서드에게 예외를 전달하여 예외처리를 떠맡기는 것으로 예외를 전달받은 메서드는 또다시 메서드를 호출한 메서드에게 예외를 전달할 수 있다.
 
@@ -358,7 +361,7 @@ Exception in thread "main" java.lang.Exception
 - `main()`가 `method1()`을, `method1()`은 `method2()`를 호출했다는 것을 알 수 있음.
 - 예외처리를 해주지 않았기 때문에 호출한 메서드에 계속 예외를 전달하고 `main()`이 종료되면서 프로그램이 비정상적으로 종료됨
 
-##### 메서드 예외 선언하기 예제 2 : 예외처리(`method1()`에서)
+#### 메서드 예외 선언하기 예제 2 : 예외처리(`method1()`에서)
 
 ```java
 public static void main(String[] args) {
@@ -384,7 +387,7 @@ java.lang.Exception
 
 - `method1()`에서 예외가 처리되면 `main()`에서는 예외가 발생했다는 것을 알지 못함.
 
-##### 메서드 예외 선언하기 예제 3 : 예외처리(`main()`에서)
+#### 메서드 예외 선언하기 예제 3 : 예외처리(`main()`에서)
 
 ```java
 public static void main(String[] args) {
@@ -410,7 +413,7 @@ main()에서 예외처리
 
 - `method1()`에서 예외를 선언하고, 호출한 `main()`에게 예외를 전달하여 `try-catch`문으로 예외를 처리
 
-##### 메서드 예외 선언하기 예제 3 : 예외가 발생한 메서드에서 직접 예외를 처리
+#### 메서드 예외 선언하기 예제 3 : 예외가 발생한 메서드에서 직접 예외를 처리
 
 ```java
 public static void main(String[] args) {
@@ -448,7 +451,7 @@ static void createNewFile(File file) {
 - 파일명이 없거나 공백일 경우, 파일명을 `제목없음.txt`로 설정하여 파일을 생성
 - `finally`블럭에서는 예외의 발생 여부와 관계 없이 파일을 생성하도록 처리
 
-##### 메서드 예외 선언하기 예제 4 : 호출한 메서드에서 예외를 전달받아 처리
+#### 메서드 예외 선언하기 예제 4 : 호출한 메서드에서 예외를 전달받아 처리
 ```java
 public static void main(String[] args) {
   String fileName = "";
@@ -470,7 +473,7 @@ static File createFile(String fileName) throws Exception {
 ```
 - 예외가 발생한 `createFile()`메서드에서 예외를 처리하지 않고, 호출한 `main()`에 예외발생을 전달하여 파일명을 확인하도록 처리
 
-##### 메서드 예외의 처리 방법
+#### 메서드 예외의 처리 방법
 - 예외가 발생할 경우 메서드 내에서 자체적으로 처리해도 되는 것은 메서드 내에서 `try-catch`문을 사용해 처리
 - 메서드에 호출한 값을 다시 넘겨받아야 할 경우(메서드 내에서 자체적으로 해결이 안될 경우) 예외를 메서드에 선언해서 호출한 메서드에서 처리
 
@@ -478,7 +481,7 @@ static File createFile(String fileName) throws Exception {
 
 ## 8 `finally`블럭
 
-##### `finally`블럭의 사용법
+#### `finally`블럭의 사용법
 `finally`블럭은 `try-catch`문과 함께 예외의 발생여부와 관계없이 실행되어야할 코드를 포함시킬 목적으로 사용되며, `try-catch`문의 끝에 덧붙여 사용할 수 있다.
 
 ```java
@@ -491,7 +494,7 @@ try {
 }
 ```
 
-##### `finally` 블럭 예제 1, 2 : 동일로직의 중복제거
+#### `finally` 블럭 예제 1, 2 : 동일로직의 중복제거
 ```java
 public static void main(String[] args) {
   try {
@@ -530,7 +533,7 @@ static void deleteTempFiles() {};
 - 예외의 발생여부와 관계없이 삭제처리를 수행
 - 그렇다면 `finally`블럭에 파일을 삭제하는 코드를 작성함으로써 예외의 발생여부와 관계없이 중복된 코드를 줄일 수 있음
 
-##### `finally` 블럭 예제 3
+#### `finally` 블럭 예제 3
 ```java
 public static void main(String[] args) {
   method1();
@@ -558,7 +561,7 @@ method1() ended and returned main() from method1()
 
 ## 9 자동 자원 반환 - `try-with-resources`문
 
-##### `try-with-resources`를 사용하는 이유?
+#### `try-with-resources`를 사용하는 이유?
 JDK1.7부터 `try-with-resources`문이 추가되었는데 이 구문은 주로 입출력(I/O)와 관련된 클래스를 사용할 때 유용, 주로 입출력에 사용되는 클래스의 경우 사용했던 자원을 반환하기 위해서 사용한 뒤 반드시 받아줘야함
 ```java
 try {
@@ -617,7 +620,7 @@ try (fis = new FileInputStream("score.dat"); dis = new DateInputStream(fis)) {
   }
   ```
 
-##### `try-with-resources` 예제 1
+#### `try-with-resources` 예제 1
 ```java
 public static void main(String[] args) {
   // close()만 예외 발생
@@ -694,7 +697,7 @@ com.doubles.standardofjava.exceptions.WorkException: WorkException!!!
 
 ## 10 사용자정의 예외 만들기
 
-##### 사용자정의 예외란?
+#### 사용자정의 예외란?
 기존의 정의된 예외 클래스 외에 필요에 따라 프로그래머가 새로운 예외 클래스를 정의하여 사용할 수 있는데 보통 `Exception`클래스로부터 상속받는 클래스를 만들지만 필요에 따라 알맞은 예외 클래스를 선택할수도 있다.
 
 ```java
@@ -728,7 +731,7 @@ class MyException extends Exception {
 - `checked`예외는 반드시 예외처리를 해줘야하기 때문에 예외처리가 필요하지 않은 경우에도 `try-catch`문을 넣어 코드가 복잡해지기 때문
 - 필요에 따라 예외처리를 선택할 수 있는 `unchecked`예외가 선호되고 있다.
 
-##### 사용자정의 예외 예제 : 파일 설치 프로그램(설치공간, 메모리 부족 예외발생)
+#### 사용자정의 예외 예제 : 파일 설치 프로그램(설치공간, 메모리 부족 예외발생)
 
 ```java
 public class NewExceptionTest {
@@ -792,12 +795,12 @@ class MemoryException extends Exception {
 
 ### 11. 예외 되던지기(exception re-throwing)
 
-##### 예외 되던지기란?
+#### 예외 되던지기란?
 한 메서드에서 발생할 수 있는 예외가 여러 개인 경우, 몇 개는 `try-catch`문을 통해 메서드 내에서 자체적으로 처리하도록 하고 그 나머지는 메서드 선언부에서 지정하여 호출한 메서드에서 예외를 처리하도록 할 수 있다. 심지어 하나의 예외에 대해서도 예외가 발생한 메서드와 호출한 메서드 양쪽에서 예외를 처리할 수 있도록 할 수도 있다. 이것을 예외를 처리한 후 인위적으로 예외를 발생시키는 방법을 통해 구현이 가능한데 이것을 예외 되던지기라고 한다.
 
 이러한 방법을 쓰는 이유는 예외가 발생한 메서드와 호출한 메서드 양쪽 모두에서 처리해줘야할 작업이 있을 경우 사용한다.
 
-### 2) 예외 되던지기 예제
+#### 예외 되던지기 예제
 ```java
 public static void main(String[] args) {
   try {
@@ -825,10 +828,11 @@ main()에서 예외처리
 - 만약 반환값이 있는 `return`문일 경우, `catch`블럭에도 `return`문이 반드시 있어야 함
 
 ## 12 연결된 예외(chained exception)
-##### 연결된 예외란?
+
+#### 연결된 예외란?
 한 예외가 다른 예외를 발생시킬 수 있다. 예를 들어 예외 A가 예외 B를 발생시켰다면, A를 B의 원인예외(cuase exception)라고 한다. 발생한 예외를 그냥 처리하면 될텐데 굳이 원인 예외로 등록하여 다시 예외를 발생시키는 이유는 여러가지 예외를 하나의 큰 분류의 예외로 묶어서 다루기 위해서이다.
 
-##### 연결된 예외 예제
+#### 연결된 예외 예제
 ```java
 public class ChainedExceptionEx {
     public static void main(String[] args) {

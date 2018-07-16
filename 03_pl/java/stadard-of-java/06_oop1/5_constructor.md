@@ -26,7 +26,7 @@ ClassName(Type variableName) {
 
 예제를 통해 기본 생성자에 대해 좀더 알아보자.
 
-##### 기본생성자 예제 1 : 기본 생성자의 유무
+#### 기본생성자 예제 1 : 기본 생성자의 유무
 
 ```java
 public class ConstructorTest {
@@ -66,7 +66,7 @@ Error:(6, 23) java: constructor Data2 in class com.doubles.standardofjava.ch06_o
 
 예제를 통해 매개변수가 있는 생성자가 어떻게 유용한지 구체적으로 알아보자.
 
-##### 매개변수가 있는 생성자 예제 1 : 매개변수를 통한 초기화
+#### 매개변수가 있는 생성자 예제 1 : 매개변수를 통한 초기화
 ```java
 public class CarTest {
     public static void main(String[] args) {
@@ -134,7 +134,7 @@ Car(String color) {
 
 예제를 통해 생성자에서 다른 생성자를 호출해보자.
 
-##### 생성자 호출 예제 1
+#### 생성자 호출 예제 1
 
 ```java
 public class CarTest2 {
@@ -190,7 +190,7 @@ Car(Car car2) {
 
 위의 코드는 `Car`클래스의 참조변수를 매개변수로 한 생성자이다. 매개변수로 넘거진 참조변수가 가리키는 `Car`인스턴스의 인스턴스 변수인 `color`, `gearType`, `door`의 값을 인스턴스 자신으로 복사한다.
 
-##### 생성자를 이용한 인스턴스 복사 예제 1
+#### 생성자를 이용한 인스턴스 복사 예제 1
 ```java
 public class CarTest3 {
   public static void main(String[] args) {
