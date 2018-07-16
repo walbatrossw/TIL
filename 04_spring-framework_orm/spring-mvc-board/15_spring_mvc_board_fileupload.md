@@ -849,11 +849,11 @@ $(document).on("click", ".delBtn", function (event) {
 
 ##### 게시글 입력페이지의 첨부파일 업로드 영역
 
-![file](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2013-48-29.png?raw=true)
+![file](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file.png)
 
 ##### 게시글 입력페이지의 첨부파일 업로드 처리 및 출력처리 확인
 
-![file2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-02-33.png?raw=true)
+![file2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file2.png)
 
 - 파일 탐색기에서 첨부파일을 선택해 업로드 영역에 드래그
 - 첨부파일 업로드 처리 후 파일이 정상적으로 서버에 저장 확인, 이미지 파일인 경우 썸네일이 생성되었는지 확
@@ -863,24 +863,24 @@ $(document).on("click", ".delBtn", function (event) {
 
 ##### 게시글 입력페이지의 첨부파일 삭제 처리 확인
 
-![file3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-10-48.png?raw=true)
+![file3](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file3.png)
 
 - 첨부파일 삭제버튼을 클릭하면 파일이 정상적으로 서버에서 삭제되었는지 확인
 - 첨부파일이 삭제처리가 되고 화면에서 해당파일이 사라졌는지 확인
 
 ##### 게시글 입력페이지의 lightbox 라이브러리 적용 확인
 
-![file4](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-13-12.png?raw=true)
+![file4](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file4.png)
 
 - 첨부파일의 이미지인 경우 파일명 클릭시 원본 이미지가 팝업창으로 뜨는지 확인
 
 ##### 게시글 입력페이지에서 일반파일인 경우 파일명 클릭시 다운로드 창 팝업 확인
 
-![file5](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-14-35.png?raw=true)
+![file5](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file5.png)
 
 ##### 게시글 입력처리 완료 후에 게시글 목록 페이지 이동, 파일 개수 확인, 테이블에 파일정보가 등록되었는지 확인
 
-![file6](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-19-13.png?raw=true)
+![file6](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file6.png)
 
 ## 6. 게시글 조회 페이지의 첨부파일 목록 구현/ 게시글 삭제 처리시 첨부파일삭제 처리 구현
 
@@ -890,15 +890,19 @@ $(document).on("click", ".delBtn", function (event) {
 - 게시글 삭제 처리시 서버에 저장된 첨부파일 삭제, 테이블에 저장된 첨부파일 정보 삭제
 
 **첨부파일 목록 출력**은 아래와 같은 과정을 거치게 된다.
+
 1. AJAX 방식으로 현재 조회하고 있는 게시글의 첨부파일 목록을 가져온다.
 2. 테이블로부터 가져온 첨부파일 목록에서 첨부파일명을 통해 AJAX 방식으로 파일을 출력처리 한다.
 
 **게시글 삭제시 첨부파일의 삭제처리**는 아래와 같은 과정을 거치게 된다.
+
 1. AJAX 방식으로 해당 게시글의 첨부파일을 서버에서 삭제처리를 먼저 수행한다.
 2. 해당 게시글의 첨부파일 정보를 테이블에서 먼저 삭제 처리를 수행하고 난 뒤, 게시글을 삭제 처리한다.
 
 #### # 게시글 첨부파일 영속 계층 : `ArticleFileDAO` / `ArticleFileDAOImpl`
+
 아래와 같이 `ArticleFileDAO`인터페이스에 첨부파일 목록을 가져오는 추상 메서드를 추가하고, `ArticleFileDAOImpl`클래스에 메서드를 구현해준다.
+
 ```java
 // 첨부 파일 목록
 List<String> getArticleFiles(Integer articleNo) throws Exception;
@@ -906,6 +910,7 @@ List<String> getArticleFiles(Integer articleNo) throws Exception;
 // 게시글의 첨부 파일 전체 삭제
 void deleteFiles(Integer articleNo) throws Exception;
 ```
+
 ```java
 // 첨부 파일 목록
 @Override
@@ -921,7 +926,9 @@ public void deleteFiles(Integer articleNo) throws Exception {
 ```
 
 #### # 게시글 첨부파일 SQL Mapper : `articleFileMapper.xml`
+
 특정 게시글의 첨부파일 목록을 가져오는 SQL과 해당 게시글의 첨부파일들을 삭제처리하는 SQL을 아래와 같이 작성한다.
+
 ```sql
 <select id="getArticleFiles" resultType="string">
     SELECT file_name
@@ -937,7 +944,9 @@ public void deleteFiles(Integer articleNo) throws Exception {
 ```
 
 #### # 게시글 첨부파일 비지니스 계층 : `ArticleFileService` / `ArticleServiceImpl`
+
 아래와 같이 `ArticleFileService`인터페이스를 생성하고, 첨부파일 목록을 가져오는 추상메서드를 작성해준다. 그리고 `ArticleFileServiceImpl`클래스에 첨부파일 목록 메서드를 구현해준다.
+
 ```java
 public interface ArticleFileService {
 
@@ -968,7 +977,9 @@ public class ArticleFileServiceImpl implements ArticleFileService {
 ```
 
 #### # 게시글 비지니스 계층 수정 : `ArticleServiceImpl`
+
 게시글이 삭제 처리되기 전에 해당 게시글의 첨부파일들을 테이블에서 먼저 삭제처리 하도록 아래와 같이 코드를 작성하고, 트랜잭션처리를 위해 `@Transactional`애너테이션을 붙여준다.
+
 ```java
 private final ArticleDAO articleDAO;
 
@@ -992,7 +1003,9 @@ public void delete(Integer articleNo) throws Exception {
 ```
 
 #### # 게시글 첨부파일 컨트롤러 : `ArticleFileController`
+
 아래와 같이 컨트롤러에 첨부파일 목록 매핑 메서드를 아래와 같이 작성해준다.
+
 ```java
 // 게시글 첨부 파일 목록
 @RequestMapping(value = "/list/{articleNo}", method = RequestMethod.GET)
@@ -1008,7 +1021,9 @@ public ResponseEntity<List<String>> getFiles(@PathVariable("articleNo") Integer 
     return entity;
 }
 ```
+
 그리고 해당 게시글의 첨부파일 전체를 삭제하는 매핑 메서드를 아래와 같이 작성해준다.
+
 ```java
 // 게시글 파일 전체 삭제
 @RequestMapping(value = "/deleteAll", method = RequestMethod.POST)
@@ -1035,17 +1050,22 @@ public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] f
 #### # 게시글 목록 페이지 수정 : `read.jsp`
 
 ##### 게시글 첨부파일 출력 영역 HTML코드
+
 게시글의 첨부파일 목록이 출력될 영역을 아래와 같이 추가해준다.
-```xml
+
+```html
 <%--업로드 파일 정보 영역--%>
 <div class="box-footer uploadFiles">
     <ul class="mailbox-attachments clearfix uploadedFileList"></ul>
 </div>
 <%--업로드 파일 정보 영역--%>
 ```
+
 ##### 게시글 첨부파일 Handlebars 파일 템플릿
+
 게시글 첨부파일을 출력하기 위해 Handlebars 파일 템플릿 코드를 아래와 추가적으로 작성해준다. 기존의 첨부파일 Handlebars와 다른점은 `<li>`태그에 `data-src`속성을 추가하였는데 이 속성을 통해 게시글 삭제할 때 함께 수행할 첨부파일 삭제처리를 위한 정보로 쓰이기 위해서이다.
-```xml
+
+```html
 <script id="fileTemplate" type="text/x-handlebars-template">
     <li data-src="{{fullName}}">
         <span class="mailbox-attachment-icon has-img">
@@ -1061,7 +1081,9 @@ public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] f
 ```
 
 ##### 게시글 첨부파일 JS파일 수정 : `article_file_upload.js`
+
 `article_file_upload.js`파일에 아래와 같이 파일 목록을 가져오는 코드를 작성해준다. 만약 첨부파일이 없을 경우 첨부파일이 없다는 메시지를 출력하게 해주었다.
+
 ```js
 // 파일 목록 : 게시글 조회, 수정페이지
 function getFiles(articleNo) {
@@ -1077,13 +1099,16 @@ function getFiles(articleNo) {
 ```
 
 ##### 게시글 목록 페이지 JS 영역
+
 게시글 조회페이지가 로드되면 첨부파일 목록을 출력하기 위해 `getFiles()`메서드를 호출해준다.
+
 ```js
 // 현재 게시글 번호
 var articleNo = "${article.articleNo}";  
 // 첨부파일 목록
 getFiles(articleNo);
 ```
+
 게시글 삭제 버튼 클릭시 서버에 저장된 첨부파일 삭제처리하는 메서드를 아래와 같이 작성해준다. 그리고 기존의 코드에서 추가적으로 변경된 내용은 다음과 같다.
 - 댓글이 달린 게시글은 삭제처리 되지 않도록 조건문을 추가
 - 해당 게시글의 첨부파일들을 삭제처리하기 위해서 배열에 각각의 첨부파일명을 담아 AJAX 삭제 요청
@@ -1123,17 +1148,17 @@ $(".delBtn").on("click", function () {
 
 ##### 게시글 조회 화면에서 정상적으로 게시글 첨부파일 목록이 나오는 것을 확인
 
-![file7](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-23-07.png?raw=true)
+![file7](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file7.png)
 
 ##### 게시글 처리완료 후에 서버에 저장된 첨부파일 삭제 및 첨부파일 테이블에 파일정보 삭제 확인
 
 삭제처리 전
 
-![file8](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-25-16.png?raw=true)
+![file8](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file8.png)
 
 삭제처리 후
 
-![file9](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2014-27-23.png?raw=true)
+![file9](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file9.png)
 
 ## 7. 게시글 수정 페이지의 첨부파일 수정 구현
 첨부파일을 정상적으로 수정하기 위해서는 다음과 같은 조건이 필요하다.
@@ -1237,7 +1262,9 @@ public void update(ArticleVO articleVO) throws Exception {
 ```
 
 #### # 게시글 첨부파일 컨트롤러 : `ArticleFileController`
+
 게시글 수정화면에서 첨부파일을 삭제할 경우, 게시글 입력페이지의 첨부파일 삭제와 다르게 서버에 저장된 파일뿐만 아니라 테이블의 파일정보도 함께 삭제처리해야하기 때문에 첨부파일 삭제처리 매핑 메서드를 추가적으로 작성해야한다. 특정 게시글의 첨부파일들을 조회할 수 있도록 `@PathVariable`애너테이션을 통해 게시글 번호를 가져오게 된다.
+
 ```java
 // 게시글 첨부파일 삭제 : 게시글 수정
 @RequestMapping(value = "/delete/{articleNo}", method = RequestMethod.POST)
@@ -1260,6 +1287,7 @@ public ResponseEntity<String> deleteFile(@PathVariable("articleNo") Integer arti
 ```
 
 게시글을 수정처리 시에 서버에 저장된 게시글의 기존 첨부파일들을 삭제처리하기 위한 매핑 메서드를 아래와 같이 작성해준다.
+
 ```java
 // 게시글 첨부파일 전체 삭제
 @RequestMapping(value = "/deleteAll", method = RequestMethod.POST)
@@ -1284,8 +1312,10 @@ public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] f
 ```
 
 #### # 게시글 수정 페이지 수정 : `modify.jsp`
+
 ##### 파일 업로드 영역 추가, Handlebars 파일 템플릿 작성
 게시글 작성페이지와 마찬가지로 CSS, HTML코드, Handlebars 파일 템플릿 코드를 `modify.jsp`에 아래와 같이 작성해준다.
+
 ```css
 .fileDrop {
     width: 100%;
@@ -1293,6 +1323,7 @@ public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] f
     border: 2px dotted #0b58a2;
 }
 ```
+
 ```html
 <div class="form-group">
     <div class="fileDrop">
@@ -1304,7 +1335,8 @@ public ResponseEntity<String> deleteAllFiles(@RequestParam("files[]") String[] f
     </div>
 </div>
 ```
-```xml
+
+```html
 <script id="fileTemplate" type="text/x-handlebars-template">
     <li>
         <span class="mailbox-attachment-icon has-img">
@@ -1385,21 +1417,21 @@ $("#modifyForm").submit(function (event) {
 #### # 구현 확인
 
 ##### 게시글 수정페이지에서 파일 업로드 영역, 파일목록 출력확인
-![file10](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2015-42-56.png?raw=true)
+![file10](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file10.png)
 
 ##### 게시글 수정페이지의 파일 삭제처리 확인
 파일 삭제버튼 클릭, 파일 삭제 확인 메시지 alert창 팝업 확인
-![file11](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2015-56-45.png?raw=true)
+![file11](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file11.png)
 
 파일 삭제 처리 확인(서버 첨부파일 삭제, 테이블 첨부파일 정보 삭제)
-![file12](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2016-00-26.png?raw=true)
+![file12](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file12.png)
 
 ##### 게시글 수정페이지의 첨부파일 수정처리 확인
 새로운 첨부파일 추가 업로드
-![file13](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2016-05-19.png?raw=true)
+![file13](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file13.png)
 
 게시글 수정처리완료 후 게시글 조회페이지, 테이블에 수정된 파일정보 입력확인
-![file14](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-04-06%2016-07-58.png?raw=true)
+![file14](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/15_spring_mvc_board_fileupload/file14.png)
 
 ## 8. 게시글 첨부파일 기능 구현 정리
 
