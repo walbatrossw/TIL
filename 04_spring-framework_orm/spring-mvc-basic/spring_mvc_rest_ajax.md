@@ -78,7 +78,8 @@ public String sayHello() {
 }
 ```
 해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다.
-![hello](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112615.png?raw=true)
+
+![return_string](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/return_string.png?raw=true)
 
 #### # 객체를 JSON으로 리턴할 경우 메서드 작성법
 
@@ -109,7 +110,7 @@ public SampleVO sendVO() {
 ```
 
 해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다.
-![json](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112649.png?raw=true)
+![return_json](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/return_json.png?raw=true)
 
 만약 406에러가 발생한다면 `pom.xml`에 `jackson-databind`라이브러리가 추가한다.
 ```xml
@@ -140,7 +141,8 @@ public List<SampleVO> sendList() {
 }
 ```
 해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다. JSON의 문법상 리스트는 배열로 표현되기 때문에 아래와 같이 나오게 된다.
-![list](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112724.png?raw=true)
+
+![return_list](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/return_list.png?raw=true)
 
 #### # 컬렉션 타입(`Map`)의 객체를 리턴할 경우 메서드 작성법
 ```java
@@ -160,7 +162,8 @@ public Map<Integer, SampleVO> sendMap() {
 }
 ```
 해당 URI를 요청하면 브라우저에 아래와 같이 출력이 되는 것을 확인 할 수 있다. Map의 경우 자바스크립트의 JSON형태로 보여지게 되는데 Key와 Value로 구성되서 `{}`로 표현된다.
-![map](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112759.png?raw=true)
+
+![return_map](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/return_map.png?raw=true)
 
 ## 4. `ResponseEntity` 타입
 
@@ -179,7 +182,8 @@ public ResponseEntity<Void> sendListAuth() {
 }
 ```
 해당 URI를 요청하면 리턴타입으로 선언된 `ResponseEntity`는 결과 데이터로 Http상태코드 중에서 400에러를 헤더메시지로 보내게 되는데 크롬 개발자도구의 네트워크 탭을 확인해보면 아래와 같이 400에러가 발생된 것을 확인해볼 수 있다.
-![400](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_112916.png?raw=true)
+
+![return_400](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/return_400.png?raw=true)
 
 #### # `ResponseEntity` 예제2 : 결과데이터와 HTTP상태코드 같이 보내기
 아래와 같이 예제를 작성하고 해당 URI를 요청해보자.
@@ -201,14 +205,15 @@ public ResponseEntity<List<SampleVO>> sendListNot() {
 ```
 해당 URI를 요청하면 리턴타입에 list 데이터와 HTTP상태코드(404)를 전송하게 된다. 앞서 본 예제와 달리 화면에는 전송한 결과를 보여주면서, 상태코드도 함께 전달되는 것을 확인해볼 수 있다.
 
-![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_113106.png?raw=true)
+![return_404](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/return_404.png?raw=true)
 
 ## 5. AJAX(Asynchronous Javascript and XML)
 
 #### AJAX란?
 웹을 통해 작업할 때 REST방식이 가장 많이 쓰이는 형태는 AJAX와 같이 결합된 형태이다. 주로 브라우저에서 대화형으로 서버와 데이터를 주고받는 형태의 메시지 전송방식을 의미한다. **AJAX는 화면의 전환이나 깜빡임없이 서버에서 데이터를 받는 방법** 이라고 생각하면 된다. 페이스북이나 네이버와 같은 포털사이트의 검색창 자동완성기능들이 AJAX를 활용한 대표적인 서비스라고 할 수 있다.
 
-![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/ajax-fig2_small.png?raw=true)
+![ajax](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-basic/img/spring_mvc_rest_ajax/ajax.png?raw=true)
+
 사진출처(http://adaptivepath.org/ideas/ajax-new-approach-web-applications/)
 
 **비동기화는 결과의 데이터를 기다리는 방식이 아닌 결과를 통보받는 형식** 이라고 할 수 있다. 대부분의 프로그래밍은 특정로직을 호출하고, 결과를 받아서 다음 로직을 실행하는 방식이라면 비동기화된 방식은 로직을 호출하고 결과를 기다리지 않는다. 대신 결과가 통보될 때 실행할 로직을 지정하는 방식이다.
