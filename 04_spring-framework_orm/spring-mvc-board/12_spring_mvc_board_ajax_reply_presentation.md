@@ -131,7 +131,7 @@ public class ReplyTestController {
 
 아래는 해당 페이지의 모습이다. 아직 댓글 목록과 페이징처리가 완료되지 않았기 때문에 하단의 2개의 빨간 박스는 비어있다. 추후에 댓글 목록과 페이징처리가 구현되면 차이점을 구분할 수 있다.
 
-![before]()
+![before](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/before.png)
 
 **JS코드를 이용한 댓글 목록 가져오기 테스트**
 jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록을 배열 형태로 가져와 보자. `@RestController`의 경우 객체를 JSON방식으로 전달하기 때문에 jQuery를 이용해서 호출할 때는 `getJSON()`를 아래와 같이 사용한다.
@@ -145,7 +145,7 @@ jQuery를 이용하여 특정 게시글(1000번째 게시글)의 댓글 목록�
 
 아래는 해당 페이지로 이동하고, 크롬 개발자 도구 콘솔창을 통해 확인해본 결과이다.
 
-![replyt_list]()
+![reply_list](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/reply_list.png)
 
 #### # 댓글 목록
 댓글 목록을 출력하기 위한 함수 `getReplies()`를 정의하고, 위에서 댓글 목록 가져오기 테스트를 했던 것처럼 `getJSON()`함수를 통해 댓글 목록 객체를 JSON형식으로 받아온다. 받아온 댓글 객체를 `each()`함수를 통해 루프를 돌면서 `<li>`태그를 만들어낸다. `<li>`태그마다 댓글내용과 댓글작성자들이 출력되도록 한다. 아래의 코드에서 주목해서봐야할 점은 `<li>`태그 속성에 `data-replyNo`이다. `data-`로 시작되는 속성은 이름이나 갯수에 상관없이 id나 name속성을 대신해서 사용하기에 편리하다. 이 속성을 통해 앞으로 댓글 수정/삭제 처리시 댓글 번호를 세팅하는데 사용하게 된다.
@@ -184,14 +184,16 @@ function getReplies() {
 
 댓글 목록이 출력된 모습은 아래와 같다.
 
-![replyt_list2]()
+![reply_list2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/reply_list2.png)
 
 #### # 댓글 등록
+
 댓글 저장 버튼 클릭을 할 경우, 이벤트 처리는 아래와 같이 작성해준다.
 - jQuery를 이용하여 화면에서 입력된 변수를 처리하고, `$.ajax()`를 통해 서버를 호출한다.
 - 전송하는 데이터는 JSON으로 구성된 문자열을 사용하고, 전송 받은 결과는 단순 문자열인 `regSuccess`이다.
 - 이 문자열을 통해 댓글이 정상적으로 등록되었는지 확인할 수 있는 알림창을 띄워준다.
 - 마지막으로 댓글 목록 출력 함수를 호출하여 댓글 목록을 갱신시키고, 댓글내용과 작성자 입력창은 초기화를 시켜준다.
+
 ```js
 var articleNo = 1000;
 
@@ -236,13 +238,14 @@ $("#replyAddBtn").on("click", function () {
 
 아래는 댓글내용과 댓글 작성자를 입력하고 저장버튼을 클릭하고 난 직후의 모습이다. 댓글 등록이 제대로 처리되고 나서 댓글 등록이 완료되었다는 알림창이 뜨게 되는 것을 확인 할 수 있다.
 
-![reply_register]()
+![reply_register](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/reply_register.png)
 
 그리고 알림창 확인 버튼을 클릭하고 나면 댓글 목록이 갱신되면서 방금 등록한 댓글의 내용이 출력되고, 입력했던 댓글내용과 등록자는 초기화가 된다.
 
-![reply_register2]()
+![reply_register2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/reply_register2.png)
 
 #### # 댓글 조회 및 수정/삭제
+
 `getReplies()`함수를 통해 생성된 `<li>`태그 안의 수정버튼을 클릭하면 Modal창이 뜨고, 클릭한 댓글의 값들(댓글번호, 댓글내용, 댓글작성자)이 `<input>`태그 value값으로 세팅된다.
 
 **댓글 수정/삭제 Modal 버튼**
@@ -287,7 +290,9 @@ $("#replyAddBtn").on("click", function () {
 ```
 
 **댓글의 값들 세팅**
+
 jQuery코드에서 주목해서 봐야할 것은 클릭 이벤트 선택자가 `<ul>`의 id인 `replies`로 되어있다는 점이다. 단순히 클릭이 발생한 수정버튼을 선택자로 지정하면 될 것 같지만 Ajax통신 후에 생기는 요소이기 때문에 이벤트처리가 되지 않는다. 그래서 AJA통신 이전에 존재하는 `<ul>`을 이용해서 이벤트를 등록해야만 한다.
+
 ```js
 $("#replies").on("click", ".replyLi button", function () {
     var reply = $(this).parent();
@@ -305,7 +310,7 @@ $("#replies").on("click", ".replyLi button", function () {
 
 아래를 보면 댓글 수정 버튼 클릭시 모달창이 나오고, 해당 댓글의 값들이 함께 출력되는 것을 확인할 수 있다.
 
-![modal]()
+![modal](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/modal.png)
 
 **댓글 삭제 호출하기**
 Modal의 삭제버튼을 클릭할 경우, 이벤트 처리는 아래와 같이 작성해준다.
@@ -389,19 +394,19 @@ $(".modalModBtn").on("click", function () {
 **댓글 삭제/수정 구현 결과 확인**
 댓글 삭제버튼 클릭하면 댓글 삭제 처리가 되고, 성공적으로 처리가 되었다는 알림창이 뜬다.
 
-![delete1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-55-52.png?raw=true)
+![delete1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/delete1.png)
 
 그리고 Modal이 닫히고, 댓글 목록이 갱신된다.
 
-![delete2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-56-08.png?raw=true)
+![delete2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/delete2.png)
 
 댓글 수정버튼 클릭하면 댓글 수정 처리가 되고, 성공적으로 처리가 되었다는 알림창이 뜬다.
 
-![update1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-58-43.png?raw=true)
+![update1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/update1.png)
 
 그리고 Modal이 닫히고, 댓글 목록이 갱신된다.
 
-![update2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2020-59-00.png?raw=true)
+![update2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/update2.png)
 
 #### # 댓글 목록 페이징 처리
 
@@ -480,9 +485,9 @@ $(".pagination").on("click", "li a", function (event) {
 
 **댓글 페이징처리 구현 모습**
 
-![paging1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2021-22-19.png?raw=true)
+![paging1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/paging1.png)
 
-![paging2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2021-23-09.png?raw=true)
+![paging2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/paging2.png)
 
 ## 2. 게시판에 댓글 적용하기
 지금까지 AJAX방식으로 댓글 기능을 구현하기 위한 화면 구현 연습을 했으니 실제로 게시판에 적용시켜보자.
@@ -556,7 +561,7 @@ $(".pagination").on("click", "li a", function (event) {
 **현재까지의 댓글 영역의 모습**
 아래는 아직은 구현이 되지 않은 댓글 영역의 모습이다.
 
-![before_reply](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-12%2023-32-09.png?raw=true)
+![before_reply](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/before_reply.png)
 
 #### # Handlebars를 이용한 JS템플릿 적용
 댓글 기능을 구현하는데 있어서 가장 핵심적인 부분은 댓글이 추가되거나 수정, 삭제되더라도 지속적으로 댓글 목록이 갱신되어 화면에 출력 되어야하는 것이다. 목록의 출력은 `<div>`태그가 반복적으로 구성되고, 하나의 `<div>` 안의 댓글의 정보들이 채워지는 방식으로 동작하게 된다. 이러한 작업은 문자열로 이루어지기 때문에 상당히 번거롭고, 지저분한 코드가 만들어지게 된다. 앞서 본 연습에서도 `str`변수에 html코드를 계속 붙여가면서 작성해야하는 번거로움이 있었던 것처럼 말이다. 하지만 자바스크립트 템플릿을 통해 좀더 깔끔한 코드를 작성할 수 있고 가독성 향상에도 도움이 된다. 자바스크립트 템플릿 종류에는 JS Render, Mustache, Mustache를 기반으로 한 Handlebars, Hogan 등이 있다. 이 예제에서는 Handlebars를 사용할 것이다.
@@ -877,53 +882,53 @@ $(".modalDelBtn").on("click", function () {
 **댓글 목록**
 댓글이 없을 경우
 
-![box1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-40-59.png?raw=true)
+![box1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/box1.png)
 
 댓글이 있을 경우(댓글 목록 접기)
 
-![box2_1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-42-29.png?raw=true)
+![box2_1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/box2_1.png)
 
 댓글이 있을 경우(댓글 목록 펼치기)
 
-![box2_2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-44-34.png?raw=true)
+![box2_2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/box2_2.png)
 
 **댓글 입력**
 
 댓글 저장 버튼 클릭하고, 댓글 저장 처리 후 알림창을 띄운 모습
 
-![add1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-47-53.png?raw=true)
+![add1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/add1.png)
 
 댓글 목록 갱신, 댓글 입력창 초기화
 
-![add2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2014-48-08.png?raw=true)
+![add2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/add2.png)
 
 **댓글 수정**
 
 댓글 수정 버튼 클릭시 Modal창이 뜨고, 기존의 댓글을 수정
 
-![mod1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-00-30.png?raw=true)
+![mod1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/mod1.png)
 
 Modal창의 댓글 수정버튼 클릭하고, 댓글 수정 처리 후 알림창을 띄운 모습
 
-![mod2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-01-21.png?raw=true)
+![mod2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/mod2.png)
 
 댓글 수정 처리 후 댓글 목록 갱신
 
-![mod3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-01-38.png?raw=true)
+![mod3](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/mod3.png)
 
 **댓글 삭제**
 
 댓글 삭제 버튼 클릭시 Modal창의 모습
 
-![del1](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-03-07.png?raw=true)
+![del1](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/del1.png)
 
 Modal창의 댓글 삭제버튼을 클릭하고, 댓글 삭제 처리 후 알림창을 띄운 모습
 
-![del2](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-03-53.png?raw=true)
+![del2](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/del2.png)
 
 댓글 삭제 처리 후 댓글 목록 갱신
 
-![del3](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-13%2015-04-38.png?raw=true)
+![del3](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/12_spring_mvc_board_ajax_reply_presentation/del3.png)
 
 ## 3. 정리
 Rest방식으로 AJAX를 통해 댓글 기능 구현을 완료하였다. 일반적으로 `@Controller`를 사용하여 작성하는 방식보다 `@RestController`를 통해 작성하는 방식의 경우 클라이언트에 작성해야할 코드가 많아졌다. 물론 JS템플릿을 통해 코드의 양이 줄어들긴했지만 여전히 많은 양의 코드를 작성해줘야만 했다. 덕분에 설명해야할 포스팅의 양도 많아졌다. 그래서 지금까지 댓글 화면을 구현한 내용 중에서 설명을 빼먹은 부분이나 기억해두어야할 내용들을 간단하게 정리해보자.
