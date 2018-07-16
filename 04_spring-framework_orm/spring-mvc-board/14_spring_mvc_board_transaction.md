@@ -58,6 +58,7 @@
 ## 2. 트랙잭션 처리를 위한 준비
 
 #### # 트랜잭션 라이브러리 추가 : `pom.xml`
+
 ```xml
 <dependency>
     <groupId>org.springframework</groupId>
@@ -68,6 +69,7 @@
 
 #### # 트랜잭션 매너저 설정 : `applicationContext.xml`
 트랜잭션 매니저를 설정은 보통 DataSource의 설정이 존재하는 곳에 함께 적용하는 것이 편리하다. `<tx:annotation-driven/>`은 `@Treansactional`애너테이션을 이용한 트랜잭션 관리가 가능하게 하는 설정이다.
+
 ```xml
 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource"/>
@@ -81,6 +83,7 @@
 
 #### # 댓글 갯수 칼럼 추가
 게시글 테이블에 댓글 갯수 칼럼을 추가하고, 게시글 등록일자와 조회수 칼럼명도 수정해준다.(이 작업은 기존의 칼럼명이 맘에 들지 않아서 변경하는 것일 뿐 트랜잭션작업과 무관하다.)
+
 ```sql
 -- 댓글 갯수 칼럼 추가
 ALTER TABLE tbl_article ADD COLUMN reply_cnt int DEFAULT 0;
@@ -94,6 +97,7 @@ ALTER TABLE tbl_article CHANGE COLUMN viewcnt view_cnt int DEFAULT 0;
 
 #### # 게시글 도메인 클래스 수정
 게시글 도메인 클래스인 `ArticleVO`에 멤버변수로 `replyCnt`를 추가해준다.
+
 ```java
 public class ArticleVO {
 
@@ -111,6 +115,7 @@ public class ArticleVO {
 
 #### # SQL Mapper 수정 : `articleMapper.xml`
 댓글 갯수 칼럼이 필요한 SQL문과 `resultMap`에 댓글 갯수 칼럼을 추가시켜주고, 변경한 칼럼명은 수정해준다.
+
 ```sql
 <select id="listSearch" resultMap="ArticleResultMap">
     <![CDATA[
@@ -132,6 +137,7 @@ public class ArticleVO {
     ]]>
 </select>
 ```
+
 ```xml
 <resultMap id="ArticleResultMap" type="ArticleVO">
     <id property="articleNo" column="article_no"/>
@@ -164,6 +170,7 @@ public void updateReplyCnt(Integer articleNo, int amount) throws Exception {
 ```
 
 **`articleMapper.xml` 댓글 갯수 갱신 SQL 작성**
+
 ```sql
 <update id="updateReplyCnt">
     UPDATE tbl_article
@@ -189,6 +196,7 @@ public int getArticleNo(Integer replyNo) throws Exception {
 ```
 
 **`replyMapper.xml` 댓글의 게시글 번호 조회 SQL 작성**
+
 ```sql
 <select id="getArticleNo" resultType="int">
     SELECT
@@ -288,7 +296,7 @@ public ArticleVO read(Integer articleNo) throws Exception {
 ## 4. 최종 기능 구현 모습 확인
 댓글 추가/삭제에 따른 댓글 갯수 변화와 게시글 조회에 따른 조회수 증가 모습은 아래와 같다.
 
-![check](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/2018-03-14%2023-52-31.png?raw=true)
+![check](https://raw.githubusercontent.com/walbatrossw/TIL/master/04_spring-framework_orm/spring-mvc-board/img/14_spring_mvc_board_transaction/check.png)
 
 ## 5. 정리
 게시글의 조회수 변화와 댓글 갯수의 갱신작업을 트랜잭션을 통해 처리했는데 앞서 포스팅한 내용에 비해 간단한 내용들이어서 따로 정리할 것은 없다. 다만 불만족스러운 부분은 게시글의 조회수 중복증가 방지처리를 하지 않았다는 점이다. 이 부분은 앞으로 로그인처리를 구현하면서 Session을 통해 조회수 중복증가를 막아보도록 할 예정이다.
