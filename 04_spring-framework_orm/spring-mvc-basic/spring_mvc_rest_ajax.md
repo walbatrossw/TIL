@@ -200,6 +200,7 @@ public ResponseEntity<List<SampleVO>> sendListNot() {
 }
 ```
 해당 URI를 요청하면 리턴타입에 list 데이터와 HTTP상태코드(404)를 전송하게 된다. 앞서 본 예제와 달리 화면에는 전송한 결과를 보여주면서, 상태코드도 함께 전달되는 것을 확인해볼 수 있다.
+
 ![](https://github.com/walbatrossw/develop-notes/blob/master/reding-notes/%EC%BD%94%EB%93%9C%EB%A1%9C_%EB%B0%B0%EC%9A%B0%EB%8A%94_%EC%8A%A4%ED%94%84%EB%A7%81_%EC%9B%B9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/photo/20180308_113106.png?raw=true)
 
 ## 5. AJAX(Asynchronous Javascript and XML)
