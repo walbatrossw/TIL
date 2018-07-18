@@ -38,7 +38,7 @@
 
 ---
 
-# 스프링 MVC Interceptor
+# Spring MVC Interceptor
 
 ## 1. Filter와 Interceptor의 공통점과 차이점
 
@@ -288,4 +288,10 @@ public void postHandle(HttpServletRequest request, HttpServletResponse response,
 첫번째 사진은 `/doA`에서 `/doB`를 요청하기 전이고, 두번째 사진은 `/doB` 요청을 처리하고 리다이렉트되어 `/doA`로 이동한 모습이다. 위에서 설명한 것처럼 리다이렉트 되기 전에
 인터셉터에서 `result`변수에 담긴 문자열을 `HttpSession`에 보관하여 `/doA`로 이동하게 되고 화면에 결과 데이터가 보여지게 된다.
 
+## 5. 정리
+
+위 예제와 같은 내용을 로그인 처리에서 유용하게 사용할 수 있다. 컨트롤러에서 로그인 처리 후의 결과를 반환하고, 인터셉터를 이용해서 `HttpSession`에 로그인이 필요한 객체를 보관하는
+형태로 작성하면 컨트롤러에서 직접 `HttpSession`을 사용하지 않는 코드를 만들 수 있다.
+
+다음 포스팅에서는 게시판예제에 실제로 로그인기능을 추가하는 내용을 정리할 예정이다.
 
