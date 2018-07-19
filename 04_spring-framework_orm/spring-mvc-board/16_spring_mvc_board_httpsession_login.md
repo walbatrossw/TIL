@@ -48,10 +48,149 @@ HttpSession은 서블릿이 다음 작업을 수행하도록 허용한다.
 
 Session의 정보는 현재 웹 어플리케이션(Servlet Context)의 범위만 지정되기 때문에 하나의 Context에 저장된 정보는 직접적으로 다른 Context에서는 볼 수가 없다.
 
+## 2. 로그인 처리를 위한 회원가입 기능 구현
 
-## 2. 로그인 처리를 위한 준비 작업
+로그인 처리를 위해서 먼저 회원가입 기능을 먼저 구현해보자. 현재 보고있는 책에서는 따로 회원가입에 대한 내용이 없다. 그래서 직접 구현한 내용을 정리하였다.
 
 #### # 회원 테이블 생성
+회원가입과 로그인을 처리하기 위해 아래와 같이 회원 테이블을 생성한다. 기본적으로 회원 테이블의 칼럼에는 아이디, 비밀번호, 이름, 이메일이 있고, 추후에 구현될 회원포인트 기능을 위한 칼럼과 로그인 유지를
+위한 `session_key`, `session_limit` 칼럼이 있다. 그리고 회원의 프로필 이미지 칼럼, 가입일자, 로그인일자, 서명이 있다.
+
+```sql
+-- 회원 테이블
+CREATE TABLE tbl_user (
+  user_id VARCHAR(50) NOT NULL,
+  user_pw VARCHAR(100) NOT NULL,
+  user_name VARCHAR(100) NOT NULL,
+  user_email VARCHAR(50) NOT NULL,
+  user_point INT NOT NULL DEFAULT 0,
+  session_key VARCHAR(50) NOT NULL DEFAULT 'none',
+  session_limit TIMESTAMP,
+  user_img VARCHAR(100) NOT NULL DEFAULT 'user/default-user.png',
+  user_join_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  user_login_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  user_signature VARCHAR(200) NOT NULL DEFAULT '안녕하세요 ^^',
+  PRIMARY KEY (user_id)
+);
+```
+#### # 회원 클래스 작성
+`기본패키지/user/domain`패키지에 회원 클래스를 아래와 같이 작성해준다.
+```java
+public class UserVO {
+
+    private String userId;
+    private String userPw;
+    private String userName;
+    private String userEmail;
+    private Date userJoinDate;
+    private Date userLoginDate;
+    private String userSignature;
+    private String userImg;
+    private int userPoint;
+
+    // getter, setter, toString 생략 
+}
+```
+
+#### # 회원 영속 계층 구현
+`기본패키지/user/persistence`패키지에 `UserDAO` 인터페이스와 `UserDAOImpl`클래스를 아래와 같이 작성해준다.
+
+```java
+public interface UserDAO {
+    
+    // 회원가입 처리
+    void register(UserVO userVO) throws Exception;
+    
+}
+```
+
+```java
+@Repository
+public class UserDAOImpl implements UserDAO {
+    
+    private static final String NAMESPACE = "com.doubles.mvcboard.mappers.user.UserMapper";
+    
+    private final SqlSession sqlSession;
+
+    @Inject
+    public UserDAOImpl(SqlSession sqlSession) {
+        this.sqlSession = sqlSession;
+    }
+    
+    // 회원가입처리
+    @Override
+    public void register(UserVO userVO) throws Exception {
+        sqlSession.insert(NAMESPACE + ".register", userVO);
+    }
+    
+}
+```
+
+`/resources/mappers/user`경로에 `userMapper.xml`을 생성하고 아래와 같이 작성해준다. `tbl_user`테이블의 칼럼과 `UserVO`클래스의 필드명이 불일치하기 때문에 각각을 매칭시켜주기 위해 `resultMap`도
+아래와 같이 작성해준다. insert 퀴리의 경우 문제가 발생하지 않지만 select 쿼리의 경우 문제가 발생하기 때문에 미리 작성한 것이다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.doubles.mvcboard.mappers.user.UserMapper">
+    
+    <insert id="register">
+        INSERT INTO tbl_user (
+            user_id
+            , user_pw
+            , user_name
+            , user_email
+        ) VALUES (
+            #{userId}
+            , #{userPw}
+            , #{userName}
+            , #{userEmail}
+        )
+    </insert>
+    
+</mapper>
+```
+
+#### # 회원 서비스 계층 구현
+
+#### # 회원가입 컨트롤러 작성
+
+#### # 회원가입 페이지 작성
+
+
+## 3. 로그인 처리를 위한 준비 작업
+
+#### # 회원 테이블 생성
+로그인 처리를 위해 회원 테이블을 아래와 같이 생성한다.
+
+```sql
+-- 회원 테이블
+CREATE TABLE tbl_user (
+  user_id VARCHAR(50) NOT NULL,
+  user_pw VARCHAR(100) NOT NULL,
+  user_name VARCHAR(100) NOT NULL,
+  user_point INT NOT NULL DEFAULT 0,
+  session_key VARCHAR(50) NOT NULL DEFAULT 'none',
+  session_limit TIMESTAMP,
+  user_img VARCHAR(100) NOT NULL DEFAULT 'user/default-user.png',
+  user_email VARCHAR(50) NOT NULL,
+  user_join_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  user_login_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  user_signature VARCHAR(200) NOT NULL DEFAULT '안녕하세요 ^^',
+  PRIMARY KEY (user_id)
+);
+```
+
+```sql
+-- 회원 추가
+intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('doubles', '1234', 'doubles', 'doubles@mail.com');
+intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('user01', '1234', 'user01', 'user01@mail.com');
+intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('user02', '1234', 'user02', 'user02@mail.com');
+intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('user03', '1234', 'user03', 'user03@mail.com');
+```
 
 #### # 회원 클래스 작성
 
