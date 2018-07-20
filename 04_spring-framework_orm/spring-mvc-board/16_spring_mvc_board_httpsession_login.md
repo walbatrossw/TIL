@@ -235,7 +235,7 @@ public class UserRegisterController {
 
 #### # 회원가입 및 로그인 페이지 작성
 
-`/views/user/` 디렉토리에 회원가입 페이지(`register.jsp`)를 아래와 같이 작성한다.
+`/views/user/` 디렉토리에 회원가입 페이지(`register.jsp`)를 생성하고, 아래와 같이 작성한다.
 
 ```html
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -318,7 +318,9 @@ public class UserRegisterController {
 </html>
 ```
 
-`/views/user/` 디렉토리에 회원가입 페이지(`login.jsp`)를 아래와 같이 작성한다.
+![user_register]()
+
+`/views/user/` 디렉토리에 로그인 페이지(`login.jsp`)를 생성하고, 아래와 같이 작성한다.
 
 ```html
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -403,6 +405,20 @@ public class UserRegisterController {
 </body>
 </html>
 ```
+
+![user_login]()
+
+#### # 회원가입 처리 확인
+
+회원가입 처리가 제대로 되는지 확인해보자.
+
+`/user/register` uri를 요청하여 회원가입 페이지로 이동한 뒤 아이디, 이름, 이메일, 비밀번호를 작성하고 가입 버튼을 누른다.
+
+![user_register_check]()
+
+회원가입이 성공적으로 처리가 되면, `/user/login` uri로 리다이렉트 되고, 아래와 같이 성공 메시지가 나타나게 된다.
+
+![user_register_check2]()
 
 
 ## 3. 로그인 처리를 위한 준비 작업
