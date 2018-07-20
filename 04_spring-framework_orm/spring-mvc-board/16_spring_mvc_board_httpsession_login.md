@@ -422,13 +422,12 @@ public class UserRegisterController {
 
 #### 2.7 회원가입 처리 확인
 
-회원가입 처리가 제대로 되는지 확인해보자.
+회원가입 처리가 제대로 되는지 확인해보자. `/user/register` uri를 요청하거나 회원가입 버튼을 누르고 회원가입 페이지로 이동한 뒤 아이디, 이름, 이메일, 비밀번호를 작성하고 가입 버튼을 누른다.
+회원가입이 성공적으로 처리가 되면, `/user/login` uri로 리다이렉트 되고, 아래 화면과 같이 성공 메시지가 나타나게 된다.
 
-`/user/register` uri를 요청하여 회원가입 페이지로 이동한 뒤 아이디, 이름, 이메일, 비밀번호를 작성하고 가입 버튼을 누른다.
+![user_register_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check.gif?raw=true)
 
-![user_register_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check.png?raw=true)
 
-회원가입이 성공적으로 처리가 되면, `/user/login` uri로 리다이렉트 되고, 아래와 같이 성공 메시지가 나타나게 된다.
 
 ![user_register_check2](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check2.png?raw=true)
 
@@ -754,17 +753,12 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
 #### 3.7 로그인 처리 확인
 
-이제 로그인 처리가 제대로 작동하는지 확인해보자. 로그인 페이지로 이동한 뒤 아이디와 비밀번호를 입력하고, 로그인 버튼을 누른다.
+이제 로그인 처리가 제대로 작동하는지 확인해보자. 로그인 페이지로 이동한 뒤 아이디와 비밀번호를 입력하고, 로그인 버튼을 누른다. 로그인이 제대로 처리되었다면
+메인페이지(`/`)로 이동하게 되고, session에 `user`정보를 저장하여 아래 화면과 같이 로그인한 회원의 정보가 보이게 된다. 로그인 이전의 모습과 비교해보면
+차이점을 알 수 있다.
 
-![user_login_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check.png?raw=true)
+![user_login_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check.gif?raw=true)
 
-로그인이 제대로 처리되었다면 메인페이지(`/`)로 이동하게 되고, session에 `user`정보를 저장하여 아래와 같이 로그인한 회원의 정보가 보이게 된다.
-
-![user_login_check2](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check2.png?raw=true)
-
-로그인 이전의 모습과 비교해보면 차이점을 알 수 있다.
-
-![user_login_check3](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check3.png?raw=true)
 
 #### 3.8 권한 Interceptor 클래스 및 설정
 
@@ -817,6 +811,79 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 
 #### 3.9 권한 Interceptor 처리 확인
 
-![auth_interceptor_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/auth_interceptor_check.gif?raw=true)
+![auth_interceptor_check](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/auth_interceptor_check.gif?raw=true)
 
-위의 화면을 보면 로그인하지 않은 상태에서 게시글 쓰기 버튼을 누르거나, 게시글 쓰기 uri를 주소창에 쓰고 페이지로 이동하려고 하면 아래의 화면과 같이 로그인 화면으로 이동하게 된다.
+로그인하지 않은 상태에서 게시글 쓰기 버튼을 누르거나, 게시글 쓰기 uri를 주소창에 쓰고 페이지로 이동하려고 하면 위의 화면과 같이 로그인 화면으로 이동하게 된다.
+
+#### 3.10 자동 페이지 이동처리
+
+로그인하지 않은 사용자가 로그인 인증이 필요한 페이지로 접근할 경우 `AuthInterceptor`를 통해 로그인 페이지로 이동하게 되고, 로그인을 하게 되면 메인페이지(`/`)로 이동하게 된다.
+하지만 여기서 아쉬운 점은 사용자가 윈하던 페이지로 바로 이동할 수 있게 하지 않았다는 점이다. 이것을 해결하는 방법은 `AuthInterceptor`에서 사용자가 원하던 페이지가 무엇이었는지
+보관했다가, 로그인 성공 후 해당 페이지로 이동시켜주는 것이다.
+
+그래서 아래와 같이 `AuthInterceptor`를 수정해주었다. `AuthInterceptor`에서 `saveDestination()` 메서드를 이용하여 사용자가 원하는 페이지 정보를 HttpSession에 `destination`이라는 변수로 저장한다.
+
+```java
+public class AuthInterceptor extends HandlerInterceptorAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthInterceptor.class);
+    
+    // 페이지 요청 정보 저장
+    private void saveDestination(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String query = request.getQueryString();
+        if (query == null || query.equals("null")) {
+            query = "";
+        } else {
+            query = "?" + query;
+        }
+
+        if (request.getMethod().equals("GET")) {
+            logger.info("destination : " + (uri + query));
+            request.getSession().setAttribute("destination", uri + query);
+        }
+    }
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        HttpSession httpSession = request.getSession();
+
+        if (httpSession.getAttribute("login") == null) {
+            logger.info("current user is not logged");
+            saveDestination(request);
+            response.sendRedirect("/user/login");
+            return false;
+        }
+
+        return true;
+    }
+}
+```
+
+`LoginInterceptor`도 수정이 필요한데 아래와 같이 `response.sendRedirect("/")`를 `AuthInterceptor`에서 저장한 `destination`을 사용하도록 수정해준다.
+
+```java
+@Override
+public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+    HttpSession httpSession = request.getSession();
+    ModelMap modelMap = modelAndView.getModelMap();
+    Object userVO =  modelMap.get("user");
+
+    if (userVO != null) {
+        logger.info("new login success");
+        httpSession.setAttribute(LOGIN, userVO);
+        //response.sendRedirect("/");
+        Object destination = httpSession.getAttribute("destination");
+        response.sendRedirect(destination != null ? (String) destination : "/");
+    }
+}
+```
+
+#### 3.11 자동 페이지 이동 확인
+
+로그인하지 않은 상태에서 글쓰기 버튼을 누르면 로그인 페이지로 이동하게 된다. 이 상태에서 로그인을 하면 메인 페이지가 아닌 글쓰기 페이지로 이동하는 것을 아래 화면에서
+확인 할 수 있다.
+
+![auth_interceptor_check2](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/auth_interceptor_check2.gif?raw=true)
