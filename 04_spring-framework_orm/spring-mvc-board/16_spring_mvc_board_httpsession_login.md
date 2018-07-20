@@ -817,4 +817,6 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 
 #### 3.9 권한 Interceptor 처리 확인
 
-![auth_interceptor_check]()
+![auth_interceptor_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/auth_interceptor_check.gif?raw=true)
+
+위의 화면을 보면 로그인하지 않은 상태에서 게시글 쓰기 버튼을 누르거나, 게시글 쓰기 uri를 주소창에 쓰고 페이지로 이동하려고 하면 아래의 화면과 같이 로그인 화면으로 이동하게 된다.
