@@ -427,10 +427,6 @@ public class UserRegisterController {
 
 ![user_register_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check.gif?raw=true)
 
-
-
-![user_register_check2](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check2.png?raw=true)
-
 DB를 확인해보면 비밀번호가 제대로 암호화가 되었는지도 확인할 수 있다.
 ![user_register_check3](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check3.png?raw=true)
 
@@ -887,3 +883,134 @@ public void postHandle(HttpServletRequest request, HttpServletResponse response,
 확인 할 수 있다.
 
 ![auth_interceptor_check2](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/auth_interceptor_check2.gif?raw=true)
+
+## 4. 게시물 세부 기능에 Interceptor 적용
+
+회원가입과 로그인 처리와 관련된 인터셉터나 컨트롤러의 처리를 마무리했다. 이제 게시물의 세부 기능(게시글 수정, 삭제, 댓글 등록, 삭제, 수정)을 로그인한 사용자만 할 수 있도록
+구현해보자.
+
+#### 4.1 인터셉터 URI Mapping
+
+이전의 `AuthInterceptor`를 스프링에 인터셉터로 등록할 때 `dispatcher-servlet.xml`에 아래와 같이 URI를 매핑했었다.
+
+```xml
+<bean id="authInterceptor" class="com.doubles.mvcboard.commons.interceptor.AuthInterceptor"/>
+
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/article/paging/search/write"/>
+        <mvc:mapping path="/article/paging/search/modify"/>
+        <mvc:mapping path="/article/paging/search/remove"/>
+        <mvc:mapping path="/user/info"/>
+        <ref bean="authInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+`AuthInterceptor`를 적용하는 규칙은 다음과 같다.
+
+- 로그인 사용자
+    - 게시글 등록
+    - 게시글 수정/삭제
+    - 댓글 추가/수정/삭제
+
+- 일반 사용자
+    - 게시글 목록
+    - 게시글 조회
+    - 댓글 목록
+
+#### 4.2 게시글 등록 페이지 수정
+
+이전에는 아래의 화면과 같이 게시글 등록 페이지(`write.jsp`)에서 작성자를 직접 입력하도록 처리했었다.
+
+![write](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/04_spring_mvc_board_crud_controller_view/write.png?raw=true)
+
+게시글 쓰기 페이지에서 로그인한 사용자를 작성자로 변경하고 정보를 화면에 나타나도록 하지 않도록 코드를 작성했다.
+
+```html
+<div class="form-group" hidden>
+    <label for="writer">작성자</label>
+    <input class="form-control" id="writer" name="writer" value="${login.userId}" readonly>
+</div>
+```
+
+아래의 화면을 보면 작성자가 따로 화면에 나타나지 않는다.
+
+![user_write](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_write.png?raw=true)
+
+
+#### 4.3 게시글 조회 페이지 수정
+
+게시글의 조회 페이지(`read.jsp`)에서는 게시글을 작성한 로그인 사용자만 가능하도록 아래와 같이 수정해준다.
+
+```html
+<div class="box-footer">
+    <form role="form" method="post">
+        <input type="hidden" name="articleNo" value="${article.articleNo}">
+        <input type="hidden" name="page" value="${searchCriteria.page}">
+        <input type="hidden" name="perPageNum" value="${searchCriteria.perPageNum}">
+        <input type="hidden" name="searchType" value="${searchCriteria.searchType}">
+        <input type="hidden" name="keyword" value="${searchCriteria.keyword}">
+    </form>
+    <button type="submit" class="btn btn-primary listBtn"><i class="fa fa-list"></i> 목록</button>
+    <c:if test="${login.userId == article.writer}">
+        <div class="pull-right">
+            <button type="submit" class="btn btn-warning modBtn"><i class="fa fa-edit"></i> 수정</button>
+            <button type="submit" class="btn btn-danger delBtn"><i class="fa fa-trash"></i> 삭제</button>
+        </div>
+    </c:if>
+</div>
+```
+
+아래의 화면은 로그인 전의 조회 페이지이다.
+
+![user_read_before_login](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_read_before_login.png?raw=true)
+
+아래의 화면은 로그인 후의 조회 페이지이다.
+
+![user_read_after_login](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_read_after_login.png?raw=true)
+
+
+그리고 조회 페이지의 댓글은 사용자의 로그인 상태에 따라 영향을 받게 아래와 같이 처리를 해야한다.
+
+- 댓글 추가 : 로그인한 사용자는 댓글을 작성할 수 있지만, 로그인하지 않은 사용자는 댓글을 작성할 수 없다.
+- 댓글의 수정/삭제 : 댓글 목록을 보는 것은 로그인/비로그인 사용자 둘다 자유롭지만 자신이 작성한 댓글의 수정/삭제는 로그인한 사용자만 가능해야한다.
+
+댓글 추가/입력 코드는 아래와 같이 수정해준다.
+
+```html
+<div class="box box-warning">
+    <div class="box-header with-border">
+        <a class="link-black text-lg"><i class="fa fa-pencil margin-r-5"></i> 댓글 쓰기</a>
+    </div>
+    <div class="box-body">
+        <c:if test="${not empty login}">
+            <form>
+                <div class="form-group">
+                    <textarea class="form-control" id="newReplyText" rows="3" placeholder="댓글내용..."style="resize: none"></textarea>
+                </div>
+                <div class="col-sm-2" hidden>
+                    <input class="form-control" id="newReplyWriter" type="text" value="${login.userId}" readonly>
+                </div>
+                <button type="button" class="btn btn-default btn-block replyAddBtn">
+                    <i class="fa fa-save"></i> 댓글 저장
+                </button>
+            </form>
+        </c:if>
+        <c:if test="${empty login}">
+            <a href="${path}/user/login" class="btn btn-default btn-block" role="button">
+                <i class="fa fa-edit"></i> 로그인 한 사용자만 댓글 등록이 가능합니다.
+            </a>
+        </c:if>
+    </div>
+</div>
+```
+
+아래의 화면은 로그인 전의 댓글 추가 영역이다.
+
+![user_reply_add_before_login](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_reply_add_before_login.png?raw=true)
+
+아래의 화면은 로그인 후의 댓글 추가 영역이다.
+
+![user_reply_add_after_login](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_reply_add_after_login.png?raw=true)
+
