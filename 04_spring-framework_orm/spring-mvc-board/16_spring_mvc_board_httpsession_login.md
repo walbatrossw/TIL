@@ -233,6 +233,18 @@ public class UserRegisterController {
 
 그리고 최종적으로 회원가입 처리가 완료되면 최종적으로 성공메서지를 가지고 로그인페이지로 리다이렉트 하게된다.
 
+암호화 처리를 위해 BCrypt를 사용하기 위해서는 `pom.xml`에 아래와 같이 의존성을 추가시켜줘야한다.
+
+```xml
+<!--비밀번호 암호화 -->
+<!-- https://mvnrepository.com/artifact/org.mindrot/jbcrypt -->
+<dependency>
+    <groupId>org.mindrot</groupId>
+    <artifactId>jbcrypt</artifactId>
+    <version>0.4</version>
+</dependency>
+```
+
 #### # 회원가입 및 로그인 페이지 작성
 
 `/views/user/` 디렉토리에 회원가입 페이지(`register.jsp`)를 생성하고, 아래와 같이 작성한다.
@@ -318,7 +330,7 @@ public class UserRegisterController {
 </html>
 ```
 
-![user_register]()
+![user_register](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register.png?raw=true)
 
 `/views/user/` 디렉토리에 로그인 페이지(`login.jsp`)를 생성하고, 아래와 같이 작성한다.
 
@@ -406,7 +418,7 @@ public class UserRegisterController {
 </html>
 ```
 
-![user_login]()
+![user_login](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login.png?raw=true)
 
 #### # 회원가입 처리 확인
 
@@ -414,12 +426,14 @@ public class UserRegisterController {
 
 `/user/register` uri를 요청하여 회원가입 페이지로 이동한 뒤 아이디, 이름, 이메일, 비밀번호를 작성하고 가입 버튼을 누른다.
 
-![user_register_check]()
+![user_register_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check.png?raw=true)
 
 회원가입이 성공적으로 처리가 되면, `/user/login` uri로 리다이렉트 되고, 아래와 같이 성공 메시지가 나타나게 된다.
 
-![user_register_check2]()
+![user_register_check2](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check2.png?raw=true)
 
+DB를 확인해보면 비밀번호가 제대로 암호화가 되었는지도 확인할 수 있다.
+![user_register_check3](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check3.png?raw=true)
 
 ## 3. 로그인 처리를 위한 준비 작업
 
