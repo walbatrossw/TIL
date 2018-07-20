@@ -561,7 +561,7 @@ public class UserLoginController {
 - `userVO`가 `null`이거나 비밀번호를 `BCrypt.checkpw()`를 통해 검증해서 맞지않으면 메서드를 종료시킨다.
 - 비밀번호가 일치하면 model에 `userVO`를 `user`란 이름의 변수에 저장한다.
 
-#### 3.5 로그인 Interceptor 클래스 작성
+#### 3.5 로그인 Interceptor 클래스 작성 및 설정
 
 `UserLoginController`에서 HttpSession과 관련된 작업이 처리되지 않았기 때문에 HttpSession과 관련된 모든 설정은 인터셉터에서 처리한다. `기본패키지/commons/interceptor` 패키지에 `LoginInterceptor`를
 생성하고, 아래와 같이 코드를 작성한다.
@@ -605,8 +605,6 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 `LoginInterceptor`의 `postHandle()` 메서드는 httpSession에 컨트롤러에서 저장한 `user`를 저장하고, `/`로 리다이렉트를 한다. 그리고 `preHandle()` 메서드는 기존의 로그인 정보가 있을 경우 초기화하는 역할을
 수행한다.
 
-#### 3.6 로그인 Interceptor 설정
-
 앞서 작성한 로그인 인터셉터 클래스를 스프링에서 인터셉터로 인식시키기 위해 아래와 같이 `dispatcher-servlet.xml`(`servlet-context.xml`)에 코드를 작성해준다.
 
 ```xml
@@ -620,7 +618,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 <mvc:interceptors>
 ```
 
-#### 3.7 로그인 화면
+#### 3.6 로그인 화면
 
 이미 회원가입 처리를 구현하면서 로그인 화면을 이미 작성했고, 결과 페이지에 해당하는 `loginPost.jsp`를 아래와 같이 작성해준다. 컨트롤러에서 만약 회원정보가 없거나, 비밀번호가 불일치한다면 `loginPost.jsp`로
 이동하여 아이디와 비밀번호를 확인하라는 메시지와 함께 로그인페이지로 다시 이동하게 처리하였다.
@@ -754,16 +752,69 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 </div>
 ```
 
-#### 3.8 로그인 처리 확인
+#### 3.7 로그인 처리 확인
 
 이제 로그인 처리가 제대로 작동하는지 확인해보자. 로그인 페이지로 이동한 뒤 아이디와 비밀번호를 입력하고, 로그인 버튼을 누른다.
 
-![user_login_check]()
+![user_login_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check.png?raw=true)
 
 로그인이 제대로 처리되었다면 메인페이지(`/`)로 이동하게 되고, session에 `user`정보를 저장하여 아래와 같이 로그인한 회원의 정보가 보이게 된다.
 
-![user_login_check2]()
+![user_login_check2](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check2.png?raw=true)
 
 로그인 이전의 모습과 비교해보면 차이점을 알 수 있다.
 
-![user_login_check3]()
+![user_login_check3](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login_check3.png?raw=true)
+
+#### 3.8 권한 Interceptor 클래스 및 설정
+
+이전에 작성한 `LoginInterceptor`는 로그인한 사용자에 대한 정보를 HttpSessin에 보관처리를 담당했는데, 지금 작성하는 인터셉터는 특정 경로에 접근할 경우
+현재 사용자의 로그인 여부를 체크하는 역할을 수행한다.
+
+`LoginInterceptor`와 마찬가지로 `기본패키지/commons/interceptor` 패키지에 `AuthInterceptor` 클래스를 생성하고 아래와 같이 코드를 작성한다.
+
+```java
+public class AuthInterceptor extends HandlerInterceptorAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthInterceptor.class);
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        HttpSession httpSession = request.getSession();
+
+        if (httpSession.getAttribute("login") == null) {
+            logger.info("current user is not logged");
+            response.sendRedirect("/user/login");
+            return false;
+        }
+
+        return true;
+    }
+}
+```
+
+`preHandle()`메서드는 현재 사용자가 로그인한 상태여부를 확인하고, 컨트롤러를 호출할 것인지 아닌지를 결정한다. 그리고 만약 로그인하지 않은 사용자라면
+로그인 페이지(`/user/login`)으로 리다이렉트하게 된다.
+
+
+`AuthInterceptor`클래스를 인터셉터로 인식하기 위해 `dispatcher-servlet.xml`(`servlet-context.xml`)에서 아래와 같이 코드를 작성해준다. 게시물 입력, 수정, 삭제, 회원 정보 페이지 요청에는
+권한 인터셉터가 작동하도록 아래와 같이 매핑을 해주었다.
+
+```xml
+<bean id="authInterceptor" class="com.doubles.mvcboard.commons.interceptor.AuthInterceptor"/>
+
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/article/paging/search/write"/>
+        <mvc:mapping path="/article/paging/search/modify"/>
+        <mvc:mapping path="/article/paging/search/remove"/>
+        <mvc:mapping path="/user/info"/>
+        <ref bean="authInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+#### 3.9 권한 Interceptor 처리 확인
+
+![auth_interceptor_check]()
