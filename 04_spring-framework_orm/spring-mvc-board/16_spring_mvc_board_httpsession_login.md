@@ -20,7 +20,7 @@ session에 보관된 객체는 JSP에서 EL을 이용해서 자동으로 추적�
 데이터를 검색한다. 이와 같은 방식으로 동작하기 때문에 JSP를 개발하는 개발자는 자신이 사용하는 변수가 request에 존재하는 것인지, session에 존재하는 것인지 고민하지 않아도
 된다.
 
-#### # HttpSession
+#### 1.1 HttpSession
 
 [Interface HttpSession 링크](https://tomcat.apache.org/tomcat-5.5-doc/servletapi/javax/servlet/http/HttpSession.html)
 
@@ -52,7 +52,7 @@ Session의 정보는 현재 웹 어플리케이션(Servlet Context)의 범위만
 
 로그인 처리를 위해서 먼저 회원가입 기능을 먼저 구현해보자. 현재 보고있는 책에서는 따로 회원가입에 대한 내용이 없다. 그래서 직접 구현한 내용을 정리하였다.
 
-#### # 회원 테이블 생성
+#### 2.1 회원 테이블 생성
 회원가입과 로그인을 처리하기 위해 아래와 같이 회원 테이블을 생성한다. 기본적으로 회원 테이블의 칼럼에는 아이디, 비밀번호, 이름, 이메일이 있고, 추후에 구현될 회원포인트 기능을 위한 칼럼과 로그인 유지를
 위한 `session_key`, `session_limit` 칼럼이 있다. 그리고 회원의 프로필 이미지 칼럼, 가입일자, 로그인일자, 서명이 있다.
 
@@ -73,7 +73,7 @@ CREATE TABLE tbl_user (
   PRIMARY KEY (user_id)
 );
 ```
-#### # 회원 클래스 작성
+#### 2.2 회원 클래스 작성
 `기본패키지/user/domain`패키지에 회원 클래스를 아래와 같이 작성해준다.
 ```java
 public class UserVO {
@@ -92,7 +92,7 @@ public class UserVO {
 }
 ```
 
-#### # 회원 영속 계층 구현
+#### 2.3 회원 영속 계층 구현
 `기본패키지/user/persistence`패키지에 `UserDAO` 인터페이스와 `UserDAOImpl`클래스를 아래와 같이 작성해준다.
 
 ```java
@@ -154,7 +154,7 @@ public class UserDAOImpl implements UserDAO {
 </mapper>
 ```
 
-#### # 회원 서비스 계층 구현
+#### 2.4 회원 서비스 계층 구현
 
 `기본패키지/user/service`패키지에 `UserService`인터페이스와 `UserServiceImpl`클래스를 아래와 같이 작성해준다.
 
@@ -187,7 +187,7 @@ public class UserServiceImpl implements UserService {
 }
 ```
 
-#### # 회원가입 컨트롤러 작성
+#### 2.5 회원가입 컨트롤러 작성
 
 회원관련 uri를 통합해서 하나의 컨트롤러에 모든 매핑시키는 것도 좋지만 그렇게 되면 코드가 많아지고, 구분이 어려워지기 때문에
 회원 가입페이지, 가입처리, 탈퇴 uri만을 매핑하는 컨트롤러를 따로 만들어 사용한다.
@@ -245,7 +245,7 @@ public class UserRegisterController {
 </dependency>
 ```
 
-#### # 회원가입 및 로그인 페이지 작성
+#### 2.6 회원가입 및 로그인 페이지 작성
 
 `/views/user/` 디렉토리에 회원가입 페이지(`register.jsp`)를 생성하고, 아래와 같이 작성한다.
 
@@ -420,7 +420,7 @@ public class UserRegisterController {
 
 ![user_login](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_login.png?raw=true)
 
-#### # 회원가입 처리 확인
+#### 2.7 회원가입 처리 확인
 
 회원가입 처리가 제대로 되는지 확인해보자.
 
@@ -435,50 +435,335 @@ public class UserRegisterController {
 DB를 확인해보면 비밀번호가 제대로 암호화가 되었는지도 확인할 수 있다.
 ![user_register_check3](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_register_check3.png?raw=true)
 
-## 3. 로그인 처리를 위한 준비 작업
 
-#### # 회원 테이블 생성
-로그인 처리를 위해 회원 테이블을 아래와 같이 생성한다.
+## 3. 로그인 구현
 
-```sql
--- 회원 테이블
-CREATE TABLE tbl_user (
-  user_id VARCHAR(50) NOT NULL,
-  user_pw VARCHAR(100) NOT NULL,
-  user_name VARCHAR(100) NOT NULL,
-  user_point INT NOT NULL DEFAULT 0,
-  session_key VARCHAR(50) NOT NULL DEFAULT 'none',
-  session_limit TIMESTAMP,
-  user_img VARCHAR(100) NOT NULL DEFAULT 'user/default-user.png',
-  user_email VARCHAR(50) NOT NULL,
-  user_join_date TIMESTAMP NOT NULL DEFAULT NOW(),
-  user_login_date TIMESTAMP NOT NULL DEFAULT NOW(),
-  user_signature VARCHAR(200) NOT NULL DEFAULT '안녕하세요 ^^',
-  PRIMARY KEY (user_id)
-);
+#### 3.1 로그인 처리를 위한 DTO 클래스 작성
+
+`기본클래스/user/domain`에 `LoginDTO`클래스를 생성하고, 아래와 같이 코드를 작성한다. `LoginDTO`의 용도는 로그인화면으로부터 전달되는 회원의 데이터(아이디, 비밀번호)를 수집하는 용도로 사용한다.
+
+```java
+public class LoginDTO {
+
+    private String userId;
+    private String userPw;
+    private boolean useCookie;
+
+    // getter, setter, toString 생략
+}
 ```
 
-```sql
--- 회원 추가
-intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('doubles', '1234', 'doubles', 'doubles@mail.com');
-intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('user01', '1234', 'user01', 'user01@mail.com');
-intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('user02', '1234', 'user02', 'user02@mail.com');
-intsert into tbl_user (user_id, user_pw, user_name, user_email) values ('user03', '1234', 'user03', 'user03@mail.com');
+**VO(Value Object)와 DTO(Data Transfer Object)의 차이점**
+
+일반적으로 컨트롤러에 전달되는 데이터를 수집하는 용도로 VO를 사용하는 경우도 있고, DTO를 사용하는 경우도 있는데 두 용어에 대해서 공통점과 차이점에 대해 알아보자.
+
+- 공통점
+    - DTO와 VO의 용도는 데이터 수집과 전달에 사용할 수 있다.
+    - 파라미터나 리턴 타입으로 사용하는 것이 가능하다.
+- 차이점
+    - VO의 경우 보다 데이터베이스와 거리가 가깝기 때문에 VO는 테이블 구조를 이용해서 작성되는 경우가 많다.
+    - DTO의 경우 화면에 거리가 가깝기 때문에 화면에서 전달되는 데이터를 수집하는 용도로 사용하는 경우가 많다.
+
+
+#### 3.2 회원 영속 계층 구현
+
+`UserDAO`인터페이스에 로그인 메서드를 추가하고, `UserDAOImpl`클래스에서 로그인 메서드를 구현한다.
+
+```java
+// 로그인 처리
+UserVO login(LoginDTO loginDTO) throws Exception;
 ```
 
-#### # 회원 클래스 작성
+```java
+// 로그인 처리
+@Override
+public UserVO login(LoginDTO loginDTO) throws Exception {
+    return sqlSession.selectOne(NAMESPACE + ".login", loginDTO);
+}
+```
 
-#### # 회원 영속 계층 구현
+그리고 `userMapper.xml`에서 회원의 아이디로 회원정보를 select하는 쿼리를 작성해준다. 물론 책에서는 `where` 조건절을 아이디와 비밀번호 둘다 가지고 쿼리를 작성하지만 나의 경우
+비밀번호 암호화를 처리했기때문에 컨트롤러에서 비밀번호 검증처리가 들어간다. 그래서 비밀번호는 제외하고 아이디만으로 select하도록 작성했다.
 
-#### # 회원 서비스 계층 구현
+```xml
+<select id="login" resultMap="userVOResultMap">
+    SELECT
+      *
+    FROM tbl_user
+    WHERE user_id = #{userId}
+</select>
+```
 
-## 3. 로그인 컨트롤러 작성
+#### 3.3 회원 서비스 계층 구현
 
-## 4. 로그인 Interceptor
+`UserService`인터페이스에 로그인 메서드를 추가하고, `UserServceImpl`클래스에서 로그인 메서드를 아래와 같이 구현한다.
 
-#### # 로그인 Interceptor 클래스 작성
+```java
+UserVO login(LoginDTO loginDTO) throws Exception;
+```
 
-#### # 로그인 Interceptor 설정
+```java
+@Override
+public UserVO login(LoginDTO loginDTO) throws Exception {
+    return userDAO.login(loginDTO);
+}
+```
 
-## 5. 로그인 화면
+#### 3.4 로그인 컨트롤러 작성
 
+서비스 계층까지 구현이 완료되었는데 나머지 컨트롤러와 인터셉터를 적용하는 작업을 해야한다. 이 때 가장 중요한 것은 컨트롤러에서 HttpSessin 객체를 처리할 것인지 인터셉터에서 HttpSessin을
+처리할 것인지 정해야한다.
+
+스프링 MVC는 컨트롤러에서 필요한 모든 작원을 파라미터에서 수집해서 처리하기 때문에 `HttpServletRequest`나 `HttpSession`과 같은 자원들 역시 파라미터로 처리해도 문제가 없다. 그래서 컨트롤러에서는
+되도록 순수하게 데이터를 만들어내는데 집중하고, 인터셉터를 이용해 HttpSessin을 처리하도록 작성해준다.
+
+`기본패키지/user/controller` 패키지에 `UserLoginController` 클래스를 생성하고, 아래와 같이 코드를 작성한다. 이전에도 언급했지만 하나의 컨트롤러엣 회원관련 uri를 매핑하는 메서드가 많아지면
+코드의 양이 많아지고, 구분하기 어렵기때문에 로그인 처리를 담당하는 컨트롤러를 따로 작성해주었다.
+
+```java
+@Controller
+@RequestMapping("/user")
+public class UserLoginController {
+
+    private final UserService userService;
+
+    @Inject
+    public UserLoginController(UserService userService) {
+        this.userService = userService;
+    }
+
+    // 로그인 페이지
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String loginGET(@ModelAttribute("loginDTO") LoginDTO loginDTO) {
+        return "/user/login";
+    }
+
+    // 로그인 처리
+    @RequestMapping(value = "/loginPost", method = RequestMethod.POST)
+    public void loginPOST(LoginDTO loginDTO, HttpSession httpSession, Model model) throws Exception {
+
+        UserVO userVO = userService.login(loginDTO);
+
+        if (userVO == null || !BCrypt.checkpw(loginDTO.getUserPw(), userVO.getUserPw())) {
+            return;
+        }
+
+        model.addAttribute("user", userVO);
+        
+    }
+    
+}
+```
+
+위 코드에서 주목해서 봐야할 점은 로그인처리 메서드(`loginPost()`)인데 처리과정을 정리하면 아래와 같다.
+
+- 화면으로부터 받은 데이터(회원아이디, 비밀번호) 중에서 아이디를 통해 select한 회원 정보를 변수 `userVO`에 담는다.
+- `userVO`가 `null`이거나 비밀번호를 `BCrypt.checkpw()`를 통해 검증해서 맞지않으면 메서드를 종료시킨다.
+- 비밀번호가 일치하면 model에 `userVO`를 `user`란 이름의 변수에 저장한다.
+
+#### 3.5 로그인 Interceptor 클래스 작성
+
+`UserLoginController`에서 HttpSession과 관련된 작업이 처리되지 않았기 때문에 HttpSession과 관련된 모든 설정은 인터셉터에서 처리한다. `기본패키지/commons/interceptor` 패키지에 `LoginInterceptor`를
+생성하고, 아래와 같이 코드를 작성한다.
+
+```java
+public class LoginInterceptor extends HandlerInterceptorAdapter {
+
+    private static final String LOGIN = "login";
+    private static final Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+        HttpSession httpSession = request.getSession();
+        ModelMap modelMap = modelAndView.getModelMap();
+        Object userVO =  modelMap.get("user");
+
+        if (userVO != null) {
+            logger.info("new login success");
+            httpSession.setAttribute(LOGIN, userVO);
+            response.sendRedirect("/");
+        }
+
+    }
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        HttpSession httpSession = request.getSession();
+        // 기존의 로그인 정보 제거
+        if (httpSession.getAttribute(LOGIN) != null) {
+            logger.info("clear login data before");
+            httpSession.removeAttribute(LOGIN);
+        }
+
+        return true;
+    }
+}
+```
+
+`LoginInterceptor`의 `postHandle()` 메서드는 httpSession에 컨트롤러에서 저장한 `user`를 저장하고, `/`로 리다이렉트를 한다. 그리고 `preHandle()` 메서드는 기존의 로그인 정보가 있을 경우 초기화하는 역할을
+수행한다.
+
+#### 3.6 로그인 Interceptor 설정
+
+앞서 작성한 로그인 인터셉터 클래스를 스프링에서 인터셉터로 인식시키기 위해 아래와 같이 `dispatcher-servlet.xml`(`servlet-context.xml`)에 코드를 작성해준다.
+
+```xml
+<bean id="loginInterceptor" class="com.doubles.mvcboard.commons.interceptor.LoginInterceptor"/>
+
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/user/loginPost"/>
+        <ref bean="loginInterceptor"/>
+    </mvc:interceptor>
+<mvc:interceptors>
+```
+
+#### 3.7 로그인 화면
+
+이미 회원가입 처리를 구현하면서 로그인 화면을 이미 작성했고, 결과 페이지에 해당하는 `loginPost.jsp`를 아래와 같이 작성해준다. 컨트롤러에서 만약 회원정보가 없거나, 비밀번호가 불일치한다면 `loginPost.jsp`로
+이동하여 아이디와 비밀번호를 확인하라는 메시지와 함께 로그인페이지로 다시 이동하게 처리하였다.
+
+```html
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+    <script>
+        alert("아이디와 비밀번호를 확인해주세요.");
+        self.location = "/user/login";
+    </script>
+</body>
+</html>
+
+```
+
+그리고 실제로 로그인이 되었는지 사용자 알 수 있게 include한 페이지들(`main_header.jsp`, `left_column.jsp`)를 아래와 같이 수정해준다.
+
+**`main_header.jsp`**
+
+```html
+<%-- Header Navbar --%>
+<nav class="navbar navbar-static-top" role="navigation">
+    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+    </a>
+    <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+            <c:if test="${not empty login}">
+                <li class="dropdown user user-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="/${login.userImg}" class="user-image" alt="User Image">
+                        <span class="hidden-xs">${login.userName}</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="user-header">
+                            <img src="/${login.userImg}" class="img-circle" alt="User Image">
+                            <p>${login.userName}
+                                <small>
+                                    가입일자 : <fmt:formatDate value="${login.userJoinDate}" pattern="yyyy-MM-dd"/>
+                                </small>
+                            </p>
+                        </li>
+                        <li class="user-body">
+                            <div class="row">
+                                <div class="col-xs-4 text-center">
+                                    <a href="#">게시글</a>
+                                </div>
+                                <div class="col-xs-4 text-center">
+                                    <a href="#">추천글</a>
+                                </div>
+                                <div class="col-xs-4 text-center">
+                                    <a href="#">북마크</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a href="${path}/user/info" class="btn btn-default btn-flat"><i
+                                        class="fa fa-info-circle"></i><b> 내 프로필</b></a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="${path}/user/logout" class="btn btn-default btn-flat"><i
+                                        class="glyphicon glyphicon-log-out"></i><b> 로그아웃</b></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </c:if>
+            <c:if test="${empty login}">
+                <li class="dropdown user user-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="${path}/user/default-user.png" class="user-image" alt="User Image">
+                        <span class="hidden-xs">회원가입 또는 로그인</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="user-header">
+                            <img src="/dist/img/default-user.png" class="img-circle" alt="User Image">
+                            <p>
+                                <b>회원가입 또는 로그인해주세요</b>
+                                <small></small>
+                            </p>
+                        </li>
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a href="${path}/user/register" class="btn btn-default btn-flat"><i
+                                        class="fa fa-user-plus"></i><b> 회원가입</b></a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="${path}/user/login" class="btn btn-default btn-flat"><i
+                                        class="glyphicon glyphicon-log-in"></i><b> 로그인</b></a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </c:if>
+        </ul>
+    </div>
+</nav>
+```
+
+**`left_column.jsp`**
+
+```html
+<!-- Sidebar user panel (optional) -->
+<div class="user-panel">
+    <c:if test="${empty login}">
+        <div class="pull-left image">
+            <img src="${path}/user/default-user.png" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+            <p>Guest</p>
+                <%-- Status --%>
+            <a href="#"><i class="fa fa-circle text-danger"></i> OFFLINE</a>
+        </div>
+    </c:if>
+    <c:if test="${not empty login}">
+        <div class="pull-left image">
+            <img src="/${login.userImg}" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+            <p>${login.userName}</p>
+                <%-- Status --%>
+            <a href="#"><i class="fa fa-circle text-success"></i> ONLINE</a>
+        </div>
+    </c:if>
+</div>
+```
+
+#### 3.8 로그인 처리 확인
+
+이제 로그인 처리가 제대로 작동하는지 확인해보자. 로그인 페이지로 이동한 뒤 아이디와 비밀번호를 입력하고, 로그인 버튼을 누른다.
+
+![user_login_check]()
+
+로그인이 제대로 처리되었다면 메인페이지(`/`)로 이동하게 되고, session에 `user`정보를 저장하여 아래와 같이 로그인한 회원의 정보가 보이게 된다.
+
+![user_login_check2]()
+
+로그인 이전의 모습과 비교해보면 차이점을 알 수 있다.
+
+![user_login_check3]()
