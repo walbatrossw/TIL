@@ -156,9 +156,253 @@ public class UserDAOImpl implements UserDAO {
 
 #### # 회원 서비스 계층 구현
 
+`기본패키지/user/service`패키지에 `UserService`인터페이스와 `UserServiceImpl`클래스를 아래와 같이 작성해준다.
+
+```java
+public interface UserService {
+    
+    // 회원 가입 처리
+    void register(UserVO userVO) throws Exception;
+    
+}
+```
+
+```java
+@Service
+public class UserServiceImpl implements UserService {
+
+    private final UserDAO userDAO;
+
+    @Inject
+    public UserServiceImpl(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+    
+    // 회원 가입 처리
+    @Override
+    public void register(UserVO userVO) throws Exception {
+        userDAO.register(userVO);
+    }
+    
+}
+```
+
 #### # 회원가입 컨트롤러 작성
 
-#### # 회원가입 페이지 작성
+회원관련 uri를 통합해서 하나의 컨트롤러에 모든 매핑시키는 것도 좋지만 그렇게 되면 코드가 많아지고, 구분이 어려워지기 때문에
+회원 가입페이지, 가입처리, 탈퇴 uri만을 매핑하는 컨트롤러를 따로 만들어 사용한다.
+
+`기본패키지/user/controller` 패키지에 `UserRegisterController` 클래스를 생성하고, 아래와 같이 코드를 작성해준다.
+
+```java
+@Controller
+@RequestMapping("/user")
+public class UserRegisterController {
+
+    private final UserService userService;
+
+    @Inject
+    public UserRegisterController(UserService userService) {
+        this.userService = userService;
+    }
+
+    // 회원가입 페이지
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String registerGET() throws Exception {
+        return "/user/register";
+    }
+
+    // 회원가입 처리
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String registerPOST(UserVO userVO, RedirectAttributes redirectAttributes) throws Exception {
+
+        String hashedPw = BCrypt.hashpw(userVO.getUserPw(), BCrypt.gensalt());
+        userVO.setUserPw(hashedPw);
+        userService.register(userVO);
+        redirectAttributes.addFlashAttribute("msg", "REGISTERED");
+
+        return "redirect:/user/login";
+    }
+    
+}
+```
+
+위의 코드에서 주목해서 봐야할 점은 회원가입 처리 매핑 메서드인 `registerPost()`이다. 파라미터로 넘어온 회원의 객체정보(`UserVO`) 중에서 비밀번호(`userPw`)를 암호화 하는 작업을 수행한다.
+이렇게 하는 이유는 회원으로부터 받은 정보 중에서 비밀번호는 반드시 DB에 암호화해서 보관해야 보안에 비교적 안전하기 때문이다. `BCrypt.hashpw()`메서드는 위와 같이 첫번째 파라미터에는 암호화할
+비밀번호를 두번째 파라미터는 `BCrypt.gensalt()`를 받고 암호화된 비밀번호를 리턴해준다. 이렇게 암호화된 비밀번호를 다시 회원 객체에 저장하고 서비스의 회원가입 메서드를 호출하면 된다.
+
+그리고 최종적으로 회원가입 처리가 완료되면 최종적으로 성공메서지를 가지고 로그인페이지로 리다이렉트 하게된다.
+
+#### # 회원가입 및 로그인 페이지 작성
+
+`/views/user/` 디렉토리에 회원가입 페이지(`register.jsp`)를 아래와 같이 작성한다.
+
+```html
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<%@ include file="../include/head.jsp" %>
+<body class="hold-transition register-page">
+<div class="register-box">
+    <div class="register-logo">
+        <a href="${path}/">
+            <b>DoubleS</b>&nbsp MVC-BOARD
+        </a>
+    </div>
+
+    <div class="register-box-body">
+        <p class="login-box-msg">회원가입 페이지</p>
+
+        <form action="${path}/user/register" method="post">
+            <div class="form-group has-feedback">
+                <input type="text" name="userId" class="form-control" placeholder="아아디">
+                <span class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" name="userName" class="form-control" placeholder="이름">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="email" name="userEmail" class="form-control" placeholder="이메일">
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" name="userPw" class="form-control" placeholder="비밀번호">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" placeholder="비밀번호 확인">
+                <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox icheck">
+                        <label>
+                            <input type="checkbox"> 약관에 <a href="#">동의</a>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-4">
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">가입</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="social-auth-links text-center">
+            <p>- 또는 -</p>
+            <a href="#" class="btn btn-block btn-social btn-facebook btn-flat">
+                <i class="fa fa-facebook"></i> 페이스북으로 가입
+            </a>
+            <a href="#" class="btn btn-block btn-social btn-google btn-flat">
+                <i class="fa fa-google-plus"></i> 구글 계정으로 가입
+            </a>
+        </div>
+
+        <a href="${path}/user/login" class="text-center">로그인</a>
+    </div>
+    <!-- /.form-box -->
+</div>
+<!-- /.register-box -->
+
+<%@ include file="../include/plugin_js.jsp" %>
+<script>
+    $(function () {
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_square-blue',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+    });
+</script>
+</body>
+</html>
+```
+
+`/views/user/` 디렉토리에 회원가입 페이지(`login.jsp`)를 아래와 같이 작성한다.
+
+```html
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<%@ include file="../include/head.jsp" %>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <a href="${path}/">
+            <b>DoubleS</b>&nbsp MVC-BOARD
+        </a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg">로그인 페이지</p>
+
+        <form action="${path}/user/loginPost" method="post">
+            <div class="form-group has-feedback">
+                <input type="text" name="userId" class="form-control" placeholder="아아디">
+                <span class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" name="userPw" class="form-control" placeholder="비밀번호">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="checkbox icheck">
+                        <label>
+                            <input type="checkbox" name="useCookie"> 로그인유지
+                        </label>
+                    </div>
+                </div>
+                <!-- /.col -->
+                <div class="col-xs-4">
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">
+                        <i class="fa fa-sign-in"></i> 로그인
+                    </button>
+                </div>
+                <!-- /.col -->
+            </div>
+        </form>
+
+        <div class="social-auth-links text-center">
+            <p>- 또는 -</p>
+            <a href="#" class="btn btn-block btn-social btn-facebook btn-flat">
+                <i class="fa fa-facebook"></i> 페이스북으로 로그인
+            </a>
+            <a href="#" class="btn btn-block btn-social btn-google btn-flat">
+                <i class="fa fa-google-plus"></i> 구글 계정으로 로그인
+            </a>
+        </div>
+        <!-- /.social-auth-links -->
+
+        <a href="#">비밀번호 찾기</a><br>
+        <a href="${path}/user/register" class="text-center">회원가입</a>
+
+    </div>
+    <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+
+<%@ include file="../include/plugin_js.jsp" %>
+<script>
+
+    var msg = "${msg}";
+    if (msg === "REGISTERED") {
+        alert("회원가입이 완료되었습니다. 로그인해주세요~");
+    } else if (msg == "FAILURE") {
+        alert("아이디와 비밀번호를 확인해주세요.");
+    }
+
+    $(function () {
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_square-blue',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+    });
+</script>
+</body>
+</html>
+```
 
 
 ## 3. 로그인 처리를 위한 준비 작업
