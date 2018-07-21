@@ -1138,5 +1138,5 @@ public class ReplyVO {
 
 아직 회원 프로필 이미지 업로드 및 수정 기능이 구현되지 않았기 때문에 임의로 각각의 프로필 이미지를 적용해보았다.
 
-![user_profile_img](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_reply_mod_del.png?raw=true)
+![user_profile_img](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_profile_img.png?raw=true)
 
