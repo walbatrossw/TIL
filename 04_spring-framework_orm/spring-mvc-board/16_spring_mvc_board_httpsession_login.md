@@ -971,12 +971,14 @@ public void postHandle(HttpServletRequest request, HttpServletResponse response,
 ![user_read_after_login](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_read_after_login.png?raw=true)
 
 
-그리고 조회 페이지의 댓글은 사용자의 로그인 상태에 따라 영향을 받게 아래와 같이 처리를 해야한다.
+#### 4.4 게시글 댓글 수정
+
+게시글 조회 페이지의 댓글은 사용자의 로그인 상태에 따라 영향을 받게 아래와 같이 처리를 해야한다.
 
 - 댓글 추가 : 로그인한 사용자는 댓글을 작성할 수 있지만, 로그인하지 않은 사용자는 댓글을 작성할 수 없다.
 - 댓글의 수정/삭제 : 댓글 목록을 보는 것은 로그인/비로그인 사용자 둘다 자유롭지만 자신이 작성한 댓글의 수정/삭제는 로그인한 사용자만 가능해야한다.
 
-댓글 추가/입력 코드는 아래와 같이 수정해준다.
+댓글 추가/입력 영역의 코드는 아래와 같이 수정해준다.
 
 ```html
 <div class="box box-warning">
@@ -1013,4 +1015,128 @@ public void postHandle(HttpServletRequest request, HttpServletResponse response,
 아래의 화면은 로그인 후의 댓글 추가 영역이다.
 
 ![user_reply_add_after_login](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_reply_add_after_login.png?raw=true)
+
+그리고 게시글의 댓글 목록 영역의 코드는 아래와 같이 자바스크립트 코드와 HTML코드를 수정해준다.
+
+handlebars의 기능을 확장하기 위해 `eqReplyWriter`를 작성했다. 댓글 목록에서 session의 로그인 사용자가 글 작성자와 비교하여 같은 댓글일 경우에만 수정, 삭제 버튼이 나타나도록 처리하였다.
+
+```js
+Handlebars.registerHelper("eqReplyWriter", function (replyWriter, block) {
+    var accum = "";
+    if (replyWriter === "${login.userId}") {
+        accum += block.fn();
+    }
+    return accum;
+});
+```
+
+```html
+<script id="replyTemplate" type="text/x-handlebars-template">
+    {{#each.}}
+    <div class="post replyDiv" data-replyNo={{replyNo}}>
+        <div class="user-block">
+            <%--댓글 작성자 프로필사진--%>
+            <img class="img-circle img-bordered-sm" src="/user/default-user.png" alt="user image">
+            <%--댓글 작성자--%>
+            <span class="username">
+                <%--작성자 이름--%>
+                <a href="#">{{replyWriter}}</a>
+                {{#eqReplyWriter replyWriter}}
+                <%--댓글 삭제 버튼--%>
+                <a href="#" class="pull-right btn-box-tool replyDelBtn" data-toggle="modal" data-target="#delModal">
+                    <i class="fa fa-times"> 삭제</i>
+                </a>
+                <%--댓글 수정 버튼--%>
+                <a href="#" class="pull-right btn-box-tool replyModBtn" data-toggle="modal" data-target="#modModal">
+                    <i class="fa fa-edit"> 수정</i>
+                </a>
+                {{/eqReplyWriter}}
+            </span>
+            <%--댓글 작성일자--%>
+            <span class="description">{{prettifyDate regDate}}</span>
+        </div>
+        <%--댓글 내용--%>
+        <div class="oldReplyText">{{{escape replyText}}}</div>
+        <br/>
+    </div>
+    {{/each}}
+</script>
+```
+
+![user_reply_mod_del](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_reply_mod_del.png?raw=true)
+
+
+#### 4.5 게시글 작성자의 프로필 이미지 수정
+
+그리고 댓글 작성자의 프로필 이미지가 각각의 회원에 프로필 이미지에 맞게 출력하기위한 작업을 수행해야하는데 가장먼저 댓글의 SQL Mapper인 `replyMapper.xml`을 수정해준다.
+
+```xml
+<resultMap id="ReplyResultMap" type="ReplyVO">
+    <id property="replyNo" column="reply_no"/>
+    <result property="articleNo" column="article_no"/>
+    <result property="replyText" column="reply_text"/>
+    <result property="replyWriter" column="reply_writer"/>
+    <result property="regDate" column="reg_date"/>
+    <result property="updateDate" column="update_date"/>
+    <association property="userVO" resultMap="userVOResultMap"/>
+</resultMap>
+    
+<resultMap id="userVOResultMap" type="UserVO">
+    <id property="userId" column="user_id"/>
+    <result property="userPw" column="user_pw"/>
+    <result property="userName" column="user_name"/>
+    <result property="userEmail" column="user_email"/>
+    <result property="userJoinDate" column="user_join_date"/>
+    <result property="userLoginDate" column="user_login_date"/>
+    <result property="userSignature" column="user_signature"/>
+    <result property="userImg" column="user_img"/>
+    <result property="userPoint" column="user_point"/>
+</resultMap>
+
+<select id="listPaging" resultMap="ReplyResultMap">
+    SELECT
+        reply_no
+        , article_no
+        , reply_text
+        , reply_writer
+        , reg_date
+        , update_date
+        , user_img
+    FROM tbl_reply
+        , tbl_user
+    WHERE user_id = reply_writer and article_no = #{articleNo}
+    ORDER BY reply_no DESC
+    LIMIT #{criteria.pageStart}, #{criteria.perPageNum}
+</select>
+```
+
+위 코드에서 주목해야할 점은 댓글 `ResultMap`이 변경과 회원 `ResultMap`이 추가된 것이다. 회원의 프로필 이미지를 가져오기 위해 `association`태그를 사용해 회원 `ResultMap`을 사용할 수 있게 변경하였다.
+이렇게 `ResultMap`을 변경하고, 댓글 목록 SQL을 회원 이미지를 가져올 수 있도록 위와 같이 변경하였다.
+
+위와 같이 SQL의 변경사항을 적용하기 위해 `ReplyVO`도 아래와 같이 변경해준다.
+
+```java
+public class ReplyVO {
+
+    private Integer replyNo;
+    private Integer articleNo;
+    private String replyText;
+    private String replyWriter;
+    private Date regDate;
+    private Date updateDate;
+    
+    private UserVO userVO; // 회원 필드 추가
+    
+    // getter, setter, toString 생략
+```
+
+이제 마지막으로 회원의 프로필 이미지를 출력해주기 위해 `read.jsp`에서 댓글 handlebars 템플릿의 코드를 아래와 같이 수정해준다.
+
+```html
+<img class="img-circle img-bordered-sm" src="/{{userVO.userImg}}" alt="user image">
+```
+
+아직 회원 프로필 이미지 업로드 및 수정 기능이 구현되지 않았기 때문에 임의로 각각의 프로필 이미지를 적용해보았다.
+
+![user_profile_img](https://github.com/walbatrossw/TIL/raw/master/04_spring-framework_orm/spring-mvc-board/img/16_spring_mvc_board_httpsession_login/user_reply_mod_del.png?raw=true)
 
