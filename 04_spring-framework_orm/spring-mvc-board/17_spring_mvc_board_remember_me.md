@@ -104,7 +104,7 @@ session cookie의 값을 의미한다. session cookie의 경우 브라우저를 
 
 위 코드를 이용해서 로그인한 후에 게시물의 여러 페이지에서 매번 브라우저에 `loginCookie`가 전달되는 것을 개발자 도구에서 확인할 수 있다.
 
-![]()
+![cookie_check]()
 
 
 
