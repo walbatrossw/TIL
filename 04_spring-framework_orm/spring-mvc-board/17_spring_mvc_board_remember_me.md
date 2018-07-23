@@ -110,5 +110,8 @@ session cookie의 값을 의미한다. session cookie의 경우 브라우저를 
 
 ![cookie_check3](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/cookie_check3.png?raw=true)
 
+여기서 JSESSIONID는 Tomcat에서 발행된 세션 쿠키의 이름이고, loginCookie는 인터셉터에 의해서 만들어진 쿠키이다. 자세히 보면 세션 쿠키의 값과 동일한 값이 loginCookie에 기록된
+것을 볼 수 있다.
 
+#### 1.3 브라우저 종료 후 다시 접속
 
