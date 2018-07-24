@@ -323,7 +323,7 @@ public class RememberMeInterceptor extends HandlerInterceptorAdapter {
 
 실제로 자동 로그인이 구현되었는지 확인해보자.
 
-![remember_me_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/remember_me_check.png?raw=true)
+![remember_me_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/remember_me_check.gif?raw=true)
 
 위의 화면을 보면 로그인 유지를 선택하고 로그인을 하면 실제로 DB에 쿠키값과 로그인 유지기간에 저장되고, 브라우저를 종료한 뒤 다시 접속하면 정상적으로 로그인이 유지가 되는 것을 확인할 수 있다.
 
