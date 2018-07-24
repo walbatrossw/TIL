@@ -44,7 +44,7 @@
 
 자동로그인을 구현해보자.
 
-## 1. 쿠키를 이용하는 자동로그인 방식
+## 1. 쿠키를 이용하는 자동로그인 방식 구현
 
 자동 로그인을 처리하기 전에 앞서 사용자가 로그인한 후 쿠키를 만들어 브라우저로 전송하고, 다시 서버에 접속할 때 쿠키가 전달되는지 확인해보자.
 
@@ -61,7 +61,7 @@
 </div>
 ```
 
-![user_login_remember_me](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/user_login_remember_me.png?raw=true)
+![user_login_remember_me1](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/user_login_remember_me1.png?raw=true)
 
 #### 1.2 LoginInterceptor에서의 쿠키 생성하기
 
@@ -104,7 +104,7 @@ session cookie의 값을 의미한다. session cookie의 경우 브라우저를 
 
 위 코드를 이용해서 로그인한 후에 게시물의 여러 페이지에서 매번 브라우저에 `loginCookie`가 전달되는 것을 개발자 도구에서 확인할 수 있다.
 
-![cookie_check1](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/cookie_check1.png?raw=true)
+![cookie_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/cookie_check.png?raw=true)
 
 ![cookie_check2](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/cookie_check2.png?raw=true)
 
@@ -115,3 +115,218 @@ session cookie의 값을 의미한다. session cookie의 경우 브라우저를 
 
 #### 1.3 브라우저 종료 후 다시 접속
 
+현재의 브라우저를 종료한 뒤 다시 해당 페이지를 쿠키가 유지되는 5분이내에 접속하면 아래와 같은 결과를 볼 수 있다.
+
+![cookie_check4](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/cookie_check4.png?raw=true)
+
+브라우저를 종료한 뒤 다시 접속하면 JSESSION은 변경되지만 일주일간 유효기간이 지정된 쿠키는 그 값을 유지하고 있는 것을 확인할 수 있다.
+
+세션 쿠키는 브라우저가 종료될 때 같이 종료되기 때문에 매번 브라우저를 새로 실행하고, 접속하면 새롭게 만들어진다. 하지만 loginCookie의 경우 로그인할 때 브라우저를 이용해서 보관된다.
+
+#### 1.4 자동로그인 구상
+
+자동로그인의 처리는 Session과 Cookie를 이용하여 처리하도록 하는데 아래와 같이 4가지의 상황이 있을 수 있다.
+
+|번호|HttpSession에 login 객체의 유무|loginCookie의 유무|상황|
+|:---:|:---:|:---:|:---:|
+|1|X|X|사용자 로그인이 필요, 비로그인 상태|
+|2|O|X|사용자 로그인 상태(접속 중), 로그인 유지 선택 X|
+|3|X|O|이전에 로그인 한 적이 있음, 7일사이에 로그인한 적 있음|
+|4|O|O|사용자 로그인 상태(접속 중), 로그인 유지 선택 O|
+
+위의 4가지 상황 중에서 자동 로그인이 필요한 상황은 3번이다. HttpSession에 login이란 이름으로 보관된 객체가 없지만, loginCookie가 존재한다. 이 경우는 인터셉터에서 설정한 7일의 기간 사이에
+접속한 적이 있다는 것을 의미하므로, 과거의 로그인 시점에 기록된 정보를 이용해서 다시 HttpSession에 login이란 이름으로 `UserVO` 객체를 보관해줘야 한다.
+
+#### 1.5 자동로그인을 위한 데이터베이스 설정 및 `LoginDTO`
+
+위의 구상을 토대로 사용자가 loginCookie를 가지고 있다면 그 값은 과거에 로그인한 시점의 세션 아이디라는 것을 알 수 있다. 그래서 loginCookie의 값을 이용해서
+데이터베이스에 `UserVO`의 정보를 읽어오고, 읽어본 `UserVO` 객체를 현재의 HttpSession에 보관하면 로그인이 된다. 이 과정을 정리하면 아래와 같다.
+
+- 사용자가 로그인하면 데이터베이스에 현재의 Session ID값과 유효기간을 저장한다.
+- 사용자가 로그인하지 않은 상태에서 쿠키를 가지고 접속하면 쿠키의 내용물을 추출한다.
+- 쿠키의 내용물로 데이터베이스를 조회하고, 유효기간에 맞는 값인지 검증한다.
+- 확인된 사용자는 Session에 로그인한 정보를 기록해서, 자동로그인 처리를 수행한다.
+
+위의 내용을 구현하기 위해서 데이터베이스의 `tbl_user`의 컬럼들을 살펴보자. 이전에 회원가입과 로그인을 구현하면서 이미 자동로그인과 관련된 칼럼을 생성해두었다.
+
+```sql
+-- 회원 테이블
+CREATE TABLE tbl_user (
+  user_id VARCHAR(50) NOT NULL,
+  user_pw VARCHAR(100) NOT NULL,
+  user_name VARCHAR(100) NOT NULL,
+  user_point INT NOT NULL DEFAULT 0,
+  session_key VARCHAR(50) NOT NULL DEFAULT 'none',  -- session 아이디 보관
+  session_limit TIMESTAMP,                          -- 자동로그인 유효시간 기록
+  user_img VARCHAR(100) NOT NULL DEFAULT 'user/default-user.png',
+  user_email VARCHAR(50) NOT NULL,
+  user_join_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  user_login_date TIMESTAMP NOT NULL DEFAULT NOW(),
+  user_signature VARCHAR(200) NOT NULL DEFAULT '안녕하세요 ^^',
+  PRIMARY KEY (user_id)
+);
+```
+
+#### 1.6 자동로그인 영속계층
+
+`UserDAO` 인터페이스에 `sessionKey`와 `sessionLimit`를 업데이트하는 메서드(`keepLogin()`)와 `loginCookie`에 기록된 값으로 사용자의 정보를 조회하는 메서드(`checkUserWithSessionKey()`)를 추가하고,
+`UserDAOImpl` 클래스에서 구현을 완료해준다.
+
+```java
+// 로그인 유지 처리
+void keepLogin(String userId, String sessionId, Date sessionLimit) throws Exception;
+
+// 세션키 검증
+UserVO checkUserWithSessionKey(String value) throws Exception;
+```
+
+```java
+// 로그인 유지 처리
+@Override
+public void keepLogin(String userId, String sessionId, Date sessionLimit) throws Exception {
+    Map<String, Object> paramMap = new HashMap<>();
+    paramMap.put("userId", userId);
+    paramMap.put("sessionId", sessionId);
+    paramMap.put("sessionLimit", sessionLimit);
+
+    sqlSession.update(NAMESPACE + ".keepLogin", paramMap);
+}
+
+// 세션키 검증
+@Override
+public UserVO checkUserWithSessionKey(String value) throws Exception {
+    return sqlSession.selectOne(NAMESPACE + ".checkUserWithSessionKey", value);
+}
+```
+
+`userMapper.xml`에 아래와 같이 sql을 추가해준다.
+
+로그인 유지를 선택한 경우 현재의 세션아이디와 로그인 유지기간을 갱신해준다.
+```xml
+<update id="keepLogin">
+    UPDATE tbl_user
+    SET session_key = #{sessionId}
+        , session_limit = #{sessionLimit}
+    WHERE user_id = #{userId}
+</update>
+```
+
+로그인 시에 loginCookie 값과 `session_key`이 일치하는 회원의 정보를 가져온다.
+```xml
+<select id="checkUserWithSessionKey" resultMap="userVOResultMap">
+    SELECT
+        *
+    FROM tbl_user
+    WHERE session_key = #{value}
+</select>
+```
+
+#### 1.7 자동로그인 서비스 계층
+
+`UserService` 인터페이스에 로그인 유지 메서드(`keepLogin()`)와 loginCookie로 회원정보를 조회하는 메서드(`checkLoginBefore()`)를 추가하고 `UserServiceImpl` 클래스에서 구현을 완료한다.
+
+```java
+void keepLogin(String userId, String sessionId, Date next) throws Exception;
+
+UserVO checkLoginBefore(String value) throws Exception;
+```
+
+```java
+@Override
+public void keepLogin(String userId, String sessionId, Date sessionLimit) throws Exception {
+    userDAO.keepLogin(userId, sessionId, sessionLimit);
+}
+
+@Override
+public UserVO checkLoginBefore(String value) throws Exception {
+    return userDAO.checkUserWithSessionKey(value);
+}
+```
+
+#### 1.8 자동로그인 컨트롤러
+`UserLoginController`의 로그인 매핑 메서드(`loginPost()`)를 아래와 같이 수정해준다.
+
+```java
+// 로그인 처리
+@RequestMapping(value = "/loginPost", method = RequestMethod.POST)
+public void loginPOST(LoginDTO loginDTO, HttpSession httpSession, Model model) throws Exception {
+
+    UserVO userVO = userService.login(loginDTO);
+
+    if (userVO == null || !BCrypt.checkpw(loginDTO.getUserPw(), userVO.getUserPw())) {
+        return;
+    }
+
+    model.addAttribute("user", userVO);
+
+    // 로그인 유지를 선택할 경우
+    if (loginDTO.isUseCookie()) {
+        int amount = 60 * 60 * 24 * 7;  // 7일
+        Date sessionLimit = new Date(System.currentTimeMillis() + (1000 * amount)); // 로그인 유지기간 설정
+        userService.keepLogin(userVO.getUserId(), httpSession.getId(), sessionLimit);
+    }
+
+}
+```
+
+위 코드에서 주목해서 봐야할 점은 로그인 유지기간을 7일로 설정하고, 유지기간을 실제로 DB에 저장하도록 처리하는 것이다.
+
+
+#### 1.9 자동로그인 인터셉터
+
+이제 마지막으로 인터셉터를 통해 사용자가 접속을 할 경우 자동으로 로그인이 되도록 처리해보자. 책에서는 `AuthInterceptor`에 코드를 작성하였지만,
+나의 경우 `RememberMeInterceptor` 클래스를 만들고 그 곳에 코드를 작성했다.
+
+`RememberMeInterceptor` 클래스를 인터셉터로 스프링이 인식할 수 있도록 `dispatcher-servlet.xml`에 아래와 같이 설정을 추가한다.
+
+```xml
+<bean id="rememberMeInterceptor" class="com.doubles.mvcboard.commons.interceptor.RememberMeInterceptor"/>
+
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/**/"/>
+        <ref bean="rememberMeInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+```java
+public class RememberMeInterceptor extends HandlerInterceptorAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(RememberMeInterceptor.class);
+
+    @Inject
+    private UserService userService;
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        HttpSession httpSession = request.getSession();
+        Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
+        if (loginCookie != null) {
+            UserVO userVO = userService.checkLoginBefore(loginCookie.getValue());
+            if (userVO != null)
+                httpSession.setAttribute("login", userVO);
+        }
+
+        return true;
+    }
+}
+```
+
+위의 코드를 설명하면 아래와 같다.
+
+- 접속한 사용자가 `loginCookie`를 가지고 있다면, `loginCookie`의 정보를 이용해 사용자 정보가 존재하는지 확인한다.
+- 사용자 정보가 존재할 경우, HttpSessin에 회원의 정보를 넣어준다.
+
+#### 1.10 자동 로그인 테스트 확인
+
+실제로 자동 로그인이 구현되었는지 확인해보자.
+
+![remember_me_check](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/remember_me_check.png?raw=true)
+
+위의 화면을 보면 로그인 유지를 선택하고 로그인을 하면 실제로 DB에 쿠키값과 로그인 유지기간에 저장되고, 브라우저를 종료한 뒤 다시 접속하면 정상적으로 로그인이 유지가 되는 것을 확인할 수 있다.
+
+## 2. 로그아웃 처리
+
+## 3. 로그인 상태에서 로그인 페이지, 회원가입 페이지 접근 제한하기

@@ -469,8 +469,8 @@ public List<ReplyVO> listPaging(Integer articleNo, Criteria criteria) throws Exc
 }
 
 @Override
-public int countReply(Integer articleNo) throws Exception {
-    return 0;
+public int countReplies(Integer articleNo) throws Exception {
+    return sqlSession.selectOne(NAMESPACE + ".countReplies", articleNo);
 }
 ```
 
@@ -490,7 +490,7 @@ public int countReply(Integer articleNo) throws Exception {
     LIMIT #{criteria.pageStart}, #{criteria.perPageNum}
 </select>
 
-<select id="countReply" resultType="int">
+<select id="countReplies" resultType="int">
     SELECT
         COUNT(article_no)
     FROM tbl_reply
