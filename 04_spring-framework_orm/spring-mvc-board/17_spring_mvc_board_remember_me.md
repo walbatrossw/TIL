@@ -329,4 +329,128 @@ public class RememberMeInterceptor extends HandlerInterceptorAdapter {
 
 ## 2. 로그아웃 처리
 
+#### 2.1 로그아웃 처리 구현
+
+로그아웃 처리는 `UserLoginController`에서 login과 같이 저장된 정보를 삭제하고 `invalidate()`를 해주는 작업과 쿠키의 유효시간을 만료시키는 작업을 해준다.
+
+```java
+// 로그아웃 처리
+@RequestMapping(value = "/logout", method = RequestMethod.GET)
+public String logout(HttpServletRequest request,
+                     HttpServletResponse response,
+                     HttpSession httpSession) throws Exception {
+
+    Object object = httpSession.getAttribute("login");
+    if (object != null) {
+        UserVO userVO = (UserVO) object;
+        httpSession.removeAttribute("login");
+        httpSession.invalidate();
+        Cookie loginCookie = WebUtils.getCookie(request, "loginCookie");
+        if (loginCookie != null) {
+            loginCookie.setPath("/");
+            loginCookie.setMaxAge(0);
+            response.addCookie(loginCookie);
+            userService.keepLogin(userVO.getUserId(), "none", new Date());
+        }
+    }
+
+    return "/user/logout";
+}
+```
+
+위 코드의 흐름은 다음과 같다.
+
+- HttpSession에 `login`이라는 객체가 존재하면 `login`객체를 삭제하고, `invalidate()` 처리를 한다.
+- 사용자가 로그인 유지를 선택했다면, `LoginInterceptor` 인터셉터에서 설정했던 `loginCookie`값을 초기화한다.
+- DB에 저장했던 세션아이디와 자동로그인 유지기간을 초기화한다.
+
+그리고 `logout.jsp`는 아래와 같이 별다른 내용없이 로그아웃 알림 메시지와 메인 페이지(`/`)로 이동하는 코드를 작성해준다.
+
+```html
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+<script>
+    alert("로그아웃 되었습니다.");
+    self.location = "/";
+</script>
+</body>
+</html>
+```
+
+#### 2.2 로그아웃 처리 확인
+
+실제로 로그아웃이 처리되었는지 확인해보자.
+
+![remember_me_logout](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/remember_me_logout.gif?raw=true)
+
+위의 화면에서 확인할 수 있듯이 로그아웃을 하면 DB의 세션아이디와 로그인 유지기간도 초기화가 되면서 로그인 유지가 풀리게 된다.
+
 ## 3. 로그인 상태에서 로그인 페이지, 회원가입 페이지 접근 제한하기
+
+#### 3.1 구현
+
+책의 내용은 로그아웃 처리까지로 완료가 되었다. 추가적으로 이제부터는 보완해서 구현해야할 내용들은 이후의 포스팅을 통해 정리할 예정이다. 그러나 로그인과 관련된 내용에서 추가적으로 정리해야할
+부분은 여기에서 정리를 했다.
+
+지금가지 구현된 내용에서는 사용자가 로그인 상태임에도 불구하고 주소창에 로그인페이지와 회원가입 페이지로 이동이 가능하다. 인터셉터를 통해 이러한 접근이 불가능하도록 해보자.
+
+`LoginAfterInterceptor` 인터셉터를 아래와 같이 코드를 작성해준다. 로그인 페이지나 회원가입페이지로 이동하려고 할 때 로그인 객체가 HttpSession에 존재할 경우 메인페이지로 이동하도록 처리한다.
+
+```java
+public class LoginAfterInterceptor extends HandlerInterceptorAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginAfterInterceptor.class);
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        // 로그인 처리후 로그인페이지 or 회원가입 페이지로 이동할 경우
+        HttpSession session = request.getSession();
+        if (session.getAttribute("login") != null) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return false;
+        }
+        return true;
+    }
+}
+```
+
+스프링에서 `LoginAfterInterceptor`클래스를 인터셉터로 인식하도록 `dispatcher-servlet.xml`에 아래와 같이 설정한다.
+
+```xml
+<bean id="loginAfterInterceptor" class="com.doubles.mvcboard.commons.interceptor.LoginAfterInterceptor"/>
+
+<mvc:interceptors>
+    <mvc:interceptor>
+        <mvc:mapping path="/user/login"/>
+        <mvc:mapping path="/user/register"/>
+        <ref bean="loginAfterInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+```
+
+#### 3.2 구현확인
+
+로그인 상태에서 로그인페이지(`/user/login`)과 회원가입 페이지(`/user/register`)로 이동하면 메인페이지로 리다이렉트 되는지 확인해보자.
+
+![Login_after_redirect](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/Login_after_redirect.gif?raw=true)
+
+위 화면에서와 같이 로그인 상태에서는 해당페이지로의 이동이 되지 않고 바로 메인페이지로 리다이렉트되는 것을 알 수 있다.
+
+#### 4. 최종 정리
+
+지금까지 책의 내용을 바탕으로 게시판을 만들어보았다. 전체적인 내용은 책의 내용에 맞춰 게시판을 구현했지만, 극히 일부의 내용은 내방식데로 바꿨다. 이제부터는
+필요하다고 생각하는 부분들을 직접 구현해보면서 포스팅을 할 예정이다. 지금까지 필요하다고 생각한 기능은 아래와 같다.
+
+- 회원 정보 페이지
+    - 회원정보 수정 기능
+    - 비밀번호 찾기 기능
+    - 회원 탈퇴 기능
+    - 이메일 인증 기능
+    - 프로필 이미지 업로드 및 수정 기능
+
+현재까지 생각한 이 기능들은 추가적으로 구현하면서 포스팅할 예정이다.
