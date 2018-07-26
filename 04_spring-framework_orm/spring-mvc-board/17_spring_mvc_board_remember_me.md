@@ -51,6 +51,7 @@
 #### 1.1 로그인유지를 위한 체크박스
 로그인 처리 구현하면서 `login.jsp`에 체크박스를 이미 만들어 두었다.
 
+
 ```html
 <div class="col-xs-8">
     <div class="checkbox icheck">
@@ -60,6 +61,7 @@
     </div>
 </div>
 ```
+
 
 ![user_login_remember_me1](https://github.com/walbatrossw/TIL/blob/master/04_spring-framework_orm/spring-mvc-board/img/17_spring_mvc_board_remember_me/user_login_remember_me1.png?raw=true)
 
@@ -202,6 +204,7 @@ public UserVO checkUserWithSessionKey(String value) throws Exception {
 `userMapper.xml`에 아래와 같이 sql을 추가해준다.
 
 로그인 유지를 선택한 경우 현재의 세션아이디와 로그인 유지기간을 갱신해준다.
+
 ```xml
 <update id="keepLogin">
     UPDATE tbl_user
@@ -212,6 +215,7 @@ public UserVO checkUserWithSessionKey(String value) throws Exception {
 ```
 
 로그인 시에 loginCookie 값과 `session_key`이 일치하는 회원의 정보를 가져온다.
+
 ```xml
 <select id="checkUserWithSessionKey" resultMap="userVOResultMap">
     SELECT
@@ -220,6 +224,7 @@ public UserVO checkUserWithSessionKey(String value) throws Exception {
     WHERE session_key = #{value}
 </select>
 ```
+
 
 #### 1.7 자동로그인 서비스 계층
 
@@ -279,6 +284,7 @@ public void loginPOST(LoginDTO loginDTO, HttpSession httpSession, Model model) t
 
 `RememberMeInterceptor` 클래스를 인터셉터로 스프링이 인식할 수 있도록 `dispatcher-servlet.xml`에 아래와 같이 설정을 추가한다.
 
+
 ```xml
 <bean id="rememberMeInterceptor" class="com.doubles.mvcboard.commons.interceptor.RememberMeInterceptor"/>
 
@@ -289,6 +295,7 @@ public void loginPOST(LoginDTO loginDTO, HttpSession httpSession, Model model) t
     </mvc:interceptor>
 </mvc:interceptors>
 ```
+
 
 ```java
 public class RememberMeInterceptor extends HandlerInterceptorAdapter {
@@ -366,6 +373,7 @@ public String logout(HttpServletRequest request,
 
 그리고 `logout.jsp`는 아래와 같이 별다른 내용없이 로그아웃 알림 메시지와 메인 페이지(`/`)로 이동하는 코드를 작성해준다.
 
+
 ```html
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
@@ -380,6 +388,7 @@ public String logout(HttpServletRequest request,
 </body>
 </html>
 ```
+
 
 #### 2.2 로그아웃 처리 확인
 
