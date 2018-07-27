@@ -594,12 +594,185 @@ java.lang.ThreadGroup[name=main,maxpri=10]
 #### 7.1 데몬 쓰레드 예제1
 
 ```java
+public class ThreadEx10 implements Runnable {
+
+    static boolean autoSave = false;
+
+    public static void main(String[] args) {
+
+        Thread t = new Thread(new ThreadEx10());
+        t.setDaemon(true);  // 이부분이 중요! 없을 경우 종료되지 않음
+        t.start();
+
+        for (int i = 1; i <= 10; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(i);
+
+            if (i == 5)
+                autoSave = true;
+        }
+
+        System.out.println("프로그램을 종료합니다.");
+
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(3*1000); // 3초마다
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (autoSave) {
+                autoSave();
+            }
+        }
+    }
+
+    public void autoSave() {
+        System.out.println("작업파일이 자동저장되었습니다.");
+    }
+}
 ```
+
+```
+1
+2
+3
+4
+5
+작업파일이 자동저장되었습니다.
+6
+7
+8
+작업파일이 자동저장되었습니다.
+9
+10
+프로그램을 종료합니다.
+```
+
+위의 코드는 3초마다 변수 `autoSave`의 값을 확인해서 그 값이 `true`이면, `autoSave()` 메서드를 호출하는 일을 무한히 반복하도록 쓰레드를 작성하였다.
+만약 이 쓰레드를 데몬 쓰레드로 설정하지 않았다면, 이 프로그램은 강제종료하지 않으면 계속 실행될 것이다.
+
+`setDaemon()`메서드는 반드시 `start()`메서드를 호출하기 전에 실행되어야한다. 그렇지 않으면 `IllegalThreadStateException`이 발생하게 된다.
 
 #### 7.2 데몬 쓰레드 예제2
 
 ```java
+public class ThreadEx11 {
+    public static void main(String[] args) {
+        ThreadEx11_1 t1 = new ThreadEx11_1("Thread1");
+        ThreadEx11_2 t2 = new ThreadEx11_2("Thread2");
+
+        t1.start();
+        t2.start();
+
+    }
+}
+
+class ThreadEx11_1 extends Thread {
+
+    // 생성자
+    public ThreadEx11_1(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        try {
+            sleep(5 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class ThreadEx11_2 extends Thread {
+
+    public ThreadEx11_2(String name) {
+        super(name);
+    }
+
+    @Override
+    public void run() {
+        Map map = getAllStackTraces();
+        Iterator it = map.keySet().iterator();
+
+        int x = 0;
+        while (it.hasNext()) {
+            Object obj = it.next();
+            Thread t = (Thread) obj;
+            StackTraceElement[] ste = (StackTraceElement[]) (map.get(obj));
+
+            System.out.println("[" + ++x + "]" + t.getName()
+                                + ", group : " + t.getThreadGroup().getName()
+                                + ", daemon : " + t.isDaemon());
+
+            for (int i = 0; i < ste.length; i++) {
+                System.out.println(ste[i]);
+            }
+
+            System.out.println();
+        }
+    }
+}
 ```
+
+```
+[1]DestroyJavaVM, group : main, daemon : false
+
+[2]Signal Dispatcher, group : system, daemon : true
+
+[3]Attach Listener, group : system, daemon : true
+
+[4]Thread1, group : main, daemon : false
+java.lang.Thread.sleep(Native Method)
+com.doubles.standardofjava.ch13_thread.ThreadEx11_1.run(ThreadEx11.java:27)
+
+[5]Finalizer, group : system, daemon : true
+java.lang.Object.wait(Native Method)
+java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:143)
+java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:164)
+java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:212)
+
+[6]Monitor Ctrl-Break, group : main, daemon : true
+java.net.SocketInputStream.socketRead0(Native Method)
+java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+java.net.SocketInputStream.read(SocketInputStream.java:171)
+java.net.SocketInputStream.read(SocketInputStream.java:141)
+sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+java.io.InputStreamReader.read(InputStreamReader.java:184)
+java.io.BufferedReader.fill(BufferedReader.java:161)
+java.io.BufferedReader.readLine(BufferedReader.java:324)
+java.io.BufferedReader.readLine(BufferedReader.java:389)
+com.intellij.rt.execution.application.AppMainV2$1.run(AppMainV2.java:64)
+
+[7]Reference Handler, group : system, daemon : true
+java.lang.Object.wait(Native Method)
+java.lang.Object.wait(Object.java:502)
+java.lang.ref.Reference.tryHandlePending(Reference.java:191)
+java.lang.ref.Reference$ReferenceHandler.run(Reference.java:153)
+
+[8]Thread2, group : main, daemon : false
+java.lang.Thread.dumpThreads(Native Method)
+java.lang.Thread.getAllStackTraces(Thread.java:1610)
+com.doubles.standardofjava.ch13_thread.ThreadEx11_2.run(ThreadEx11.java:42)
+```
+
+`getAllStackTraces()`를 이용하면 실행 중 또는 대기상태, 즉 작업이 완료되지 않은 모든 쓰레드의 호출스택을 출력할 수 있다. 결과를 보면 `getAllStackTraces()` 메서드가 호출되었을 때
+새로 생성한 `Thread1`, `Thread2`를 포함해서 8개의 쓰레드가 실행 중 또는 대기 상태에 있다는 것을 알 수 있다.
+
+프로그램을 실행하면 JVM은 가비지컬렉션, 이벤트처리, 그래픽처리와 같이 프로그램이 실행되는데 필요한 보조작업을 수행하는 데몬쓰레드들을 자동으로 생성해서 실행시킨다. 그리고 이들은 system쓰레드
+그룹 또는 main쓰레드 그룹에 속한다.
+
 
 ## 8. 쓰레드의 실행제어
 
