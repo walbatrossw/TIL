@@ -488,15 +488,118 @@ Priority of th2(|) : 7
 폴더 안에 폴더를 생성할 수 있듯이 쓰레드 그룹에 다른 쓰레드 그룹을 포함시킬 수 있다. 쓰레드 그룹은 보안상의 이유로 도입된 개념으로 자신이 속한 쓰레드 그룹이나 하위 쓰레드
 그룹은 변경할 수 있지만 다른 쓰레드 그룹의 쓰레드를 변경할 수는 없다.
 
-|생성자/메서드|설명|
-|---|---|
-|`TreadGroup(String name)`|지정된 이름의 새로운 쓰레드 그룹 생성|
-|`TreadGroup(TreadGroup parent, String name)`|지정된 쓰레드 그룹에 포함되는 새로운 쓰레드 그룹 생성|
-|`int activeCount()`|쓰레드 그룹에 포함된 활성상태에 있는 쓰레드의 수를 반환|
-|`int activeGroupCount()`|쓰레드 그룹에 포함된 활성상태에 있는 쓰레드 그룹의 수를 반환|
-|`void checkAccess`|현재 실행중인 쓰레드가 쓰레드 그룹을 변경할 권한이 있는지 체크|
+쓰레드 그룹의 주요 생성자와 메서드는 아래와 같다.
+
+- `TreadGroup(String name)` : 지정된 이름의 새로운 쓰레드 그룹 생성
+- `TreadGroup(TreadGroup parent, String name)` : 지정된 쓰레드 그룹에 포함되는 새로운 쓰레드 그룹 생성
+- `int activeCount()` : 쓰레드 그룹에 포함된 활성상태에 있는 쓰레드의 수를 반환
+- `int activeGroupCount()` : 쓰레드 그룹에 포함된 활성상태에 있는 쓰레드 그룹의 수를 반환
+- `void checkAccess()` : 현재 실행중인 쓰레드가 쓰레드 그룹을 변경할 권한이 있는지 체크, 권한이 없을 경우, `SecurityException`발생
+- `void destroy()` : 쓰레드 그룹과 하위 쓰레드 그룹까지 삭제, 쓰레드 그룹이나 하위 쓰레드 그룹이 비어있어야함|
+- `int enumerate(Thread[] list)`, `int enumerate(Thread[] list, boolean rescue)`, `int enumerate(ThreadGroup[] list)`, `int enumerate(ThreadGroup[] list, boolean rescue)`
+    - 쓰레드 그룹에 속한 쓰레드 또는 하위 쓰레드 그룹의 목록을 지정된 배열에 담고 그 개수를 반환
+    - 두번째 매개변수인 `rescue`의 값을 `true`로 하면 쓰레드 그룹에 속한 하위 쓰레드 그룹에 쓰레드 또는 쓰레드 그룹까지 배열에 담는다.
+- `int getMaxPriority()` : 쓰레드 그룹의 최대우선순위 반환
+- `String getName()` : 쓰레드 그룹의 이름 반환
+- `ThreadGroup getParent()` : 쓰레드 그룹의 상위 쓰레드 그룹을 반환
+- `void interrupt()` : 쓰레드 그룹에 속한 모든 쓰레드를 interrupt
+- `boolean isDaemon()` : 쓰레드 그룹이 데몬 쓰레드인지 확인
+- `boolean isDestroyed()` : 쓰레드 그룹이 삭제되었는지 확인
+- `void list()` : 쓰레드 그룹에 속한 쓰레드와 하위 쓰레드그룹에 대한 정보 출력
+- `boolean parentOf(ThreadGroup g)` : 지정된 쓰레드 그룹의 상위 쓰레드그룹인지 확인
+- `void setDaemon(boolean daemon)` : 쓰레드 그룹을 데몬 쓰레드 그룹으로 설정/해제
+- `void setMaxPriority(int pri)` : 쓰레드 그룹의 최대우선순위를 설정
+
+쓰레드를 쓰레드 그룹에 포함시키려면 `Thread`의 생성자를 이용해야한다.
+
+```java
+Thread(ThreadGroup group, String name)
+Thread(ThreadGroup group, Runnable target)
+Thread(ThreadGroup group, Runnable target, String name)
+Thread(ThreadGroup group, Runnable target, String name, long stackSize)
+```
+
+모든 쓰레드는 반드시 쓰레드 그룹에 포함되어 있어야하기 때문에 위와 같이 쓰레드 그룹을 지정하는 생성자를 사용하지 않은 쓰레드는 기본적으로 자신을 생성한 쓰레드와 같은
+쓰레드 그룹에 속하게 된다.
+
+자바 어플리케이션이 실행되면 JVM은 main과 system이라는 쓰레드 그룹을 만들고 JVM운영에 필요한 쓰레드들을 생성해서 이 쓰레드 그룹에 포함시킨다. 예를 들어 `main()`메서드를
+수행하는 main이라는 이름의 쓰레드는 이름의 쓰레드는 main쓰레드 그룹에 속하고, 가비지 컬렉션을 수행하는 Finalizer쓰레드는 system쓰레드 그룹에 속한다.
+
+우리가 생성하는 모든 쓰레드 그룹은 main쓰레드 그룹의 하위 쓰레드 그룹이 되며, 쓰레드 그룹을 지정하지 않고 생성한 쓰레드는 자동적으로 main쓰레드 그룹에 속하게 된다.
+
+#### 6.1 쓰레드 그룹 예제
+
+```java
+public class ThreadEx9 {
+    public static void main(String[] args) {
+        ThreadGroup main = Thread.currentThread().getThreadGroup();
+        ThreadGroup grp1 = new ThreadGroup("Group1");
+        ThreadGroup grp2 = new ThreadGroup("Group2");
+
+        ThreadGroup subGrp1 = new ThreadGroup(grp1, "SubGroup1");
+
+        grp1.setMaxPriority(3);
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new Thread(grp1, r, "th1").start();
+        new Thread(subGrp1, r, "th2").start();
+        new Thread(grp2, r, "th3").start();
+
+        System.out.println(">> List of ThreadGroup : " + main.getName()
+                            + ", Active ThreadGroup : " + main.activeGroupCount()
+                            + ", Active Thread : " + main.activeCount());
+
+        main.list();
+
+    }
+}
+```
+
+```
+>> List of ThreadGroup : main, Active ThreadGroup : 3, Active Thread : 5
+java.lang.ThreadGroup[name=main,maxpri=10]
+    Thread[main,5,main]
+    Thread[Monitor Ctrl-Break,5,main]
+    java.lang.ThreadGroup[name=Group1,maxpri=3]
+        Thread[th1,3,Group1]
+        java.lang.ThreadGroup[name=SubGroup1,maxpri=3]
+            Thread[th2,3,SubGroup1]
+    java.lang.ThreadGroup[name=Group2,maxpri=10]
+        Thread[th3,5,Group2]
+```
+
+위의 코드는 쓰레드 그룹과 쓰레드를 생성하고 `main.list()`를 호출해서 main쓰레드 그룹의 정보를 출력한 예제이다. 콘솔화면에 출력된 결과를 보면 쓰레드 그룹에
+포함된 하위 쓰레드 그룹이나 쓰레드는 들여쓰기를 이용해서 구별되는 것을 알 수 있다.
 
 ## 7. 데몬 쓰레드
+
+**데몬쓰레드는 일반 쓰레드의 작업을 돕는 보조적인 역할을 수행하는 쓰레드이다.** 일반 쓰레드가 모두 종료되면 데몬쓰레드는 강제적으로 자동 종료되는데 그 이유는 간단하다.
+데몬쓰레드는 일반 쓰레드를 도와주는 보조적인 역할이므로 존재의 이유가 없어지기 때문이다. 이 점을 제외하면 일반 쓰레드와 동일하다.
+
+데몬쓰레드는 무한루프와 조건문을 이용해서 실행 후 대기하고 있다가 특정 조건이 만족되면 작업을 수행하고 다시 대기하도록 작성한다.
+
+데몬쓰레드는 일반 쓰레드와 작성방법, 실행방법이 동일하며 쓰레드를 생성한 다음 실행하기 전에 `setDaemon(true)`를 호출하기만 하면된다. 그리고 데몬쓰레드가 생성한 쓰레드는
+자동적으로 데몬 쓰레드가 된다.
+
+#### 7.1 데몬 쓰레드 예제1
+
+```java
+```
+
+#### 7.2 데몬 쓰레드 예제2
+
+```java
+```
 
 ## 8. 쓰레드의 실행제어
 
