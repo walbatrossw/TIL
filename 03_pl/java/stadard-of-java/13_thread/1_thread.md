@@ -318,14 +318,183 @@ java.lang.Exception
 
 그래서 싱글 코어에서 단순히 CPU만을 사용하는 계산 작업일 경우 오히려 멀티쓰레드보다 싱글쓰레드로 프로그래밍하는 것이 효율적이다.
 
-#### 4.1 싱글쓰레드와 멀티쓰레드의 차이 예제 1
+#### 4.1 싱글쓰레드와 멀티쓰레드의 차이 예제 1 : 하나의 쓰레드로 두 개의 작업을 처리할 경우
 
 ```java
+public class ThreadEx6 {
+    public static void main(String[] args) {
+        String input = JOptionPane.showInputDialog("아무 값이나 입력하세요.");
+        System.out.println("입력하신 값은 " + input + "입니다. ");
+
+        for (int i = 10; i > 0; i--) {
+            System.out.println(i);
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
 ```
+```
+입력하신 값은 1234입니다. 
+10
+9
+8
+7
+6
+5
+4
+3
+2
+1
+```
+
+위 코드를 실행해보면 하나의 쓰레드로 사용자의 입력을 받는 작업과 숫자를 출력하는 작업을 처리하기 때문에 사용자가 입력을 마칠 때까지 화면에 숫자가 출력되지
+않다가 사용자가 입력을 마치면 콘솔 화면에 숫자가 출력된다.
+
+#### 4.2 싱글쓰레드와 멀티쓰레드의 차이 예제 2 : 두 개의 쓰레드로 두 개의 작업을 처리할 경우
+
+```java
+public class ThreadEx7 {
+    public static void main(String[] args) {
+        ThreadEx7_1 t1 = new ThreadEx7_1();
+        t1.start();
+
+        String input = JOptionPane.showInputDialog("아무 값이나 입력해주세요.");
+        System.out.println("입력하신 값은 " + input + " 입니다.");
+    }
+}
+
+class ThreadEx7_1 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 10; i > 0; i--) {
+            System.out.println(i);
+            try {
+                sleep(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+```
+10
+9
+8
+입력하신 값은 1234 입니다.
+7
+6
+5
+4
+3
+2
+1
+```
+
+첫번째 예제와 다르게 사용자로부터 입력받는 부분과 화면에 숫자를 출력하는 부분을 두 개의 쓰레드로 나누어 처리했기 때문에 사용자가 입력을 마치지 않았지만
+콘솔화면에 숫자가 출력되는 것을 알 수 있다.
 
 ## 5. 쓰레드의 우선순위
 
+쓰레드는 우선순위(Priority)라는 속성을 가지고 있는데, 이 우선순위의 값에 따라 쓰레다가 얻는 실행시간이 달라진다. 쓰레드가 수행하는 작업의 중요도에 따라
+쓰레드의 우선순위를 다르게 지정하여 특정 쓰레드가 더 많은 작업시간을 갖도록 할 수 있다.
+
+예를 들어 설명해보면 파일전송 기능이 있는 메신저의 경우 파일 다운로드를 처리하는 쓰레드보다 채팅 내용을 전송하는 쓰레드의 우선순위가 높아야 사용자가 채팅을
+하는데 불편함이 없을 것이다. 하지만 파일을 전송하는데 걸리는 시간은 더 길어지게 된다.
+
+위와 같이 시각적인 부분이나 사용자에게 빠르게 반응해야하는 작업을 하는 쓰레드의 우선 순위는 다른 작업을 수행하는 쓰레드에 비해 높아야 한다.
+
+#### 5.1 쓰레드 우선순위 지정방법
+쓰레드의 우선순위와 관련된 메서드와 상수는 다음과 같다.
+
+```java
+void setPriority(int newPriority); // 쓰레드의 우선순위를 지정한 값으로 변경
+int getPriority(); // 쓰레드의 우선순위를 반환
+
+public static final int MAX_PRIORITY = 10;  // 최대 우선순위
+public static final int MIN_PRIORITY = 1;   // 최소 우선순위
+public static final int NORM_PRIORITY = 5;  // 보통 우선순위
+```
+
+쓰레드가 가질 수 있는 우선순위의 범위는 1~10이며 숫자가 높을 수록 우선순위가 높다. 쓰레드의 우선순위는 쓰레드를 생성한 쓰레드로부터 상속받는다. `main()`메서드를
+수행하는 쓰레드는 우선순위가 5이므로 `main()`메서드 내에서 생성하는 쓰레드 우선순위는 자동적으로 5가 된다.
+
+#### 5.2 쓰레드 우선순위 예제
+
+```
+public class ThreadEx8 {
+
+    public static void main(String[] args) {
+        ThreadEx8_1 th1 = new ThreadEx8_1();
+        ThreadEx8_2 th2 = new ThreadEx8_2();
+
+        th2.setPriority(7);
+
+        System.out.println("Priority of th1(-) : " + th1.getPriority());
+        System.out.println("Priority of th2(|) : " + th2.getPriority());
+
+        th1.start();
+        th2.start();
+    }
+
+}
+
+class ThreadEx8_1 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print("-");
+            for (int x = 0; x < 1000000000; x++);
+        }
+    }
+}
+
+class ThreadEx8_2 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print("|");
+            for (int x = 0; x < 1000000000; x++);
+        }
+    }
+}
+```
+
+```
+Priority of th1(-) : 5
+Priority of th2(|) : 7
+// 생략 ...
+
+```
+
+`th1`과 `th2` 모두 `main()` 메서드에서 생성하였기 때문에 `main()` 메서드를 실행하는 쓰레드의 우선순위인 5를 상속받았지만 `th2`는 `setPriority()`메서드를 통해
+우선순위를 7로 변경하였다. 쓰레드를 실행하기 전에만 우선 순위를 변경할 수 있다.
+
+실제로 위의 코드를 실행해보면 멀티코어에서는 쓰레드의 우선순위에 따른 차이가 거의 없다. 우선순위를 다르게하여 여러번 테스트를 하더라도 결과는 같다. 결국 우선순위에
+차등을 두어 쓰레드를 실행시키는 것이 별 효과가 없다는 것을 알 수 있다. 쓰레드에 높은 우선순위를 주면 더 많은 실행시간과 실행기회를 갖게 될 것이라고 기대할 수 없다.
+
+쓰레드에 우선순위를 부여하는 대신 작업에 우선순위를 두어 PriorityQueue에 저장해 놓고, 우선순위가 높은 작업이 먼저 처리되도록 하는 것이 나을 수 있다.
+
 ## 6. 쓰레드 그룹
+
+**쓰레드 그룹은 서로 관련된 쓰레드를 그룹으로 다루기 위한 것으로 폴더를 생성해서 관련된 파일들을 함께 넣어서 관리하는 것처럼 쓰레드 그룹을 생성해서 쓰레드를 그룹으로
+묶어서 관리할 수 있다.**
+
+폴더 안에 폴더를 생성할 수 있듯이 쓰레드 그룹에 다른 쓰레드 그룹을 포함시킬 수 있다. 쓰레드 그룹은 보안상의 이유로 도입된 개념으로 자신이 속한 쓰레드 그룹이나 하위 쓰레드
+그룹은 변경할 수 있지만 다른 쓰레드 그룹의 쓰레드를 변경할 수는 없다.
+
+|생성자/메서드|설명|
+|---|---|
+|`TreadGroup(String name)`|지정된 이름의 새로운 쓰레드 그룹 생성|
+|`TreadGroup(TreadGroup parent, String name)`|지정된 쓰레드 그룹에 포함되는 새로운 쓰레드 그룹 생성|
+|`int activeCount()`|쓰레드 그룹에 포함된 활성상태에 있는 쓰레드의 수를 반환|
+|`int activeGroupCount()`|쓰레드 그룹에 포함된 활성상태에 있는 쓰레드 그룹의 수를 반환|
+|`void checkAccess`|현재 실행중인 쓰레드가 쓰레드 그룹을 변경할 권한이 있는지 체크|
 
 ## 7. 데몬 쓰레드
 
