@@ -426,7 +426,7 @@ public static final int NORM_PRIORITY = 5;  // 보통 우선순위
 
 #### 5.2 쓰레드 우선순위 예제
 
-```
+```java
 public class ThreadEx8 {
 
     public static void main(String[] args) {
