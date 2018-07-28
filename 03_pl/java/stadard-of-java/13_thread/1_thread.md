@@ -781,9 +781,40 @@ com.doubles.standardofjava.ch13_thread.ThreadEx11_2.run(ThreadEx11.java:42)
 
 쓰레드의 스케쥴링을 잘하기 위해서는 쓰레드 상태와 관련된 메서드에 대해 잘알아야한다.
 
+- `static void sleep(long millis)`, `static void sleep(long millis, int nanos)` : 저정된 시간(1/1000초 단위)동안 쓰레드 일시정지, 일시정지가 끝나고 나면 실행대기 상태로 전환
+- `void join()`, `void join(long millis)`, `void join(long millis, int nanos)` : 지정된 시간동안 쓰레드 실행되도록 함. 지정된 시간이 지나거나 작업이 종료되면 `join()`을 호출한 쓰레드로 다시 다시 돌아와 실행을 계속함
+- `void interrupt()` : `sleep()`이나 `join()`에 의해 일시정지 상태인 쓰레드를 깨워서 실행 대기상태로 만듬. `interruptedException()`이 발생함으써 일시정지상태를 벗어난게 됨
+- `void stop()` : 쓰레드를 즉시 종료
+- `void suspend()` : 쓰레드를 일시정지 시킴.
+- `void resume()` : `suspend()`에 의해 일시정지 상태에 있는 쓰레드를 실행대기 상태로 전환
+- `static void yield()` : 실행 중에 자신에게 주어진 실행시간을 다른 쓰레드에게 양보하고 자신은 실행대기 상태로 전환
+
+#### 8.1 쓰레드의 상태
+
+쓰레드의 상태는 아래와 같다.
+
+- NEW : 쓰레드가 생성되고 아직 `start()`가 호출되지 않은 상태
+- RUNNABLE : 실행 중 또는 실행 가능한 상태
+- BLOCKED : 동기화 블럭에 의해 일시정지된 상태(lock이 풀릴 때 까지 기다리는 상태)
+- WAITING, TIMED_WAITING : 쓰레드의 작업이 종료되지는 않지만 실행가능하지 않은(unrunnable) 일시정지 상태, TIMED_WAITING은 일시정지시간이 지정된 경우를 의미
+- TERMINATED : 쓰레드 작업이 종료된 상태
+
+아래의 그림은 쓰레드의 생성부터 소멸까지의 모든 과정을 그린 것인데 앞서 소개한 메서드들에 의해서 쓰레드의 상태가 어떻게 변하는지 알 수 있다.
+
+![thread_state]()
+
+1. 쓰레드를 생성하고, `start()`를 호출하면 바로 실행되는 것이 아니라 실행대기열에 저장되어 자신의 차례가 될 때가지 기다려야 한다. 실행대기열은 큐(queue)와 같은 구조로 먼저 실행대기얄에 들어온 쓰레드가 먼저 실행된다.
+2. 실행대기상태에 있다가 자신의 차례가 되면 실행상태가 된다.
+3. 주어진 실행시간이 다되거나 `yield()`를 만나면 다시 실행대기 상태가 되고, 다음 차례의 쓰레드가 실행상태가 된다.
+4. 실행 중에 `suspend()`, `sleep()`, `wait()`, `join()`, I/O break에 의해 일시정지 상태가 될 수 있다.
+5. 지정된 일시정지시간이 다되거나(time-out), `notify()`, `resume()`, `interrupt()`가 호출되면 일시정지 상태를 벗어나 다시 실행대기열에 저장되어 자신의 차례를 기다린다.
+6. 실행을 모두 마치거나 `stop()`이 호출되면 쓰레드는 소멸된다.
+
+
+
 ## 9. 쓰레드의 동기화
 
-#### `synchronized`를 이용한 동기화
+#### 9.1 `synchronized`를 이용한 동기화
 
 #### `wait()`와 `nofify()`
 
