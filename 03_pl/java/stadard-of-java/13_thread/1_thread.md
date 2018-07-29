@@ -801,7 +801,7 @@ com.doubles.standardofjava.ch13_thread.ThreadEx11_2.run(ThreadEx11.java:42)
 
 아래의 그림은 쓰레드의 생성부터 소멸까지의 모든 과정을 그린 것인데 앞서 소개한 메서드들에 의해서 쓰레드의 상태가 어떻게 변하는지 알 수 있다.
 
-![thread_state]()
+![thread_state](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/13_thread/img/thread_state.png?raw=true)
 
 1. 쓰레드를 생성하고, `start()`를 호출하면 바로 실행되는 것이 아니라 실행대기열에 저장되어 자신의 차례가 될 때가지 기다려야 한다. 실행대기열은 큐(queue)와 같은 구조로 먼저 실행대기얄에 들어온 쓰레드가 먼저 실행된다.
 2. 실행대기상태에 있다가 자신의 차례가 되면 실행상태가 된다.
@@ -809,6 +809,34 @@ com.doubles.standardofjava.ch13_thread.ThreadEx11_2.run(ThreadEx11.java:42)
 4. 실행 중에 `suspend()`, `sleep()`, `wait()`, `join()`, I/O break에 의해 일시정지 상태가 될 수 있다.
 5. 지정된 일시정지시간이 다되거나(time-out), `notify()`, `resume()`, `interrupt()`가 호출되면 일시정지 상태를 벗어나 다시 실행대기열에 저장되어 자신의 차례를 기다린다.
 6. 실행을 모두 마치거나 `stop()`이 호출되면 쓰레드는 소멸된다.
+
+#### 8.2 `sleep(long millis)` - 일정시간 동안 쓰레드 멈춤
+
+`sleep()`은 지정된 시간동안 쓰레드를 멈추게 한다. 밀리세컨드(1/1000초)와 나노세컨드(10억분의 일초)의 시간단위로 세밀하게 값을 지정할 수 있지만 어느 정도 오차가 발생할 수 있다.
+
+`sleep()`에 의해 일시정지가 된 쓰레드는 지정된 시간이 지나거나 `interrupt()` 메서드가 호출되면 `InterruptException`이 발생되어 잠에서 깨어나 실행대기 상태가 된다. 그래서 `sleep()` 메서드를 호출할 때는
+항상 `try-catch`문으로 예외를 처리해줘야한다. 매번 예외처리를 해주는 것이 번거롭기 때문에 아래와 같이 `try-catch`문까지 포함하는 새로운 메서드를 만들어 사용하기도 한다.
+
+```java
+void delay(long millis) {
+    try {
+        Thread.sleep(millis);
+    } catch(InterruptException e) {
+        
+    }
+}
+```
+
+아래는 `sleep()` 메서드 예제이다.
+
+```java
+```
+
+#### 8.3 `interrupt()`, `interrupted()` - 쓰레드 작업 취소
+
+#### 8.4 `suspend()`, `resume()`, `stop()`
+
+#### 8.5 `yield()` - 다른 쓰레드에게 양보
 
 
 
