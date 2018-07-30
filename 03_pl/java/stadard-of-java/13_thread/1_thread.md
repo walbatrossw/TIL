@@ -830,9 +830,106 @@ void delay(long millis) {
 아래는 `sleep()` 메서드 예제이다.
 
 ```java
+public class ThreadEx12 {
+    public static void main(String[] args) {
+        ThreadEx12_1 th1 = new ThreadEx12_1();
+        ThreadEx12_2 th2 = new ThreadEx12_2();
+
+        th1.start();
+        th2.start();
+
+        try {
+            th2.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+
+        System.out.println("<<main 종료>>");
+    }
+}
+
+class ThreadEx12_1 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print("-");
+        }
+        System.out.println("<<th1 종료>>");
+    }
+}
+
+class ThreadEx12_2 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print("|");
+        }
+        System.out.println("<<th2 종료>>");
+    }
+}
 ```
 
+```
+... ---------<<th1 종료>>
+... |||||||||<<th2 종료>>
+<<main 종료>>
+```
+
+위의 결과를 보면 쓰레드 `th1`의 작업이 가장 먼저 종료되었고, 그 다음이 `th2`, `main`의 순인 것을 알 수 있다. 쓰레드 `th1`과 `th2`를 `start()` 메서드를 호출하자마자 `th1.sleep(2000)` 메서드를
+호출하여 쓰레드 `th1`이 2초 동안 작업을 멈추고 일시정지 상태에 있도록 하였기 때문에 쓰레드 `th1`이 가장 늦게 종료되어야 하는데 결과에서는 제일 먼저 종료되었다.
+
+이러한 이유는 `sleep()` 메서드가 항상 현재 실행 중인 쓰레드에 대해 작동하기 때문에 `th1.sleep(2000)`과 같이 호출하였어도 실제로 영향을 받는 것은 `main()`메서드를 실행하는 `main`쓰레드이다.
+그래서 `sleep()` 메서드는 `static`으로 선언되어 있으며 참조변수를 이용해서 호출하기 보다는 `Thread.sleep(2000)`과 같이 해야한다.
+
 #### 8.3 `interrupt()`, `interrupted()` - 쓰레드 작업 취소
+
+진행 중인 쓰레드의 작업이 끝나기 전에 취소를 시켜야할 때가 있다. 예를 들면 큰 파일을 다운로드 받을 때 시간이 너무 오래 걸리면 중간에 다운로드를 포기하고 취소할 수 있어야 한다. `interrupt()` 메서드는
+쓰레드에게 작업을 멈추라고 요청한다. 하지만 쓰레드를 강제로 종료시키지는 못한다. `interrupt()` 메서드는 그저 쓰레드의 `interrupted`(인스턴스 변수)상태를 바꾸는 것일 뿐이다.
+
+`interrupted()` 메서드는 쓰레드에 대해 `interrupt()`메서드가 호출되었는지 알려준다. `interrupt()`가 호출되었는지 여부에 따라 `true`나 `false`를 반환한다.
+
+- `void interrupt()` : 쓰레드의 `interrupted` 상태를 `false`에서 `true`로 변경
+- `boolean isInterrupted()` : 쓰레드의 `interrupted` 상태를 반환
+- `static boolean interrupted()` : 현재 쓰레드의 `interrupted` 상태를 알려주고, `false`로 초기화
+
+쓰레드가 `sleep()`, `wait()`, `join()`에 의해 일시정지 상태에 있을 때, 해당 쓰레드에 대해 `interrupt()`를 호출하면 `sleep()`, `wait()`, `join()`에서 `InterruptedException`이 발생하고 쓰레드는
+실행대기 상태로 바뀐다. 다시 말하자면 멈춰있던 쓰레드를 깨워서 실행가능 상태로 만드는 것이다.
+
+```java
+public class ThreadEx13 {
+    public static void main(String[] args) {
+        ThreadEx13_1 th1 = new ThreadEx13_1();
+        th1.start();
+
+        String input = JOptionPane.showInputDialog("아무 값이나 입력하세요.");
+        System.out.println("입력하신 값은" + input + "입니다.");
+        th1.interrupt();
+        System.out.println("isInterrupted() : " + th1.isInterrupted());
+    }
+}
+
+class ThreadEx13_1 extends Thread {
+    @Override
+    public void run() {
+        int i = 10;
+        while (i != 0 && !isInterrupted()) {
+            System.out.println(i--);
+            for (long x = 0; x < 2500000000L; x++); // 시간 지연
+        }
+        System.out.println("카운트가 종료되었습니다.");
+    }
+}
+```
+```
+10
+9
+8
+7
+입력하신 값은123입니다.
+isInterrupted() : true
+카운트가 종료되었습니다.
+```
+
 
 #### 8.4 `suspend()`, `resume()`, `stop()`
 

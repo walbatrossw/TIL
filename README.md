@@ -49,7 +49,7 @@
 - [프로그램 설치](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/07_dpkg_apt-get.md)
 - [파일의 압축과 묶기](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/08_file_compression_cron_at.md)
 - [네트워크](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/09_network.md)
-- [파이프, 필터, 리디렉션](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/10.pipe_filter_redirection_rescue.md)
+- [파이프, 필터, 리디렉션](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/10_pipe_filter_redirection_rescue.md)
 - [GRUB 부트로더](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/11_GRUB_Boot_Loader_Kernel_compile.md)
 - [SATA 장치와 SCSI장치의 구성](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/13_SATA_SCSI_HDD_ADD.md)
 - [RAID](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/14_RAID.md)
