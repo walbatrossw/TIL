@@ -102,7 +102,7 @@
     - [요약](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/11_collection_framework/14_collection_summury.md)
   - [제네릭](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/12_generics_eums_annotion/1_generics.md)
   - [Enums](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/12_generics_eums_annotion/2_enums.md)
-  - 쓰레드
+  - [Thread](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/13_thread/1_thread.md)
   - [Lambda](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/14_lambda_stream/1_lambda1.md)
   - 스트림
 
