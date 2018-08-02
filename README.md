@@ -161,8 +161,9 @@
   - [소스코드](https://github.com/walbatrossw/spring-mvc-ex)
 
 ### Spring Boot
-
+- [레퍼런스 스터디](https://github.com/walbatrossw/spring-boot-reference-study)
 - 게시판 만들기 예제
+  - [소스코드](https://github.com/walbatrossw/spring-boot-ex)
 
 ### Spring boot reference
 
