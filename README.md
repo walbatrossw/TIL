@@ -167,8 +167,7 @@
 
 ### Spring boot reference
 
-- 프로젝트 생성
-- 빌드 시스템
+- 정리(https://github.com/walbatrossw/spring-boot-reference-study)
 
 
 ### JPA
