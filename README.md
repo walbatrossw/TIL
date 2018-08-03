@@ -167,7 +167,7 @@
 
 ### Spring boot reference
 
-- 정리(https://github.com/walbatrossw/spring-boot-reference-study)
+- [정리](https://github.com/walbatrossw/spring-boot-reference-study)
 
 
 ### JPA
