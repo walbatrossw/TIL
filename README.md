@@ -138,7 +138,7 @@
     - Command Pattern
     - Template Method Pattern
 
-- 도메인 주도 설계
+- [도메인 주도 설계](https://github.com/walbatrossw/domain-driven-design)
 
 ### Javascript
 
