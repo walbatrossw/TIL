@@ -106,7 +106,7 @@
   - [Lambda](https://github.com/walbatrossw/TIL/blob/master/03_pl/java/stadard-of-java/14_lambda_stream/1_lambda1.md)
   - 스트림
 
-- 이펙티브 자바 요약 정리
+- [이펙티브 자바 요약 정리](https://github.com/walbatrossw/TIL/tree/master/03_pl/java/effective-java)
   - 객체의 생성과 삭제
   - 모든 객체의 공통 메서드
   - 클래스와 인터페이스
