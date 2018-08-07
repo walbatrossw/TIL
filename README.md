@@ -193,7 +193,7 @@
 
 ## 6. 클린코드(clean_code)
 
-- 클린코드
+- [클린코드](https://github.com/walbatrossw/TIL/tree/master/06_clean-code/clean-code-book)
 
 - 클린 코더스 강의
 
