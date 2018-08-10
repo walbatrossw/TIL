@@ -197,9 +197,7 @@
 ---
 
 
-## 7. 구글링 검색 기록
-
-## 8. 개발툴 정리
+## 7. 개발도구
 
 - [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/08_tools/intellij.md)
 
