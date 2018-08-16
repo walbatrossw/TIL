@@ -895,6 +895,8 @@ class ThreadEx12_2 extends Thread {
 쓰레드가 `sleep()`, `wait()`, `join()`에 의해 일시정지 상태에 있을 때, 해당 쓰레드에 대해 `interrupt()`를 호출하면 `sleep()`, `wait()`, `join()`에서 `InterruptedException`이 발생하고 쓰레드는
 실행대기 상태로 바뀐다. 다시 말하자면 멈춰있던 쓰레드를 깨워서 실행가능 상태로 만드는 것이다.
 
+아래의 예제는 이전의 예제를 `interrupt()`와 `interrupted()`를 사용하여 수정한 것으로 카운트 다운 도중 사용자 입력이 들어오면 카운트 다운을 종료하게 한다.
+
 ```java
 public class ThreadEx13 {
     public static void main(String[] args) {
@@ -903,7 +905,7 @@ public class ThreadEx13 {
 
         String input = JOptionPane.showInputDialog("아무 값이나 입력하세요.");
         System.out.println("입력하신 값은" + input + "입니다.");
-        th1.interrupt();
+        th1.interrupt();    // interrupt()를 호출, 변수 interrupted는 true로 변경
         System.out.println("isInterrupted() : " + th1.isInterrupted());
     }
 }
@@ -930,8 +932,71 @@ isInterrupted() : true
 카운트가 종료되었습니다.
 ```
 
+아래의 예제는 위의 예제에서 for문 대신 `Thread.sleep(1000)`으로 1초 동안 지연되도록 변경하였는데 카운트가 종료되지 않는다. 게다가 `isInterrupt()` 메서드를 호출한 결과도 `false`이다.
+이러한 이유는 `Thread.sleep(1000)`에서 `InterruptException`이 발생했기 때문이다. `sleep()`메서드에 의해서 쓰레드가 잠시 멈춰있을 때, `interrupt()` 메서드를 호출하면 `InterruptException`이
+발생하고 쓰레드의 `interrupted`의 상태는 `false`로 초기화가 된다. 이럴 때에는 `catch`블럭에서 `interrupt()`메서드를 넣어줘서 쓰레드의 변수 `interrupted`의 상태를 다시 `true`로 바꿔줘야 한다.
+
+```java
+public class ThreadEx14 {
+    public static void main(String[] args) {
+        ThreadEx14_1 th1 = new ThreadEx14_1();
+        th1.start();
+
+        String input = JOptionPane.showInputDialog("아무 값이나 입력하세요.");
+        System.out.println("입력하신 값은 " + input + " 입니다.");
+        th1.interrupt();
+        System.out.println("isInterrupted() : " + th1.isInterrupted());
+    }
+}
+
+class ThreadEx14_1 extends Thread {
+
+    @Override
+    public void run() {
+        int i = 10;
+
+        while (i != 0 && !isInterrupted()) {
+            System.out.println(i--);
+            try {
+                Thread.sleep(1000); // 1초 지연
+            } catch (InterruptedException e) {
+                //interrupt(); // 추가하면 의도되로 프로그램이 작동된다.
+            }
+        }
+        System.out.println("카운트가 종료되었습니다.");
+    }
+}
+```
+
+```
+10
+9
+8
+입력하신 값은 123 입니다.
+isInterrupted() : true
+7
+6
+5
+4
+3
+2
+1
+카운트가 종료되었습니다.
+```
 
 #### 8.4 `suspend()`, `resume()`, `stop()`
+
+- `suspend()` : `sleep()`처럼 쓰레드를 멈추게 한다.
+- `resume()` : `resume()` 메서드를 호출하면 `suspend()`에 의해 정지된 쓰레드를 실행대기 상태가 된다.
+- `stop()` : 호출되는 즉시 쓰레드가 종료된다.
+
+`suspend()`, `resume()`, `stop()은 쓰레드의 실행을 제어하는 가장 손쉬운 방법이지만, `suspend()`와 `stop`이 교착상태(deadlock)를 일으키기 쉽게 작성되기 때문에 권장되지 않는다.
+이 메서드들은 모두 `deprecated`되었다. 전에는 사용했지만 앞으로 사용하지 않을 것을 권장한다는 의미로 하위 호환성을 위해 삭제하지 않을 뿐이므로 사용해서는 안된다.
+
+
+```java
+
+```
 
 #### 8.5 `yield()` - 다른 쓰레드에게 양보
 
