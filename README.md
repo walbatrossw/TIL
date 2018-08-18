@@ -5,7 +5,7 @@
 ### 자료구조, 알고리즘
 
 - 배열(Arrays)
-- [연결리스트(Linked List)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/02_linked_list.md)
+- 연결리스트(LinkedList)
 - 스택(Stack)
 - 큐(Queue)
 - 트리(Tree)
