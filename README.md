@@ -29,7 +29,7 @@
 
 - Mysql
 - Oracle
-- Nosql
+
 
 ### 네트워크
 
@@ -144,7 +144,6 @@
 - Javascript 핵심가이드
 
 - Jquery
-
 
 
 ---
