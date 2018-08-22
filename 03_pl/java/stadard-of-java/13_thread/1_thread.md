@@ -1277,14 +1277,156 @@ class ThreadEx17_1 implements Runnable {
 `yield()`는 쓰레드 자신에게 주어진 실행시간을 다음 차례의 쓰레드에게 양보하도록 한다. 예를 들어 스케쥴러에 의해 1초의 실행시간을 할당받은 쓰레드가 0.5초의 시간동안
 작업한 상태에서 `yield()`가 호출되면, 나머지 0.5초는 포기하고 다시 실행대기상태가 된다. `yield()`가 호출되면, 나머지 0.5초는 포기하고 다시 실행대기상태가 된다.
 
+`yield()`와 `interrupt()`를 적절히 사용하면, 프로그램의 응답성을 높이고 보다 효율적인 실행이 가능하게 할 수 있다. 이 메서드들이 실제로 어떻게 사용되는지 아래의 예제를
+통해 알아보자.
+
 ```java
+public class ThreadEx18 {
+    public static void main(String[] args) {
+        ThreadEx18_1 th1 = new ThreadEx18_1("*");
+        ThreadEx18_1 th2 = new ThreadEx18_1("**");
+        ThreadEx18_1 th3 = new ThreadEx18_1("***");
+        th1.start();
+        th2.start();
+        th3.start();
+        try {
+            Thread.sleep(2000);
+            th1.suspend();
+            Thread.sleep(2000);
+            th2.suspend();
+            Thread.sleep(3000);
+            th1.resume();
+            Thread.sleep(3000);
+            th1.stop();
+            th2.stop();
+            Thread.sleep(2000);
+            th3.stop();
+        } catch (InterruptedException e) {
 
+        }
+    }
+}
+
+class ThreadEx18_1 implements Runnable {
+    boolean suspended = false;
+    boolean stopped = false;
+    Thread th;
+
+    ThreadEx18_1(String name) {
+        th = new Thread(this, name);
+    }
+
+    @Override
+    public void run() {
+        String name = th.getName();
+        while (!stopped) {
+            if (!suspended) {
+                System.out.println(name);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println(name + " - interrupted");
+                }
+            } else {    // yield() 추가
+                Thread.yield();
+            }
+        }
+        System.out.println(name + " - stopped");
+    }
+
+    public void suspend() {
+        suspended = true;
+        th.interrupt();
+        System.out.println(th.getName() + " - interrupted() by suspend()");
+    }
+
+    public void resume() {
+        suspended = false;
+    }
+
+    public void stop() {
+        stopped = true;
+        th.interrupt();
+        System.out.println(th.getName() + " - interrupted() by stop()");
+    }
+
+    public void start() {
+        th.start();
+    }
+    
+}
 ```
 
 ```
-
+*
+**
+***
+*
+**
+***
+*
+**
+* - interrupted
+* - interrupted() by suspend()
+***
+**
+***
+**
+** - interrupted() by suspend()
+** - interrupted
+***
+***
+***
+*
+***
+*
+***
+*
+***
+* - interrupted() by stop()
+** - stopped
+* - interrupted
+* - stopped
+** - interrupted() by stop()
+***
+***
+*** - interrupted() by stop()
+*** - interrupted
+*** - stopped
 ```
 
+이전에 보았던 예제에 `yield()`와 `interrupt()`를 추가해서 예제의 효율과 응답성을 향상 시켰다. 먼저 `if`문에 `yield()`를 호출하는 `else`블럭이 추가되었다.
+
+이전의 코드는 변수 `suspended`의 값이 `true`일 경우 잠시 실행을 멈추게 한 상태라면 쓰레드는 주어진 실행시간을 그거 `while`문을 의미없이 돌면서 낭비하게 될 것이다.
+이런 상황을 **바쁜 대기 상태(busy-waiting)**이라고 한다. 하지만 위의 코드에서는 `suspended`의 값이 `true`일 경우 `yield()`를 호출해서 남은 실행시간을 `while`문에서
+낭비하지 않고, 다른 쓰레드에게 양보를 하게 되므로 더 효율적이다.
+
+또한 추가적으로 변경된 내용은 `suspend()`와 `stop()`인데 `interrupt()`를 호출하는 코드를 추가한 부분인데 이전 코드에서는 `stop()`이 호출되었을 때 `Thread.sleep(1000)`에
+의해 쓰레드가 일시정지 상태에 머물러있는 상황이라면, `stopped`의 값이 `true`로 바뀌었어도 쓰레드가 정지될 때까지 최대 1초의 시간지연이 생길 것이다. 그러나 위의 코드에서
+`interrupt()`를 호출하게 되면 `sleep()`에서 `InterruptedException`이 발생하여 즉시 일시정지상태를 벗어나게되므로 응답성이 좋아지게 된다.
+
+#### 8.6 `join()` - 다른 쓰레드 작업을 기다림
+**쓰레드 자신이 하던 작업을 잠시 멈추고 다른 쓰레드가 지정된 시간동안 작업을 수행하도록 할 때 사용한다**
+
+```java
+join()
+join(long millis)
+join(long millis, int nanos)
+```
+
+시간을 지정하지 않으면, 해당 쓰레드가 작업을 모두 마칠 때까지 기다리게 된다. 작업 중에 다른 쓰레드의 작업이 먼저 수행되어야할 필요가 있을 때 `join()`을 사용한다.
+
+```java
+try {
+    th1.join(); // 현재 실행중인 쓰레드가 쓰레드 th1의 작업이 끝날 때까지 기다린다.
+} catch(InterruptedException e) {
+    
+}
+```
+
+`join()`도 `sleep()`처럼 `interrupt()`에 의해 대기상태에서 벗어날 수 있으며, `join()`이 호출되는 부분을 `try-catch`부분으로 감싸야만한다.
+
+**`join()`은 `sleep()`과 유사한 점이 많은 데
 
 ## 9. 쓰레드의 동기화
 
