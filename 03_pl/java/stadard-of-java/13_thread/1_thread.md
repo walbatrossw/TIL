@@ -994,12 +994,296 @@ isInterrupted() : true
 이 메서드들은 모두 `deprecated`되었다. 전에는 사용했지만 앞으로 사용하지 않을 것을 권장한다는 의미로 하위 호환성을 위해 삭제하지 않을 뿐이므로 사용해서는 안된다.
 
 
+아래의 예제는 `suspend()`, `resume()`, `stop()`의 사용법을 보여주는 예제로 `sleep(2000)`은 쓰레드를 2초간 멈추게 하지만, 2초 후에 바로 실행상태가 아닌 실행 대기 상태가 된다.
+아래의 예제는 간단한 상태이기 때문에 교착상태가 일어날 일이 없으므로 `suspend()`, `stop()`를 사용해도 되지만 좀더 복잡한 경우에는 사용하지 않는 것이 좋다.
+
+```java
+public class ThreadEx15 {
+    public static void main(String[] args) {
+        RunImplEx15 r = new RunImplEx15();
+        Thread th1 = new Thread(r, "*");
+        Thread th2 = new Thread(r, "**");
+        Thread th3 = new Thread(r, "***");
+
+        th1.start();
+        th2.start();
+        th3.start();
+
+        try {
+
+            Thread.sleep(2000);
+            th1.suspend();  // 쓰레드 th1을 잠시 중단
+
+            Thread.sleep(2000);
+            th2.suspend();  // 쓰레드 th2을 잠시 중단
+
+            Thread.sleep(3000);
+            th1.resume();   // 쓰레드 th1을 다시 동작
+
+            Thread.sleep(3000);
+            th1.stop();     // 쓰레드 th1 강제 종료
+            th2.stop();     // 쓰레드 th2 강제 종료
+
+            Thread.sleep(2000);
+            th3.stop();     // 쓰레드 th3을 강제 종료
+
+        } catch (InterruptedException e) {
+
+        }
+    }
+}
+
+class RunImplEx15 implements Runnable {
+
+    @Override
+    public void run() {
+        while (true) {
+            System.out.println(Thread.currentThread().getName());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+}
+```
+
+```
+*
+**
+***
+**
+***
+*
+**
+***
+**
+***
+***
+***
+***
+*
+***
+*
+***
+*
+***
+***
+***
+```
+
+아래의 예제는 위에서 언급한 교착상태를 해결할 방법을 적용해본 것이다. `stopped`와 `suspended`라는 `boolean`타입의 두 변수를 인스턴스 변수로 선언하고, 이 변수를 사용해 반복문과 조건문의
+조건식을 작성한다. 그리고 이 변수의 값을 변경함으로써 쓰레드의 작업이 중지되었다가 재개되거나 종료되도록 할 수 있다.
+
+```java
+public class ThreadEx16 {
+    public static void main(String[] args) {
+        RunImplEx16 r1 = new RunImplEx16();
+        RunImplEx16 r2 = new RunImplEx16();
+        RunImplEx16 r3 = new RunImplEx16();
+
+        Thread th1 = new Thread(r1, "*");
+        Thread th2 = new Thread(r2, "**");
+        Thread th3 = new Thread(r3, "***");
+
+        th1.start();
+        th2.start();
+        th3.start();
+
+        try {
+            Thread.sleep(2000);
+            r1.suspend();
+            Thread.sleep(2000);
+            r2.suspend();
+            Thread.sleep(3000);
+            r1.resume();
+            Thread.sleep(3000);
+            r1.stop();
+            r2.stop();
+            Thread.sleep(2000);
+            r3.stop();
+        } catch (InterruptedException e) {
+
+        }
+    }
+}
+
+class RunImplEx16 implements Runnable {
+
+    volatile boolean suspended = false;
+    volatile boolean stopped = false;
+
+    @Override
+    public void run() {
+        while (!stopped) {
+            if (!suspended) {
+                System.out.println(Thread.currentThread().getName());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }
+        System.out.println(Thread.currentThread().getName() + " - stopped ");
+    }
+
+    public void suspend() {
+        suspended = true;
+    }
+
+    public void resume() {
+        suspended = false;
+    }
+
+    public void stop() {
+        stopped = true;
+    }
+}
+
+```
+
+```
+**
+*
+***
+*
+***
+**
+***
+**
+***
+**
+***
+***
+***
+*
+***
+*
+***
+*
+***
+** - stopped 
+* - stopped 
+***
+***
+*** - stopped 
+```
+
+아래의 예제는 위의 예제보다 더 객체지향적으로 개선하였다.
+
+```
+public class ThreadEx17 {
+    public static void main(String[] args) {
+        ThreadEx17_1 th1 = new ThreadEx17_1("*");
+        ThreadEx17_1 th2 = new ThreadEx17_1("**");
+        ThreadEx17_1 th3 = new ThreadEx17_1("***");
+        th1.start();
+        th2.start();
+        th3.start();
+
+        try {
+            Thread.sleep(2000);
+            th1.suspend();
+            Thread.sleep(2000);
+            th2.suspend();
+            Thread.sleep(3000);
+            th1.resume();
+            Thread.sleep(3000);
+            th1.stop();
+            th2.stop();
+            Thread.sleep(2000);
+            th3.stop();
+        } catch (InterruptedException e) {
+            
+        }
+    }
+}
+
+class ThreadEx17_1 implements Runnable {
+    boolean suspended = false;
+    boolean stopped = false;
+    Thread th;
+
+    ThreadEx17_1(String name) {
+        th = new Thread(this, name);
+    }
+
+    @Override
+    public void run() {
+        while (!stopped) {
+            if (!suspended) {
+                System.out.println(Thread.currentThread().getName());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }
+        System.out.println(Thread.currentThread().getName() + " - stopped");
+    }
+
+    public void suspend() {
+        suspended = true;
+    }
+
+    public void resume() {
+        suspended = false;
+    }
+
+    public void stop() {
+        stopped = true;
+    }
+
+    public void start() {
+        th.start();
+    }
+}
+```
+
+```
+*
+**
+***
+*
+**
+***
+*
+**
+***
+**
+***
+**
+***
+***
+***
+*
+***
+*
+***
+*
+***
+** - stopped
+* - stopped
+***
+***
+*** - stopped
+```
+
+
+#### 8.5 `yield()` - 다른 쓰레드에게 양보
+`yield()`는 쓰레드 자신에게 주어진 실행시간을 다음 차례의 쓰레드에게 양보하도록 한다. 예를 들어 스케쥴러에 의해 1초의 실행시간을 할당받은 쓰레드가 0.5초의 시간동안
+작업한 상태에서 `yield()`가 호출되면, 나머지 0.5초는 포기하고 다시 실행대기상태가 된다. `yield()`가 호출되면, 나머지 0.5초는 포기하고 다시 실행대기상태가 된다.
+
 ```java
 
 ```
 
-#### 8.5 `yield()` - 다른 쓰레드에게 양보
+```
 
+```
 
 
 ## 9. 쓰레드의 동기화
