@@ -812,7 +812,7 @@ com.doubles.standardofjava.ch13_thread.ThreadEx11_2.run(ThreadEx11.java:42)
 
 #### 8.2 `sleep(long millis)` - 일정시간 동안 쓰레드 멈춤
 
-`sleep()`은 지정된 시간동안 쓰레드를 멈추게 한다. 밀리세컨드(1/1000초)와 나노세컨드(10억분의 일초)의 시간단위로 세밀하게 값을 지정할 수 있지만 어느 정도 오차가 발생할 수 있다.
+**`sleep()`은 지정된 시간동안 쓰레드를 멈추게 한다.** 밀리세컨드(1/1000초)와 나노세컨드(10억분의 일초)의 시간단위로 세밀하게 값을 지정할 수 있지만 어느 정도 오차가 발생할 수 있다.
 
 `sleep()`에 의해 일시정지가 된 쓰레드는 지정된 시간이 지나거나 `interrupt()` 메서드가 호출되면 `InterruptException`이 발생되어 잠에서 깨어나 실행대기 상태가 된다. 그래서 `sleep()` 메서드를 호출할 때는
 항상 `try-catch`문으로 예외를 처리해줘야한다. 매번 예외처리를 해주는 것이 번거롭기 때문에 아래와 같이 `try-catch`문까지 포함하는 새로운 메서드를 만들어 사용하기도 한다.
@@ -883,10 +883,10 @@ class ThreadEx12_2 extends Thread {
 
 #### 8.3 `interrupt()`, `interrupted()` - 쓰레드 작업 취소
 
-진행 중인 쓰레드의 작업이 끝나기 전에 취소를 시켜야할 때가 있다. 예를 들면 큰 파일을 다운로드 받을 때 시간이 너무 오래 걸리면 중간에 다운로드를 포기하고 취소할 수 있어야 한다. `interrupt()` 메서드는
-쓰레드에게 작업을 멈추라고 요청한다. 하지만 쓰레드를 강제로 종료시키지는 못한다. `interrupt()` 메서드는 그저 쓰레드의 `interrupted`(인스턴스 변수)상태를 바꾸는 것일 뿐이다.
+진행 중인 쓰레드의 작업이 끝나기 전에 취소를 시켜야할 때가 있다. 예를 들면 큰 파일을 다운로드 받을 때 시간이 너무 오래 걸리면 중간에 다운로드를 포기하고 취소할 수 있어야 한다. **`interrupt()` 메서드는
+쓰레드에게 작업을 멈추라고 요청한다. 하지만 쓰레드를 강제로 종료시키지는 못한다. `interrupt()` 메서드는 그저 쓰레드의 `interrupted`(인스턴스 변수)상태를 바꾸는 것일 뿐이다.**
 
-`interrupted()` 메서드는 쓰레드에 대해 `interrupt()`메서드가 호출되었는지 알려준다. `interrupt()`가 호출되었는지 여부에 따라 `true`나 `false`를 반환한다.
+**`interrupted()` 메서드는 쓰레드에 대해 `interrupt()`메서드가 호출되었는지 알려준다. `interrupt()`가 호출되었는지 여부에 따라 `true`나 `false`를 반환한다.**
 
 - `void interrupt()` : 쓰레드의 `interrupted` 상태를 `false`에서 `true`로 변경
 - `boolean isInterrupted()` : 쓰레드의 `interrupted` 상태를 반환
@@ -1274,7 +1274,7 @@ class ThreadEx17_1 implements Runnable {
 
 
 #### 8.5 `yield()` - 다른 쓰레드에게 양보
-`yield()`는 쓰레드 자신에게 주어진 실행시간을 다음 차례의 쓰레드에게 양보하도록 한다. 예를 들어 스케쥴러에 의해 1초의 실행시간을 할당받은 쓰레드가 0.5초의 시간동안
+**`yield()`는 쓰레드 자신에게 주어진 실행시간을 다음 차례의 쓰레드에게 양보하도록 한다.** 예를 들어 스케쥴러에 의해 1초의 실행시간을 할당받은 쓰레드가 0.5초의 시간동안
 작업한 상태에서 `yield()`가 호출되면, 나머지 0.5초는 포기하고 다시 실행대기상태가 된다. `yield()`가 호출되면, 나머지 0.5초는 포기하고 다시 실행대기상태가 된다.
 
 `yield()`와 `interrupt()`를 적절히 사용하면, 프로그램의 응답성을 높이고 보다 효율적인 실행이 가능하게 할 수 있다. 이 메서드들이 실제로 어떻게 사용되는지 아래의 예제를
@@ -1426,7 +1426,203 @@ try {
 
 `join()`도 `sleep()`처럼 `interrupt()`에 의해 대기상태에서 벗어날 수 있으며, `join()`이 호출되는 부분을 `try-catch`부분으로 감싸야만한다.
 
-**`join()`은 `sleep()`과 유사한 점이 많은 데
+**`join()`은 `sleep()`과 유사한 점이 많다. 하지만 `sleep()`과 다른점은 `join()`은 현재 쓰레드가 아닌 특정 쓰레드에 대해 동작하므로 `static`메서드가 아니라는 것이다.
+
+```java
+public class ThreadEx19 {
+
+    static long startTime = 0;
+
+    public static void main(String[] args) {
+        ThreadEx19_1 th1 = new ThreadEx19_1();
+        ThreadEx19_2 th2 = new ThreadEx19_2();
+
+        th1.start();
+        th2.start();
+        startTime = System.currentTimeMillis();
+
+        try {
+            th1.join(); // 메인쓰레드가 th1의 작업이 끝날때까지 기다림
+            th2.join(); // 메인쓰레드가 th2의 작업이 끝날때까지 기다림
+        } catch (InterruptedException e) {
+
+        }
+        System.out.println("소요시간 : " + (System.currentTimeMillis() - ThreadEx19.startTime));
+    }
+
+}
+
+class ThreadEx19_1 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print(new String("-"));
+        }
+    }
+}
+
+class ThreadEx19_2 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 0; i < 300; i++) {
+            System.out.print(new String("|"));
+        }
+    }
+}
+```
+```
+// 출력내용 일부 생략
+-------------|||||||||-----------------------|||||||||||||--------------||||-------------||||||||||||||||||||||||||||||||||||소요시간 : 6
+```
+
+`join()`을 사용하지 않았으면 `main`쓰레드는 바로 종료되었겠지만 `join()`으로 쓰레드 `th1`과 `th2`의 작업을 마칠 때까지 `main`쓰레드가 기다리도록 했다. 그래서 `main`쓰레드가 두 쓰레드의 작업에
+소요된 시간을 출력할 수 있다.
+
+위의 예제만으로는 `join()`을 언제 사용해야하는지 감이 오지 않기 때문에 아래의 예제를 통해 `join()`이 어떻게 사용되는지 보자.
+
+```java
+public class ThreadEx20 {
+    public static void main(String[] args) {
+        ThreadEx20_1 gc = new ThreadEx20_1();
+        gc.setDaemon(true); // 데몬쓰레드로 변경
+        gc.start();
+
+        int requiredMemory = 0;
+
+        for (int i = 0; i < 20; i++) {고
+            requiredMemory = (int) (Math.random() * 10) * 20;
+            
+            // 필요한 메모리가 사용할 수 있는 양보다 적거나 전체 메모리의 60%이상을 사용했을 경우 gc를 깨움
+            if (gc.freeMemory() < requiredMemory || gc.freeMemory() < gc.totalMemory() * 0.4) {
+                gc.interrupt(); // 잠자고 있는 쓰레드 gc를 깨움
+            }
+
+            gc.usedMemory += requiredMemory;
+            System.out.println("usedMemory : " + gc.usedMemory);
+        }
+    }
+}
+
+class ThreadEx20_1 extends Thread {
+    final static int MAX_MEMORY = 1000;
+    int usedMemory = 0;
+
+    @Override
+    public void run() {
+        // 10초마다 가비지 컬렉션 수행
+        while (true) {
+            try {
+                Thread.sleep(10 * 1000);
+            } catch (InterruptedException e) {
+                System.out.println("Awaken by interrupt().");
+            }
+            gc(); // 가비지 컬렉션을 수행
+            System.out.println("Garbage Collected, Free Memory : " + freeMemory());
+        }
+
+    }
+
+    public void gc() {
+        usedMemory -= 300;
+        if (usedMemory < 0) usedMemory = 0;
+    }
+
+    public int totalMemory() {
+        return MAX_MEMORY;
+    }
+
+    public int freeMemory() {
+        return MAX_MEMORY - usedMemory;
+    }
+}
+```
+
+```
+usedMemory : 80
+usedMemory : 120
+usedMemory : 300
+usedMemory : 420
+usedMemory : 540
+usedMemory : 580
+usedMemory : 580
+usedMemory : 740
+usedMemory : 920
+usedMemory : 940
+Awayken by interrupt().
+usedMemory : 1040
+Garbage Collected, Free Memory : 260
+usedMemory : 860
+Awayken by interrupt().
+usedMemory : 880
+usedMemory : 620
+usedMemory : 760
+usedMemory : 780
+usedMemory : 960
+usedMemory : 1020
+usedMemory : 1040
+usedMemory : 1080
+```
+
+위의 예제는 JVM의 가비지 컬렉터를 흉내내어 간단히 구현해본 것으로 `random()`을 사용했기 때문에 실행결과가 다를 수 있다. 먼저 `sleep()`을 이용해서 10초마다 한번씩 가비지 컬렉션을 수행하는 쓰레드를 만든 다음,
+쓰레드를 생성해 데몬쓰레드로 설정하였다. 반복문을 사용해서 메모리의 양을 계속 감소 시키도록 했고, 매 만복마다 if문을 메모리를 확인해서 남은 메모리가 전체 메모리의 40%미만일 경우 `interrupt()`를 호출해서 즉시
+가비지 컬렉터 쓰레드를 깨워서 `gc()`를 수행하도록 하였다.
+
+하지만 예제의 실행결과를 보면 `MAX_MEMORY`가 1000임에도 불구하고 `usedMemory`의 값이 1000을 넘는 것을 알 수 있다. 이것은 쓰레드 `gc`가 `interrupt()`에 의해서 깨어났음에도 불구하고 `gc()`가 수행되기 이전에
+`main`쓰레드의 작업이 수행되어 메모리를 사용하기 때문이다. 그래서 쓰레드 `gc`를 깨우는 것 뿐만아니라 `join()`을 이용해서 쓰레드 `gc`가 작업할 시간을 어느 정도 주고 `main`쓰레드가 기다리도록 해서, 사용할 수 있는
+메모리가 확보된 다음에 작업을 계속하는 것이 필요하다.
+
+```java
+if (gc.freeMemory() < requiredMemory || gc.freeMemory() < gc.totalMemory() * 0.4) {
+    gc.interrupt();
+    try {
+        gc.join(100);
+    } catch (InterruptedException e) {
+        
+    }
+}    
+```
+
+그래서 예제를 위의 코드와 같이 `join()`을 호출해서 쓰레드 `gc`가 0.1초 동안 수행될 수 있도록 변경해야한다.
+
+```
+usedMemory : 20
+usedMemory : 160
+usedMemory : 280
+usedMemory : 420
+usedMemory : 440
+usedMemory : 540
+usedMemory : 600
+usedMemory : 780
+Awaken by interrupt().
+Garbage Collected, Free Memory : 520
+usedMemory : 660
+Awaken by interrupt().
+Garbage Collected, Free Memory : 640
+usedMemory : 520
+usedMemory : 700
+Awaken by interrupt().
+Garbage Collected, Free Memory : 600
+usedMemory : 480
+usedMemory : 660
+Awaken by interrupt().
+Garbage Collected, Free Memory : 640
+usedMemory : 520
+usedMemory : 660
+Awaken by interrupt().
+Garbage Collected, Free Memory : 640
+usedMemory : 440
+usedMemory : 620
+Awaken by interrupt().
+Garbage Collected, Free Memory : 680
+usedMemory : 480
+usedMemory : 580
+usedMemory : 760
+```
+
+코드를 변경 하고 예제를 다시 실행시켜보면 위와 같이 메모리가 1000을 넘지 않는 것을 확인할 수 있다.
+
+가비지 컬렉터와 같은 데몬 쓰레드의 우선순위를 낮추기보다는 `sleep()`을 이용해서 주기적으로 실행되도록 하다가 필요할 때마다 `interrupt()`를 호출해서 즉시 가비지 컬렉션이 이루어지도록 하는 것이 좋다.
+**그리고 필요하다면 `join()`도 함께 사용해야한다는 것을 기억하자**
 
 ## 9. 쓰레드의 동기화
 
