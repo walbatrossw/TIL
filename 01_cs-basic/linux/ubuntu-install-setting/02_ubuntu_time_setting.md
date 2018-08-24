@@ -9,7 +9,7 @@ $ timedatectl set-local-rtc 1
 ```
 
 ```bash
-$ /etc/default/rcS
+$ sudo gedit /etc/default/rcS
 ```
 
 ```
