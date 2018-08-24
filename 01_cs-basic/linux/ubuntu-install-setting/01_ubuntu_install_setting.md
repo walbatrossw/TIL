@@ -38,6 +38,12 @@ $ sudo apt-get install gdebi
 #### # Chrome 설치
 https://www.google.co.kr/chrome/index.html
 
+#### # KDE Desktop 설치
+
+```
+$ sudo apt -y install kubuntu-desktop 
+```
+
 #### # Gnome Tweak Tool, Gnome Extensions 설치 : 테마 및 유틸 설치를 위해
 
 - Unity Tweak은 18.04부터 없어짐
@@ -57,9 +63,13 @@ $ sudo apt install chrome-gnome-shell
   - OpenWeather : 날씨
   - User Themes : 우분투 테마
 
-#### # 한글 입력기 uim 설치
+#### # 한글 입력기 nimf 설치
 
-http://progtrend.blogspot.com/2018/06/ubuntu-1804-uim.html
+```
+$ sudo add-apt-repository ppa:hodong/nimf
+$ sudo apt-get update
+$ sudo apt install nimf nimf-libhangul
+```
 
 - 키보드 한글 키 설정 방법 : 설정 > 기능개선 > 키보드와 마우스 > 추가 배치 옵션 이동하여 수정
 
