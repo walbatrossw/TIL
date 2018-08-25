@@ -2289,6 +2289,36 @@ class Table3 {
 }
 ```
 
+```
+Dishes : [burger]
+Dishes : [burger, donut]
+Dishes : [burger, donut, donut]
+Dishes : [burger, donut, donut, burger]
+Dishes : [burger, donut, donut, burger, donut]
+Dishes : [burger, donut, donut, burger, donut, donut]
+COOK1 is waiting.
+CUST2 ate a donut
+Dishes : [burger, donut, burger, donut, donut, donut]
+CUST2 ate a donut
+CUST1 ate a donut
+Dishes : [burger, burger, donut, donut, burger]
+Dishes : [burger, burger, donut, donut, burger, donut]
+COOK1 is waiting.
+CUST1 ate a donut
+Dishes : [burger, burger, donut, burger, donut, donut]
+CUST1 ate a donut
+CUST2 ate a donut
+Dishes : [burger, burger, burger, donut, burger]
+Dishes : [burger, burger, burger, donut, burger, donut]
+COOK1 is waiting.
+CUST2 ate a donut
+CUST1 ate a donut
+Dishes : [burger, burger, burger, burger, donut]
+CUST2 ate a donut
+CUST1 is waiting.
+Dishes : [burger, burger, burger, burger, donut]
+```
+
 이전 예제에 `wait()`와 `notify()`를 추가하였다 그리고 테이블에 음식이 없을 때뿐만아니라 원하는 음식이 없을 때도 손님을 기다리도록 변경하였다. 하지만 여기에서도 문제가 존재한다.
 그것은 테이블 객체의 waiting pool에 요리사 쓰레드와 손님 쓰레드 중에서 누가 통지를 받을지는 알 수 없다.
 
