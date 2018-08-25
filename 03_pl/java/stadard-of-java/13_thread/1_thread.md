@@ -1819,13 +1819,495 @@ lock을 보유한 채로 돈이 입금될 때까지 오랜 시간을 보낸다�
 아래의 예제는 식당에서 음식을 만들어 테이블에 추가하는 요리사와 테이블의 음식을 소비하는 손님을 쓰레드로 구현했다.
 
 ```java
+public class ThreadWaitEx1 {
+
+    public static void main(String[] args) {
+        Table table = new Table();  // 여러 쓰레드가 공유하는 객체
+
+        new Thread(new Cook(table), "COOK1").start();
+        new Thread(new Customer(table, "donut"), "CUST1").start();
+        new Thread(new Customer(table, "burger"), "CUST2").start();
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+
+        }
+        System.exit(0);
+    }
+
+}
+
+// 손님 클래스
+class Customer implements Runnable {
+
+    private Table table;    // 테이블
+    private String food;    // 음식
+
+    // 생성자 초기화
+    public Customer(Table table, String food) {
+        this.table = table;
+        this.food = food;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+
+            }
+            String name = Thread.currentThread().getName();
+            // 음식
+            if (eatFood()) {
+                System.out.println(name + " ate a " + food);
+            } else {
+                System.out.println(name + " failed to eat. ");
+            }
+        }
+    }
+
+    private boolean eatFood() {
+        return table.remove(food);
+    }
+
+}
+
+// 요리사 클래스
+class Cook implements Runnable {
+
+    private Table table;    // 테이블
+
+    // 생성자
+    Cook(Table table) {
+        this.table = table;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            // 임의의 요리를 선택해서 table에 추가
+            int idx = (int) (Math.random() * table.dishNum());
+            table.add(table.dishNames[idx]);
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+}
+
+// 테이블 클래스
+class Table {
+
+    // donut이 더 자주 나옴
+    String[] dishNames = {"donut", "donut", "burger"};
+    final int MAX_FOOD = 6; // 테이블에 놓을 수 있는 최대 음식의 개수
+
+    private ArrayList<String> dishes = new ArrayList<>();
+
+    public void add(String dish) {
+        if (dishes.size() >= MAX_FOOD) {
+            return;
+        }
+        dishes.add(dish);
+        System.out.println("Dishes : " + dishes.toString());
+    }
+
+    public boolean remove(String dishName) {
+        // 지정된 요리와 일치하는 요리를 테이블에서 제거
+        for (int i = 0; i < dishes.size(); i++) {
+            if (dishName.equals(dishes.get(i))) {
+                dishes.remove(i);
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public int dishNum() {
+        return dishNames.length;
+    }
+
+}
+```
+위 코드의 실행 결과는 실행할 때마다 다른데, 예외가 발생할 수도 않을 수도 있다. 반복해서 실행해보면 아래와 같이 2가지 종류의 예외가 발생한다.
 
 ```
+Dishes : [donut]
+Dishes : [donut, donut]
+Dishes : [donut, donut, donut]
+Dishes : [donut, donut, donut, burger]
+Dishes : [donut, donut, donut, burger, donut]
+Dishes : [donut, donut, donut, burger, donut, donut]
+CUST2 ate a donut
+CUST1 ate a donut
+Dishes : [donut, burger, donut, donut, burger]
+Dishes : [donut, burger, donut, donut, burger, donut]
+Exception in thread "COOK1" java.util.ConcurrentModificationException
+	at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:909)
+	at java.util.ArrayList$Itr.next(ArrayList.java:859)
+	at java.util.AbstractCollection.toString(AbstractCollection.java:461)
+	at com.doubles.standardofjava.ch13_thread.Table.add(ThreadWaitEx1.java:99)
+	at com.doubles.standardofjava.ch13_thread.Cook.run(ThreadWaitEx1.java:75)
+	at java.lang.Thread.run(Thread.java:748)
+CUST1 ate a donut
+CUST2 ate a donut
+CUST1 ate a donut
+CUST2 ate a donut
+CUST2 ate a donut
+CUST1 failed to eat. 
+CUST1 failed to eat. 
+CUST2 failed to eat. 
+CUST1 failed to eat. 
+CUST2 failed to eat. 
+CUST1 failed to eat. 
+CUST2 failed to eat. 
+CUST1 failed to eat. 
+CUST2 failed to eat. 
+CUST1 failed to eat. 
+CUST2 failed to eat. 
+```
 
+위는 요리사(Cook) 쓰레드가 테이블에 음식을 놓는 도중에, 손님(Customer) 쓰레드가 음식을 가져가려했기 때문에 발생하는 예외(`ConcurrentModificationException`)이다.
 
+```
+Dishes : [donut]
+Dishes : [donut, donut]
+Dishes : [donut, donut, burger]
+Dishes : [donut, donut, burger, burger]
+Dishes : [donut, donut, burger, burger, donut]
+Dishes : [donut, donut, burger, burger, donut, donut]
+CUST2 ate a donut
+Dishes : [burger, burger, donut, donut, burger]
+CUST1 ate a donut
+Dishes : [burger, burger, donut, donut, burger, donut]
+CUST2 ate a donut
+CUST1 ate a donut
+Dishes : [burger, burger, burger, donut, donut]
+Dishes : [burger, burger, burger, donut, donut, burger]
+CUST1 ate a donut
+CUST2 ate a donut
+Dishes : [burger, burger, burger, burger, burger]
+Dishes : [burger, burger, burger, burger, burger, donut]
+CUST1 ate a donut
+Dishes : [burger, burger, burger, burger, burger, donut]
+CUST2 ate a donut
+CUST2 ate a donut
+Dishes : [burger, burger, burger, burger, burger, donut]
+Exception in thread "CUST1" java.lang.IndexOutOfBoundsException: Index: 5, Size: 6
+	at java.util.ArrayList.rangeCheck(ArrayList.java:657)
+	at java.util.ArrayList.remove(ArrayList.java:496)
+	at com.doubles.standardofjava.ch13_thread.Table.remove(ThreadWaitEx1.java:106)
+	at com.doubles.standardofjava.ch13_thread.Customer.eatFood(ThreadWaitEx1.java:55)
+	at com.doubles.standardofjava.ch13_thread.Customer.run(ThreadWaitEx1.java:46)
+	at java.lang.Thread.run(Thread.java:748)
+CUST2 ate a donut
+Dishes : [burger, burger, burger, burger, burger, donut]
+CUST2 ate a donut
+Dishes : [burger, burger, burger, burger, burger, burger]
+CUST2 failed to eat. 
+CUST2 failed to eat. 
+```
 
+다른 하나는 손님 쓰레드가 테이블의 마지막 음식을 가져가는 도중에 다른 손님 쓰레드가 먼저 음식을 낚아채버려서 있지도 않은 음식을 테이블에서
+제거하려했기 때문에 발생하는 예외(`IndexOutOfBoundsException`)이다.
+
+이러한 예외들이 발생하게된 이유는 여러 쓰레드가 테이블을 공유하는데도 동기화를 하지 않았기 때문인데 이제 아래의 예제를 통해 예외가 발생하지 않도록 해보자.
+
+```java
+public class ThreadWaitEx2 {
+    public static void main(String[] args) {
+        Table2 table = new Table2();
+        new Thread(new Cook2(table), "COOK1").start();
+        new Thread(new Customer2(table, "donut"), "CUST1").start();
+        new Thread(new Customer2(table, "burger"), "CUST2").start();
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+
+        }
+        System.exit(0);
+    }
+}
+
+// 손님 클래스
+class Customer2 implements Runnable {
+
+    private Table2 table;
+    private String food;
+
+    public Customer2(Table2 table, String food) {
+        this.table = table;
+        this.food = food;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+
+            }
+            String name = Thread.currentThread().getName();
+            if (eatFood()) {
+                System.out.println(name + "ate a " + food);
+            } else {
+                System.out.println(name + "failed to eat.");
+            }
+        }
+    }
+
+    private boolean eatFood() {
+        return table.remove(food);
+    }
+}
+
+// 요리사 클래스
+class Cook2 implements Runnable {
+
+    private Table2 table;
+
+    public Cook2(Table2 table) {
+        this.table = table;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            int idx = (int) (Math.random() * table.dishNum());
+            table.add(table.dishNames[idx]);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+}
+
+// 테이블 클래스
+class Table2 {
+
+    String[] dishNames = {"donut", "donut", "burger"};
+    final int MAX_FOOD = 6;
+
+    private ArrayList<String> dishes = new ArrayList<>();
+
+    // 음식 추가, 동기화
+    public synchronized void add(String dish) {
+        if (dishes.size() >= MAX_FOOD) {
+            return;
+        }
+        dishes.add(dish);
+        System.out.println("Dishes : " + dishes.toString());
+    }
+
+    // 음식 제거
+    public boolean remove(String dishNames) {
+        // 동기화
+        synchronized (this) {
+            while (dishes.size() == 0) {
+                String name = Thread.currentThread().getName();
+                System.out.println(name + " is waiting.");
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+            }
+
+            for (int i = 0; i < dishes.size(); i++) {
+                if (dishNames.equals(dishes.get(i))) {
+                    dishes.remove(i);
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public int dishNum() {
+        return dishNames.length;
+    }
+
+}
+```
+
+```
+Dishes : [burger]
+CUST1 failed to eat.
+CUST2 ate a burger
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+CUST2 is waiting.
+```
+
+위의 예제는 여러 쓰레드가 공유하는 객체 테이블(Table)의 `add()`와 `remove()`를 동기화하였다. 이전의 예제처럼 예외는 발생하진 않지만 뭔가 원활히 진행되고 있는 것 같지 않다.
+그 이유는 손님 쓰레드가 원하는 음식이 테이블에 없으면 `failed to eat`를 출력하고, 테이블에 음식이 하나도 없으면, 0.5초마다 음식이 추가되었는지 확인하면서 기다리도록 작성되어
+있다.
+
+그런데 요리사 쓰레드는 왜 음식을 추가하지 않고 손님 쓰레드를 계속 기다리게 하는 것일까? 그 이유는 손님 쓰레드가 테이블 객체의 lock을 쥐고 기다리기 때문이다. 요리사 쓰레드가 음식을
+새로 추가하려해도 테이블 객체의 lock을 얻을 수 없어서 불가능하다. 이럴 때 사용하는 것이 위에서 설명한 `wait()`와 `notify()`이다. 손님 쓰레드가 `lock`을 쥐고 기다리게 아니라,
+`wait()`으로 lock을 풀고 기다리다가 음식이 추가되면 `notify()`로 통보를 받고 다시 lock을 얻어서 나머지 작업을 진행하게 할 수 있다.
+
+이제 `wait()`와 `notify()`를 추가한 예제를 살펴보자.
+
+```java
+public class ThreadWaitEx3 {
+    public static void main(String[] args) {
+        Table3 table = new Table3();
+        new Thread(new Cook3(table), "COOK1").start();
+        new Thread(new Customer3(table, "donut"), "CUST1").start();
+        new Thread(new Customer3(table, "donut"), "CUST2").start();
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+        }
+        System.exit(0);
+    }
+}
+
+class Customer3 implements Runnable {
+    private Table3 table;
+    private String food;
+
+    Customer3(Table3 table, String food) {
+        this.table = table;
+        this.food = food;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+
+            }
+            String name = Thread.currentThread().getName();
+            table.remove(food);
+            System.out.println(name + " ate a " + food);
+        }
+    }
+}
+
+class Cook3 implements Runnable {
+    private Table3 table;
+
+    public Cook3(Table3 table) {
+        this.table = table;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            int idx = (int) (Math.random() * table.dishNum());
+            table.add(table.dishNames[idx]);
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+}
+
+class Table3 {
+    String[] dishNames = {"donut", "donut", "burger"};
+    final int MAX_FOOD = 6;
+    private ArrayList<String> dishes = new ArrayList<>();
+
+    public synchronized void add(String dish) {
+        while (dishes.size() >= MAX_FOOD) {
+            String name = Thread.currentThread().getName();
+            System.out.println(name + " is waiting.");
+            try {
+                wait();
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+
+            }
+        }
+        dishes.add(dish);
+        notify();
+        System.out.println("Dishes : " + dishes.toString());
+    }
+
+    public void remove(String dishName) {
+        synchronized (this) {
+            String name = Thread.currentThread().getName();
+            while (dishes.size() == 0) {
+                System.out.println(name + " is waiting.");
+                try {
+                    wait();
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+            }
+
+            while (true) {
+                for (int i = 0; i < dishes.size(); i++) {
+                    if (dishName.equals(dishes.get(i))) {
+                        dishes.remove(i);
+                        notify();
+                        return;
+                    }
+                }
+
+                try {
+                    System.out.println(name + " is waiting.");
+                    wait();
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+
+            }
+
+        }
+    }
+
+    public int dishNum() {
+        return dishNames.length;
+    }
+}
+```
+
+이전 예제에 `wait()`와 `notify()`를 추가하였다 그리고 테이블에 음식이 없을 때뿐만아니라 원하는 음식이 없을 때도 손님을 기다리도록 변경하였다. 하지만 여기에서도 문제가 존재한다.
+그것은 테이블 객체의 waiting pool에 요리사 쓰레드와 손님 쓰레드 중에서 누가 통지를 받을지는 알 수 없다.
+
+만일 테이블의 음식이 줄어들어서 `notify()`가 호출되었다면, 요리사 쓰레드가 통지를 받아야한다. 그러나 `notify()`는 그저 waiting pool에서 대기 중인 쓰레드 중에서 하나를 임의로
+선택해서 통지할 뿐, 요리사 쓰레드를 선택해서 통지할 수 없다. 운 좋게 요리사 쓰레드가 통지를 받으면 다행이지만 손님 쓰레드가 통지를 받으면 lock을 얻어도 여전히 자신이 원하는 음식이
+없어서 다시 waiting pool에 들어가게 된다.
+
+##### 9.2.1 기아 현상과 경쟁 상태
+
+운이 나쁘면 요리사 쓰레드는 계속 통지를 받지 못하고 오랫동안 기다리게 되는데 이것을 **기아(Starvation)현상** 이라고 한다. 이 현상을 막기 위해서는 `notify()` 대신 `notifyAll()`을
+사용해야한다. 일단 모든 쓰레드에게 통지를 하면, 손님 쓰레드는 다시 waiting pool에 들어가더라도 요리사 쓰레드는 결국 lock을 얻어 작업을 진행할 수 있기 때문이다.
+
+`notifyAll()`로 요리사 쓰레드의 기아현상은 막았지만, 손님 쓰레드까지 통지를 받아서 불필요하게 요리사 쓰레드와 lock을 얻기 위해 경쟁하게 된다. 이처럼 여러 쓰레드가 lock을 얻기 위해
+서로 경쟁하는 것을 **경쟁 상태(Race Condition)** 라고 하는데, 이 경쟁 상태를 개선하기 위해서는 요리사 쓰레드를 구별해서 통지하는 것이 필요하다. 이러한 Lock과 Condition을 이용하면,
+wait() & notify()로는 불가능한 선별적인 통지가 가능하게 된다.
 
 #### 9.3 `Lock`과 `Condition`을 이용한 동기화
+
+
 
 #### 9.4 `volatile`
 
