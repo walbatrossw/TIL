@@ -1642,10 +1642,168 @@ JDK1.5부터는 `java.util.concurrent.locks`와 `java.util.concurrent.atomic`패
 
 #### 9.1 `synchronized`를 이용한 동기화
 
-#### `wait()`와 `nofify()`
+**`synchronized`라는 키워드는 임계영역을 설정하는데 사용하며 아래와 같이 2가지 방식이 있다.**
 
-#### `Lock`과 `Condition`을 이용한 동기화
+1. 메서드 전체를 임계영역으로 지정
+    ```java
+    public synchronized void calcSum() {
+    // ...
+    }
+    ```
+    - 쓰레드는 `synchronized` 메서드가 호출된 시점부터 해당 메서드가 포함된 객체의 lock을 얻어 작업을 수행하다가 메서드가 종료되면 lock을 반환
 
-#### `volatile`
+2. 특정한 영역을 임계 영역으로 지정
+    ```java
+    synchronized(객체 참조변수) {
+    // ...   
+    }
+    ```
+    - 메서드 내의 코드 일부를 블럭으로 감싸고 블럭 앞에서 `synchronized(참조변수)`를 붙이는데 이때 참조변수는 lock을 걸고자하는 객체를 참조하는 것이어야함
+    - 이 블럭을 `synchronized`블럭이라고 함
+    - 이 블럭의 영역 안에 들어가면서부터 쓰레드는 지정된 객체의 lock을 얻게되고, 이 블럭을 벗어나면 lock을 반납함
 
-#### `fork`, `join` 프레임워크
+두 방법 모두 lock의 획득과 반납이 자동적으로 이루어지므로 해야할 일은 그저 임계영역만 설정해주는 것뿐이다. 모든 객체는 lock을 하나씩 가지고 있으며, 해당 객체의 lock을 가지고 있는 쓰레드만 임계 영역의 코드를 수행할 수 있다.
+그리고 나머지 쓰레드들은 loack을 얻을 때까지 기다리게 된다.
+
+임계 영역은 멀티 쓰레드 프로그램의 성늘을 좌우하기 때문에 가능하면 메서드 전체에 락을 거는 것보다 `synchronized`블럭으로 임계 영역을 최소화하는 것이 바람직하다.
+
+아래는 동기화가 왜 필요한지를 보여주는 예제이다.
+
+```java
+public class ThreadEx21 {
+    public static void main(String[] args) {
+        Runnable r = new RunnableEx21();
+        new Thread(r).start();
+        new Thread(r).start();
+    }
+}
+
+class Account {
+    private int balance = 1000;
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void withdraw(int money) {
+        if (balance >= money) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+
+            }
+            balance -= money;
+        }
+    }
+}
+
+class RunnableEx21 implements Runnable {
+
+    Account account = new Account();
+
+    @Override
+    public void run() {
+        while (account.getBalance() > 0) {
+            int money = (int) (Math.random() * 3 + 1) * 100;
+            account.withdraw(money);
+            System.out.println("money : " + money);
+            System.out.println("balance : " + account.getBalance());
+        }
+    }
+}
+```
+```
+money : 300
+balance : 700
+money : 200
+balance : 500
+money : 300
+balance : 200
+money : 300
+balance : 200
+money : 100
+balance : 100
+money : 100
+balance : 0
+money : 100
+balance : -100
+```
+
+위의 코드는 은행계좌에서 잔고를 확인하고 임의로 금액을 출금하도록 작성되었다. `Account`클래스의 `withdraw()`메서드를 보면 잔고가 출금하려는 금액보다 클 경우에만 출금이 가능하도록 조건문을 작성했다.
+하지만 위의 콘솔출력결과를 보면 잔고가 음수인 것을 확인할 수 있다. 그 이유는 한 쓰레드가 if문의 조건식을 통과하고 출금하기 바로 직전에 다른 쓰레드가 끼어들어서 출금을 먼저 했기 때문이다. 그래서 잔고를
+확인하는 if문과 출금하는 문장은 하나의 임계 영역으로 묶여져야 한다. 이처럼 **한 쓰레드의 작업이 다른 쓰레드에 의해서 영향을 받는 일이 발생할 수 있기 때문에 동기화가 반드시 필요하다.**
+
+```java
+// 메서드 동기화
+public synchronized void withdraw(int money) {
+    if (balance >= money) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+
+        }
+        balance -= money;
+    }
+}
+```
+
+그래서 `withdraw()`메서드에 `synchronized`키워드를 위와 같이 붙이기만 하면 간단히 동기화가 된다. 한 쓰레드에 의해 먼저 `withdraw()`가 호출되면, 이 메서드가 종료되어 lock이 반납될 때까지 다른 쓰레드는 `withdraw()`를
+호출하더라도 대기상태에 머물게 된다.
+
+메서드 앞에 `synchronized`를 붙이는 대신, `synchronized`블럭을 사용하면 다음과 같이 작성할 수도 있다.
+
+```java
+public void withdraw(int money) {
+    synchronized(this) {
+        if (balance >= money) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+    
+            }
+            balance -= money;
+        }
+    }
+}
+```
+
+위와 같이 코드를 수정하고 다시 실행하면 아래와 같이 의도한대로 결과가 출력된다.
+
+```
+money : 100
+balance : 900
+money : 100
+balance : 800
+money : 200
+balance : 600
+money : 200
+balance : 400
+money : 300
+money : 200
+balance : 100
+balance : 100
+money : 200
+balance : 100
+money : 200
+balance : 100
+money : 200
+balance : 100
+money : 300
+balance : 100
+money : 300
+balance : 100
+money : 200
+balance : 100
+money : 100
+balance : 0
+money : 300
+balance : 0
+```
+
+#### 9.2 `wait()`와 `nofify()`
+
+#### 9.3 `Lock`과 `Condition`을 이용한 동기화
+
+#### 9.4 `volatile`
+
+#### 9.5 `fork`, `join` 프레임워크
