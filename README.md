@@ -132,7 +132,7 @@
     - Observer Pattern
     - [State Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch07-state-patterns/ch07-state-patterns.md)
     - [Strategy Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch05-strategy-pattern/ch05-strategy-pattern.md)
-    - Command Pattern
+    - [Command Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch08-command-patterns/ch08-command-patterns.md)
     - Template Method Pattern
 
 - [도메인 주도 설계](https://github.com/walbatrossw/domain-driven-design)
