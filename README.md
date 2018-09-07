@@ -129,7 +129,7 @@
     - Decorator Pattern
 
   - 행위 패턴
-    - Observer Pattern
+    - [Observer Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch09-observer-patterns/ch09-observer-patterns.md)
     - [State Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch07-state-patterns/ch07-state-patterns.md)
     - [Strategy Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch05-strategy-pattern/ch05-strategy-pattern.md)
     - [Command Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch08-command-patterns/ch08-command-patterns.md)
