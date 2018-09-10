@@ -174,7 +174,7 @@
 
 ## 5. 객체지향(OOP)
 
-- 객체지향의 사실과 오해
+- [객체지향의 사실과 오해](https://github.com/walbatrossw/TIL/tree/master/05_oop/oop-ture-misunderstanding)
 
 - 객체지향과 디자인 패턴
   - 객체지향
