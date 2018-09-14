@@ -126,7 +126,7 @@
 
   - 구조 패턴
     - Composite Pattern
-    - Decorator Pattern
+    - [Decorator Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch10-decorator-patterns/ch10-decorator-patterns.md)
 
   - 행위 패턴
     - [Observer Pattern](https://github.com/walbatrossw/java-design-patterns/blob/master/ch09-observer-patterns/ch09-observer-patterns.md)
