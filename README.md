@@ -139,11 +139,7 @@
 
 ### Javascript
 
-- Javascript 정리
-
 - Javascript 핵심가이드
-
-- Jquery
 
 
 ---
