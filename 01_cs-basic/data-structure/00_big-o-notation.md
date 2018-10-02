@@ -12,7 +12,7 @@ F(int[] a) {
 위의 함수를 보면 첫번째 배열 방의 값이 0인지를 확인하고, 인자로 받는 배열 방이 크기에 상관없이 언제나 일정한 속도로 결과를 반환한다. 이러한 경우
 이 알고리즘을 O(1)의 시간 복잡도를 가진다라고 표현한다.
 
-![O(1)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(n).png?raw=true)
+![O(1)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(1).png?raw=true)
 
 0(1) 알고리즘을 그래프로 그려보면 가로축이 데이터, 세로축을 처리 시간이라고 할 때 데이터가 증가함에 따 성능에 변함이 없다.
 
@@ -28,7 +28,7 @@ F(int[] n) {
 ```
 위의 함수는 n개의 데이터를 입력받으면 n번 루프를 돌게 되고, n이 1개 늘어날 때마다 처리가 비례하게 한번씩 늘어나게 된다. 즉, 다시말하면 n의 크기만큼 처리시간이 증가하게 된다.
 
-![O(n)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(1).png?raw=true)
+![O(n)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(n).png?raw=true)
 
 0(n) 알고리즘을 그래프로 그려보면 데이터가 증가함에 따라 비례해서 처리시간도 같이 증가하는 것을 알 수 있다. 언제나 데이터와 시간이 같은 비율로 증가하기 때문에 그래프는 직선으로 표현된다.
 
@@ -64,11 +64,11 @@ F(int[] n, int[] m) {
 
 위의 함수를 보고 O(n<sup>2</sup>) 알고리즘이라고 착각하기 쉬운데 함수를 자세히 들여다보면 입력받은 인자 n, m의 길이만큼 루프를 수행하게 된다.
 
-![O(nm)]()
+![O(nm)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(nm).png?raw=true)
 
 n은 엄청 크고, m은 엄청 작을 수도 있기 때문에 변수가 다르다면 Big-O 표기법에도 반드시 다르게 표시를 해주어야 한다.
 
-![O(nm)2]()
+![O(nm)2](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(nm)2.png?raw=true)
 
 O(nm) 알고리즘도 O(n<sup>2</sup>) 알고리즘과 마찬가지로 데이터가 증가하면 할수록 그래프가 점점 수직에 가까운 형태를 나타내게 된다.
 
@@ -86,10 +86,17 @@ F(int[] n) {
 
 위의 함수를 보면 입력받은 인자 n만큼 3번의 루프를 돌리게 되면 세제곱이 된다.
 
-![0(n^3)]()
+![0(n^3)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(n%5E3).png?raw=true)
+
+O(n<sup>2</sup>) 알고리즘의 경우 n만큼 제곱의 루프를 수행하기 때문에 면적이 되었고, O(n<sup>3</sup>) 알고리즘의 경우는 n만큼의 제곱의 면적을 다시 n만큽 반복 수행하기 때문에 위와 같이 큐브가 된다.
+
+
+![0(n^3)2](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/img/big-o/o(n%5E3)2.png?raw=true)
 
 위의 함수를 다시 그림으로 그려보면 위와 같이 표현할 수 있는데 O(n<sup>3</sup>) 알고리즘은 O(n<sup>2</sup>) 알고리즘보다 데이터가 증가함에 따라 더 급격하게 처리시간이 늘어나는 것을 확인 할 수 있다.
 
-## 6. O(2<sup>n</sup>) 알고리즘
+
+
+## 6. O(2<sup>n</sup>) 알고리즘 : 피보나치
 
 O(2<sup>n</sup>) 알고리즘은 O(n<sup>2</sup>) 알고리즘과 혼동하기 쉬운데 둘은 너무나 다른 알고리즘이다.
