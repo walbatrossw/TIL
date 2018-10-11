@@ -198,4 +198,7 @@
 
 - [Atom](https://github.com/walbatrossw/TIL/blob/master/08_tools/atom.md)
 
-수정중..............
+## 8. 강연, 세미나
+
+- deview 2018 후기
+
