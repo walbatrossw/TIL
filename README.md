@@ -4,9 +4,9 @@
 
 ### 자료구조, 알고리즘
 
-- [배열(Arrays)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/01_arrays.md)
-- [연결리스트(LinkedList)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/data-structure/02_linked_list.md)
-- 스택(Stack)
+- [배열(Arrays)](https://github.com/walbatrossw/java-data-structures/blob/master/ch01-arrays/arrays.md)
+- [연결리스트(LinkedList)](https://github.com/walbatrossw/java-data-structures/blob/master/ch02-linked-list/linked-list.md)
+- [스택(Stack)](https://github.com/walbatrossw/java-data-structures/blob/master/ch03-stacks/stack.md)
 - 큐(Queue)
 - 트리(Tree)
   - Binary Search Trees
