@@ -7,7 +7,7 @@
 - [배열(Arrays)](https://github.com/walbatrossw/java-data-structures/blob/master/ch01-arrays/arrays.md)
 - [연결리스트(LinkedList)](https://github.com/walbatrossw/java-data-structures/blob/master/ch02-linked-list/linked-list.md)
 - [스택(Stack)](https://github.com/walbatrossw/java-data-structures/blob/master/ch03-stacks/stack.md)
-- 큐(Queue)
+- [큐(Queue)](https://github.com/walbatrossw/java-data-structures/blob/master/ch04-queues/queue.md)
 - 트리(Tree)
   - Binary Search Trees
   - Balanced Trees : AVL Trees
