@@ -9,8 +9,8 @@
 - [스택(Stack)](https://github.com/walbatrossw/java-data-structures/blob/master/ch03-stacks/stack.md)
 - [큐(Queue)](https://github.com/walbatrossw/java-data-structures/blob/master/ch04-queues/queue.md)
 - 트리(Tree)
-  - Binary Search Trees
-  - Balanced Trees : AVL Trees
+  - [Binary Search Trees](https://github.com/walbatrossw/java-data-structures/blob/master/ch05-binary-search-trees/binary-search-tree.md)
+  - [Balanced Trees : AVL Trees](https://github.com/walbatrossw/java-data-structures/blob/master/ch06-avl-trees/avl-tree.md)
   - Balanced Trees : Red-Black Trees
   - Splay Trees
   - B-Tree
