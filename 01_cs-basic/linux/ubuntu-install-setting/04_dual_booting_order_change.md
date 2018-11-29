@@ -1,7 +1,8 @@
 # 우분투 & 윈도우 듀얼부팅 순서 변경하기
 
 ## grub 설정파일 편집
-```bash
+
+```command-line
 $ sudo gedit /etc/default/grub
 ```
 
@@ -12,6 +13,7 @@ $ sudo gedit /etc/default/grub
 `GRUB_TIMEOUT=10` 변경
 
 ## 변경 사항 갱신
-```bash
+
+```command-line
 $ sudo update-grub
 ```
