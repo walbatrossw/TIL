@@ -191,14 +191,22 @@
 
 ---
 
+## 7. 도메인 주도 설계(DDD)
 
-## 7. 개발도구
+- [DDD Start 요약 정리](https://github.com/walbatrossw/TIL/tree/master/07_domain-driven-design)
 
-- [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/08_tools/intellij.md)
+## 8. 구글링 기록
+
+## 9. 개발도구 사용 or 정리
+
+- [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/09_tools/atom.md)
 
 - [Atom](https://github.com/walbatrossw/TIL/blob/master/08_tools/atom.md)
 
-## 8. 강연, 세미나
+- [vim]()
 
-- deview 2018 후기
+- [Mac OS]()
 
+## 10. 강연, 세미나
+
+- [deview 2018 후기]()
