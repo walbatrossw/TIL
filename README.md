@@ -139,7 +139,7 @@
 
 ### Javascript
 
-- Javascript 핵심가이드
+- [Javascript 핵심가이드](https://github.com/walbatrossw/TIL/tree/master/03_pl/js/javascript-core-guide)
 
 
 ---
