@@ -199,13 +199,13 @@
 
 ## 9. 개발도구 사용 or 정리
 
-- [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/09_tools/atom.md)
+- [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/09_tools/intellij.md)
 
-- [Atom](https://github.com/walbatrossw/TIL/blob/master/08_tools/atom.md)
+- [Atom](https://github.com/walbatrossw/TIL/blob/master/09_tools/atom.md)
 
-- [vim]()
+- [vim](https://github.com/walbatrossw/TIL/blob/master/09_tools/vim.md)
 
-- [Mac OS]()
+- [Mac OS](https://github.com/walbatrossw/TIL/blob/master/09_tools/mac-os.md)
 
 ## 10. 강연, 세미나
 
