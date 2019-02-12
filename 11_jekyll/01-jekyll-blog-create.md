@@ -46,6 +46,10 @@ gem install jekyll bundler
 bundle install
 ```
 
+jekll 로컬 구동
+
 ```bash
 bundle exec jekll serve
 ```
+
+[출처 : Yorath's 블로그 - Jekyll 테마를 사용한 개발블로그 관리 - 1](https://yonguri.tistory.com/entry/Jekyll-Jekyll-%EB%B0%8F-Github-%EA%B8%B0%EB%B0%98%EC%9D%98-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EA%B4%80%EB%A6%AC-1)
