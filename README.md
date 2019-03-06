@@ -15,11 +15,11 @@
   - Splay Trees
   - B-Tree
 
-- 힙(Heaps)
-- 해쉬테이블(HashTables)
-- 최저사용빈도(LRU)
-- 트라이(Tries)
-- Ternary Tree
+- [힙(Heaps)](https://github.com/walbatrossw/java-data-structures/blob/master/ch10-binary-heaps/ch10-binary-heaps.md)
+- [해쉬테이블(HashTables)](https://github.com/walbatrossw/java-data-structures/blob/master/ch11-hashtables/ch11-hashtables.md)
+- [최저사용빈도(LRU)](https://github.com/walbatrossw/java-data-structures/blob/master/ch12-least-recently-used-cache/ch12-least-recently-used-chache.md)
+- [트라이(Tries)](https://github.com/walbatrossw/java-data-structures/blob/master/ch13-tries/ch13-tries.md)
+- [Ternary Search Tree](https://github.com/walbatrossw/java-data-structures/blob/master/ch14-ternary-search-tree/ch14-ternary-search-tree.md)
 - Substring Search
 - String
 - Sorting
