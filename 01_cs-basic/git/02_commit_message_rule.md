@@ -76,7 +76,7 @@ See also: #456, #789
 
 ## 7. My Thought / Conclusion / Summery
 
-![before-commit-message]()
+![before-commit-message](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/git/img/before-commit-message.png?raw=true)
 
 위와 같이 그동안 커밋을 하면서 메시지에는 몇번째 커밋인지 그리고 뭘 했는지에 대해서만 간략하게 작성했다.
 나 나름의 규칙이라고 생각해서 그렇게 작성했던 것 같다. 하지만 커밋 메시지에도 나름의 규칙과 일관성을 가져야
