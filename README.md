@@ -2,7 +2,7 @@
 
 ## 1. 컴퓨터 공학 기초(cs-basic)
 
-### 자료구조, 알고리즘
+### 1.1 자료구조, 알고리즘
 
 - [x] [배열(Arrays)](https://github.com/walbatrossw/java-data-structures/blob/master/ch01-arrays/arrays.md)
 - [x] [연결리스트(LinkedList)](https://github.com/walbatrossw/java-data-structures/blob/master/ch02-linked-list/linked-list.md)
@@ -25,19 +25,19 @@
 - [ ] Sorting
 - [ ] Data Comprssion
 
-### 데이터베이스
+### 1.2 데이터베이스
 
 - [ ] Mysql
 - [ ] Oracle
 
 
-### 네트워크
+### 1.3 네트워크
 
 - [ ] Http
 - [ ] 인증
 - [ ] 보안
 
-### 리눅스
+### 1.4 리눅스
 
 - [리눅스 설치(윈도우 듀얼부팅) 및 개발 환경 설정](https://github.com/walbatrossw/TIL/tree/master/01_cs-basic/linux/ubuntu-install-setting)
 - [기본 명령어](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/02_basic_command.md)
@@ -57,6 +57,10 @@
 - [RAID에 우분투 설치하기](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/17_RAID_Ubuntu_Setup.md)
 - [사용자별 공간 할당 - 쿼터(Quota)](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/linux/this-is-ubuntu-linux/18_Quota.md)
 
+### 1.5 git
+
+- [커밋 메시지 규칙](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/git/02_commit_message_rule.md)
+- [이전 상태 되돌리기 / 브랜치 생성, 병합, 충돌 해결](https://github.com/walbatrossw/TIL/blob/master/01_cs-basic/git/01_git.md)
 
 ---
 
