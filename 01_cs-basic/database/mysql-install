@@ -16,3 +16,20 @@ sudo ./mysql -p
 SET PASSWORD = PASSWORD('root');
 flush privileges;
 ```
+
+## 4. UTF-8 설정
+
+```bash
+vi /etc/mysql/my.cnf
+```
+
+```
+[client]
+default-character-set=utf8  
+[mysql]
+default-character-set=utf8  
+[mysqld]
+collation-server = utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+```
