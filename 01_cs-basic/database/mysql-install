@@ -1,0 +1,18 @@
+# MySQL 설치 및 설정
+
+## 1. Mac OS에서 설치
+
+Mac OS에서 설치할 경우 설치화면에서 나타나는 임시 비밀번호 기억해둘것
+
+## 2. Mac OS에서 구동
+
+시스템 환경설정 > MySQL > Start MySQL Server 클릭
+
+## 3. 비밀번호 재설정
+
+```bash
+cd /usr/local/mysql/bin
+sudo ./mysql -p
+SET PASSWORD = PASSWORD('root');
+flush privileges;
+```
