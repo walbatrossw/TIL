@@ -167,7 +167,7 @@
 
 ### JPA
 
-- [자바 ORM 표준 JPA 프로그래밍 정리](https://github.com/walbatrossw/TIL/tree/master/04_spring-framework_orm/jpa/java-orm-standard-jpa-programming)
+- [자바 ORM 표준 JPA 프로그래밍 정리](https://github.com/walbatrossw/jpa-study/tree/master/docs)
 
 ---
 
