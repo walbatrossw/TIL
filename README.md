@@ -4,6 +4,8 @@
 
 ### 1.1 자료구조, 알고리즘
 
+#### 1.1.1 자료구조
+
 - [x] [배열(Arrays)](https://github.com/walbatrossw/java-data-structures/blob/master/ch01-arrays/arrays.md)
 - [x] [연결리스트(LinkedList)](https://github.com/walbatrossw/java-data-structures/blob/master/ch02-linked-list/linked-list.md)
 - [x] [스택(Stack)](https://github.com/walbatrossw/java-data-structures/blob/master/ch03-stacks/stack.md)
@@ -24,6 +26,10 @@
 - [ ] String
 - [ ] Sorting
 - [ ] Data Comprssion
+
+#### 1.1.2 알고리즘
+
+- [알고리즘 저장소](https://github.com/walbatrossw/problem-solving)
 
 ### 1.2 데이터베이스
 
