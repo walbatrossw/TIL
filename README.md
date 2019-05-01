@@ -29,7 +29,7 @@
 
 #### 1.1.2 알고리즘
 
-- [알고리즘 저장소](https://github.com/walbatrossw/problem-solving)
+- [알고리즘 코드 저장소](https://github.com/walbatrossw/problem-solving)
 
 ### 1.2 데이터베이스
 
@@ -39,9 +39,9 @@
 
 ### 1.3 네트워크
 
-- [ ] Http
-- [ ] 인증
-- [ ] 보안
+- [ ] [Http]()
+- [ ] [인증]()
+- [ ] [보안]()
 
 ### 1.4 리눅스
 
