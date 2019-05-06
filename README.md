@@ -6,26 +6,26 @@
 
 #### 1.1.1 자료구조
 
-- [x] [배열(Arrays)](https://github.com/walbatrossw/java-data-structures/blob/master/ch01-arrays/arrays.md)
-- [x] [연결리스트(LinkedList)](https://github.com/walbatrossw/java-data-structures/blob/master/ch02-linked-list/linked-list.md)
-- [x] [스택(Stack)](https://github.com/walbatrossw/java-data-structures/blob/master/ch03-stacks/stack.md)
-- [x] [큐(Queue)](https://github.com/walbatrossw/java-data-structures/blob/master/ch04-queues/queue.md)
+- [배열(Arrays)](https://github.com/walbatrossw/java-data-structures/blob/master/ch01-arrays/arrays.md)
+- [연결리스트(LinkedList)](https://github.com/walbatrossw/java-data-structures/blob/master/ch02-linked-list/linked-list.md)
+- [스택(Stack)](https://github.com/walbatrossw/java-data-structures/blob/master/ch03-stacks/stack.md)
+- [큐(Queue)](https://github.com/walbatrossw/java-data-structures/blob/master/ch04-queues/queue.md)
 - 트리(Tree)
-  - [x] [Binary Search Trees](https://github.com/walbatrossw/java-data-structures/blob/master/ch05-binary-search-trees/binary-search-tree.md)
-  - [x] [Balanced Trees : AVL Trees](https://github.com/walbatrossw/java-data-structures/blob/master/ch06-avl-trees/avl-tree.md)
-  - [ ] Balanced Trees : Red-Black Trees
-  - [ ] Splay Trees
-  - [ ] B-Tree
+  - [Binary Search Trees](https://github.com/walbatrossw/java-data-structures/blob/master/ch05-binary-search-trees/binary-search-tree.md)
+  - [Balanced Trees : AVL Trees](https://github.com/walbatrossw/java-data-structures/blob/master/ch06-avl-trees/avl-tree.md)
+  - Balanced Trees : Red-Black Trees
+  - Splay Trees
+  - B-Tree
 
-- [x] [힙(Heaps)](https://github.com/walbatrossw/java-data-structures/blob/master/ch10-binary-heaps/ch10-binary-heaps.md)
-- [x] [해쉬테이블(HashTables)](https://github.com/walbatrossw/java-data-structures/blob/master/ch11-hashtables/ch11-hashtables.md)
-- [x] [최저사용빈도(LRU)](https://github.com/walbatrossw/java-data-structures/blob/master/ch12-least-recently-used-cache/ch12-least-recently-used-chache.md)
-- [x] [트라이(Tries)](https://github.com/walbatrossw/java-data-structures/blob/master/ch13-tries/ch13-tries.md)
-- [x] [Ternary Search Tree](https://github.com/walbatrossw/java-data-structures/blob/master/ch14-ternary-search-tree/ch14-ternary-search-tree.md)
-- [ ] Substring Search
-- [ ] String
-- [ ] Sorting
-- [ ] Data Comprssion
+- [힙(Heaps)](https://github.com/walbatrossw/java-data-structures/blob/master/ch10-binary-heaps/ch10-binary-heaps.md)
+- [해쉬테이블(HashTables)](https://github.com/walbatrossw/java-data-structures/blob/master/ch11-hashtables/ch11-hashtables.md)
+- [최저사용빈도(LRU)](https://github.com/walbatrossw/java-data-structures/blob/master/ch12-least-recently-used-cache/ch12-least-recently-used-chache.md)
+- [트라이(Tries)](https://github.com/walbatrossw/java-data-structures/blob/master/ch13-tries/ch13-tries.md)
+- [Ternary Search Tree](https://github.com/walbatrossw/java-data-structures/blob/master/ch14-ternary-search-tree/ch14-ternary-search-tree.md)
+- Substring Search
+- String
+- Sorting
+- Data Comprssion
 
 #### 1.1.2 알고리즘
 
@@ -33,15 +33,15 @@
 
 ### 1.2 데이터베이스
 
-- [ ] Mysql
-- [ ] Oracle
+- Mysql
+- Oracle
 
 
 ### 1.3 네트워크
 
-- [ ] [Http]()
-- [ ] [인증]()
-- [ ] [보안]()
+- [Http]()
+- [인증]()
+- [보안]()
 
 ### 1.4 리눅스
 
