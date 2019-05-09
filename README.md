@@ -205,9 +205,7 @@
 
 - [DDD Start 요약 정리](https://github.com/walbatrossw/TIL/tree/master/07_domain-driven-design)
 
-## 8. 구글링 기록
-
-## 9. 개발도구 사용 or 정리
+## 8. 개발도구 사용 or 정리
 
 - [IntelliJ](https://github.com/walbatrossw/TIL/blob/master/09_tools/intellij.md)
 
@@ -217,6 +215,4 @@
 
 - [Mac OS](https://github.com/walbatrossw/TIL/blob/master/09_tools/mac-os.md)
 
-## 10. 강연, 세미나
-
-- [deview 2018 후기]()
+## 9. 강연, 세미나
